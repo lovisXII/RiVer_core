@@ -23,7 +23,9 @@ module x0_multiplier (
     logic [321:0] x0x1_din, x0x1_dout;
     logic x0x1_push, x0x1_full;
 
-    fifo #(322) x0x1 (
+    fifo #(
+        .N(322)
+        ) x0x1 (
         .clk(clk),
         .reset_n(reset_n),
         .DIN(x0x1_din),
@@ -34,10 +36,6 @@ module x0_multiplier (
         .DOUT(x0x1_dout)
     );
 
-    component csa;
-        input logic [63:0] A, B, C;
-        output logic [63:0] S0, S1;
-    endcomponent
 
     function unsigned one_ext_32;
         input logic [31:0] in_val;
@@ -45,41 +43,22 @@ module x0_multiplier (
             one_ext_32 = {in_val[31], {28{in_val[31]}}, in_val};
         end
     endfunction
+// need clarification
+assign signed_type = (MULT_CMD_RD == 2'b10 || MULT_CMD_RD == 2'b01) && (OP1_SE[31] && OP2_SE[31]) ? 1'b0 :
+(MULT_CMD_RD != 2'b11) ? 1'b1 : 1'b0;
 
-    initial prod = 64'b0;
+assign signed_res_sx0 = (OP1_SE[31] && OP2_SE[31]) ? 1'b0 : 1'b1; // else ??
+assign select_msb_sx0 = (MULT_CMD_RD != 2'b01) ? 1'b1 : 1'b0;
 
-    // need clarification
-    always_comb begin
-        if ((MULT_CMD_RD == 2'b10 || MULT_CMD_RD == 2'b01) && OP1_SE[31] && OP2_SE[31])
-            signed_type = 1'b0;
-        else if (MULT_CMD_RD != 2'b11)
-            signed_type = 1'b1;
-        else
-            signed_type = 1'b0;
-    end
-
-    always_comb begin
-        if (OP1_SE[31] && OP2_SE[31])
-            signed_res_sx0 = 1'b0;
-        else
-            signed_res_sx0 = 1'b1;
-    end
-
-    always_comb begin
-        if (MULT_CMD_RD != 2'b01)
-            select_msb_sx0 = 1'b1;
-        else
-            select_msb_sx0 = 1'b0;
-    end
-
-op1 = (OP1_SE[31] && OP2_SE[31] && (MULT_CMD_RD == "10" || MULT_CMD_RD == 2'b01)) ? 
-       (not(OP1_SE) + 1'b1) : 
-       ((OP1_SE[31] == 1'b0 && OP2_SE[31] == 1'b1) && (MULT_CMD_RD == "10" || MULT_CMD_RD == 2'b01)) ? 
+assign op1 = (OP1_SE[31] && OP2_SE[31] && (MULT_CMD_RD == 2'b10 || MULT_CMD_RD == 2'b01)) ? 
+       (~OP1_SE + 1'b1) : 
+       ((OP1_SE[31] == 1'b0 && OP2_SE[31] == 1'b1) && (MULT_CMD_RD == 2'b10 || MULT_CMD_RD == 2'b01)) ? 
        OP1_SE : 
        OP2_SE;
-op2 = (OP1_SE[31] && OP2_SE[31] && (MULT_CMD_RD == "10" || MULT_CMD_RD == 2'b01)) ? 
-       (not(OP2_SE) + 1'b1) : 
-       ((OP1_SE[31] == 1'b0 && OP2_SE[31] == 1'b1) && (MULT_CMD_RD == "10" || MULT_CMD_RD == 2'b01)) ? 
+
+assign op2 = (OP1_SE[31] && OP2_SE[31] && (MULT_CMD_RD == 2'b10 || MULT_CMD_RD == 2'b01)) ? 
+       (~OP2_SE + 1'b1) : 
+       ((OP1_SE[31] == 1'b0 && OP2_SE[31] == 1'b1) && (MULT_CMD_RD == 2'b10 || MULT_CMD_RD == 2'b01)) ? 
        OP2_SE : 
        OP1_SE;
 
@@ -100,7 +79,11 @@ always_ff @(posedge clk) begin
     end
 end
 
-for (int i = 0; i <= 9; i++) begin
+//---------------------------
+//-- CSA instanciation 
+//---------------------------
+generate
+for (genvar i = 0; i <= 9; i++) begin
     csa csa1 (
         .A(product[0 + 3*i]),
         .B(product[1 + 3*i]),
@@ -109,8 +92,10 @@ for (int i = 0; i <= 9; i++) begin
         .S1(product_s1[1 + 2*i])
     );
 end
+endgenerate
 
-for (int i = 0; i <= 5; i++) begin
+generate
+for (genvar i = 0; i <= 5; i++) begin
     csa csa2 (
         .A(product_s1[0 + 3*i]),
         .B(product_s1[1 + 3*i]),
@@ -119,6 +104,7 @@ for (int i = 0; i <= 5; i++) begin
         .S1(product_s2[1 + 2*i])
     );
 end
+endgenerate
 
 csa csa2_6 (
     .A(product_s1[18]),
@@ -128,7 +114,8 @@ csa csa2_6 (
     .S1(product_s2[13])
 );
 
-for (int i = 0; i <= 3; i++) begin
+generate
+  for (genvar i = 0; i <= 3; i++) begin : csa_instance
     csa csa3 (
         .A(product_s2[0 + 3*i]),
         .B(product_s2[1 + 3*i]),
@@ -136,7 +123,9 @@ for (int i = 0; i <= 3; i++) begin
         .S0(product_s3[0 + 2*i]),
         .S1(product_s3[1 + 2*i])
     );
-end
+  end
+endgenerate
+
 
 csa csa3_4 (
   .A(product_s2[12]),
@@ -146,9 +135,8 @@ csa csa3_4 (
   .S1(product_s3[9])
 );
 
-genvar i;
 generate
-  for (i = 0; i < 3; i++) begin : stage4
+  for (genvar i = 0; i < 3; i++) begin : stage4
     csa csa4 (
       .A(product_s3[0 + 3*i]),
       .B(product_s3[1 + 3*i]),
@@ -160,7 +148,7 @@ generate
 endgenerate
 
 generate
-  for (i = 0; i < 2; i++) begin : stage5
+  for (genvar i = 0; i < 2; i++) begin : stage5
     csa csa5 (
       .A(product_s4[0 + 3*i]),
       .B(product_s4[1 + 3*i]),
@@ -174,6 +162,7 @@ endgenerate
 assign stall_sx0 = x0x1_full || DEC2X0_EMPTY_SD;
 assign x0x1_push = !stall_sx0;
 
+//-- fifo x0x1 input 
 assign x0x1_din[321] = select_msb_sx0;
 assign x0x1_din[320] = signed_res_sx0;
 assign x0x1_din[319:256] = product_s3[9];
@@ -182,6 +171,7 @@ assign x0x1_din[191:128] = product_s5[2];
 assign x0x1_din[127:64] = product_s5[1];
 assign x0x1_din[63:0] = product_s5[0];
 
+//-- fifo x0x1 ouput 
 assign SELECT_MSB_RX0 = x0x1_dout[321];
 assign SIGNED_RES_RX0 = x0x1_dout[320];
 assign RES_RX0 = x0x1_dout[319:0];

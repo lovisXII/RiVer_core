@@ -53,6 +53,13 @@ module mem (
     output logic [31:0] MCAUSE_WDATA_SM,
     output logic [31:0] MTVAL_WDATA_SM,
 
+    input logic MEPC_SC[31:0],
+    input logic MSTATUS_RC[31:0],
+    input logic MTVEC_VALUE_RC[31:0],
+    input logic MIP_VALUE_RC[31:0],
+    input logic MIE_VALUE_RC[31:0],
+
+
     // Exception
     input  logic EXCEPTION_RE,
     input  logic LOAD_ADRESS_MISALIGNED_RE,

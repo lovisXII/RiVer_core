@@ -1,4 +1,4 @@
-module reg(
+module register_file(
     input logic clk,
     input logic reset_n,
     input logic [31:0] PC_INIT,
@@ -22,9 +22,6 @@ module reg(
 );
 
     logic [31:0] registers [0:32];
-
-    // debug 
-    logic [31:0] logic [0:31];
 
     always_ff @(posedge clk, negedge reset_n) begin        
         if (~reset_n) begin

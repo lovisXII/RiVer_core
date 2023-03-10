@@ -409,15 +409,15 @@ assign neg_op2_sd = sub_i_sd || slt_i_sd || slti_i_sd || sltu_i_sd || sltiu_i_sd
 
 // exe command 
 assign alu_cmd =  (and_i_sd || andi_i_sd || srl_i_sd || srli_i_sd || csrrc_i_sd || csrrci_i_sd) ? 2'b01 :
-                  (or_i_sd || ori_i_sd || sra_i_sd || srai_i_sd || csrrs_i_sd || csrrsi_i_sd) ? "10" :
+                  (or_i_sd || ori_i_sd || sra_i_sd || srai_i_sd || csrrs_i_sd || csrrsi_i_sd) ? 2'b10 :
                   (xor_i_sd || xori_i_sd) ? "11" : 2'b00;
 
 assign mult_cmd = (mul_i_sd) ? 2'b01 :
-                  (mulh_i_sd) ? "10" :
+                  (mulh_i_sd) ? 2'b10 :
                   (mulhu_i_sd) ? "11" : 2'b00;
 
 assign div_cmd =  (div_i_sd) ? 2'b01 :
-                  (divu_i_sd) ? "10" :
+                  (divu_i_sd) ? 2'b10 :
                   (rem_i_sd) ? "11" : 2'b00;  
 
 assign exe_cmd_sd = (select_operation_sd == "1000") ? div_cmd :
@@ -439,7 +439,7 @@ assign mem_store_sd = sw_i_sd || sh_i_sd || sb_i_sd;
 
 assign mem_size_sd =  (lw_i_sd || sw_i_sd) ? 2'b00 :  // word size 
                       (lh_i_sd || lhu_i_sd || sh_i_sd) ? 2'b01 : // halfword size
-                      (lb_i_sd || lbu_i_sd || sb_i_sd) ? "10" : // byte size
+                      (lb_i_sd || lbu_i_sd || sb_i_sd) ? 2'b10 : // byte size
                       "11"; // not a mem access
 
 assign mem_sign_extend_sd = lh_i_sd || lb_i_sd; 
