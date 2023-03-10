@@ -27,22 +27,22 @@ begin
 process(clk)
 begin
     if rising_edge(clk) then 
-        if reset_n = '0' then 
+        if reset_n = 1'b0 then 
             for i in 0 to SIZE-1 loop 
-                ram0(i) <= x"00";
-                ram1(i) <= x"00";
-                ram2(i) <= x"00";
-                ram3(i) <= x"00";
+                ram0(i) <= x2'b00;
+                ram1(i) <= x2'b00;
+                ram2(i) <= x2'b00;
+                ram3(i) <= x2'b00;
             end loop; 
         else 
-            if wen = '1' then 
-                if byt_sel(0) = '1' then 
+            if wen = 1'b1 then 
+                if byt_sel(0) = 1'b1 then 
                         ram0(to_integer(unsigned(adr)))     <= data_w(7 downto 0); end if; 
-                    if byt_sel(1) = '1' then 
+                    if byt_sel(1) = 1'b1 then 
                         ram1(to_integer(unsigned(adr)+1))   <= data_w(15 downto 8); end if; 
-                    if byt_sel(2) = '1' then  
+                    if byt_sel(2) = 1'b1 then  
                         ram2(to_integer(unsigned(adr)+2))   <= data_w(23 downto 16); end if; 
-                    if byt_sel(3) = '1' then 
+                    if byt_sel(3) = 1'b1 then 
                         ram3(to_integer(unsigned(adr)+3))   <= data_w(31 downto 24); end if; 
                 end if;
         end if; 

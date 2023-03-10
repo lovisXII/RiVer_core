@@ -9,8 +9,8 @@ end tb_core;
 architecture simu of tb_core is 
 
 -- global interface
-signal clk : std_logic := '1';
-signal reset_n : std_logic := '0';
+signal clk : std_logic := 1'b1;
+signal reset_n : std_logic := 1'b0;
 
 -- Mcache interface
 signal MCACHE_RESULT_SM : std_logic_vector(31 downto 0);
@@ -61,7 +61,7 @@ end component;
 begin 
 
 clk <= not clk after 5 ns; 
-reset_n <= '0', '1' after 6 ns; 
+reset_n <= 1'b0, 1'b1 after 6 ns; 
 
 core0 : core
     port map(
@@ -89,7 +89,7 @@ core0 : core
     );
 
 MCACHE_RESULT_SM <= x"00000000"; 
-MCACHE_STALL_SM  <= '0'; 
+MCACHE_STALL_SM  <= 1'b0; 
 
 
 IC_INST_SI  <= x"0180006f";

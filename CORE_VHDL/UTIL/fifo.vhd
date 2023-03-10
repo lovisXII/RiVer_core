@@ -15,46 +15,46 @@ end fifo;
 
 architecture archi of fifo is 
 signal data : std_logic_vector(N-1 downto 0);
-signal data_v : std_logic := '0';
+signal data_v : std_logic := 1'b0;
 
 begin 
 
 process(clk)
 begin 
     if(rising_edge(clk)) then 
-        if reset_n = '0' then
-            data_v <= '0';
+        if reset_n = 1'b0 then
+            data_v <= 1'b0;
         else 
-            if data_v <= '0' then 
-                if PUSH = '1' then 
-                    data_v <= '1'; 
+            if data_v <= 1'b0 then 
+                if PUSH = 1'b1 then 
+                    data_v <= 1'b1; 
                 else 
-                    data_v <= '0';
+                    data_v <= 1'b0;
                 end if;
             else 
-                if POP = '1' then 
-                    if PUSH = '1' then 
-                        data_v <= '1';
+                if POP = 1'b1 then 
+                    if PUSH = 1'b1 then 
+                        data_v <= 1'b1;
                     else 
-                        data_v <= '0';
+                        data_v <= 1'b0;
                     end if;
                 else 
-                    data_v <= '1'; 
+                    data_v <= 1'b1; 
                 end if;
             end if;
         end if;
 
-        if data_v <= '0' then 
-            if PUSH = '1' then 
+        if data_v <= 1'b0 then 
+            if PUSH = 1'b1 then 
                 data <= DIN;
             end if;
-        elsif PUSH = '1' and POP = '1' then 
+        elsif PUSH = 1'b1 and POP = 1'b1 then 
             data <= DIN;
         end if;
     end if;    
 end process;
 
-FULL <= '1' when data_v = '1' and POP = '0' else '0';
+FULL <= 1'b1 when data_v = 1'b1 and POP = 1'b0 else 1'b0;
 EMPTY <= not data_v;
 DOUT <= data;
 

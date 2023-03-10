@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity reg is 
+entity logic is 
     port(
         -- global interface
         clk, reset_n : in std_logic;
@@ -23,9 +23,9 @@ entity reg is
         -- PC
         READ_PC_SR : out std_logic_vector(31 downto 0)
     );
-end reg;
+end logic;
 
-architecture archi of reg is 
+architecture archi of logic is 
 
 type reg_t is array(0 to 32) of std_logic_vector(31 downto 0);
 signal registers : reg_t;
@@ -38,7 +38,7 @@ begin
 
 process(clk)
 begin        
-    if reset_n = '0' then
+    if reset_n = 1'b0 then
         -- init all registers except PC to 0
         for i in 0 to 31 loop 
             registers(i) <= x"00000000";
@@ -47,12 +47,12 @@ begin
 
     elsif(rising_edge(clk)) then
 
-            if WRITE_PC_ENABLE_SD = '1' then 
+            if WRITE_PC_ENABLE_SD = 1'b1 then 
                 registers(32) <= WRITE_PC_SD; 
             end if;
-            if(WADR_SW /= "111111") or WRITE_PC_ENABLE_SD = '0' then 
-                if WADR_SW /= "000000" then 
-                    if WENABLE_SW = '1' then 
+            if(WADR_SW /= "111111") or WRITE_PC_ENABLE_SD = 1'b0 then 
+                if WADR_SW /= 6'b0 then 
+                    if WENABLE_SW = 1'b1 then 
                         registers(to_integer(unsigned(WADR_SW))) <= WDATA_SW; 
                     end if;
                 end if;

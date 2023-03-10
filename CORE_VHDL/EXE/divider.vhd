@@ -22,15 +22,15 @@ end divider;
 
 architecture archi of divider is 
 
-constant one_ext_6 : std_logic_vector(5 downto 0) := "000001";
+constant one_ext_6 : std_logic_vector(5 downto 0) := 1'b1;
     
 type state is (idle, setup, zero, same_ops, run, done);
 signal EP, EF : state; 
 
-signal cmd_reg : std_logic_vector(1 downto 0) := "00";
+signal cmd_reg : std_logic_vector(1 downto 0) := 2'b00;
 
 signal op1, op2 : std_logic_vector(31 downto 0);
-signal shift_cpt_se, shift_cpt_reg : std_logic_vector(5 downto 0) := "000000";
+signal shift_cpt_se, shift_cpt_reg : std_logic_vector(5 downto 0) := 6'b0;
 
 signal divisor_se, reminder_se : std_logic_vector(63 downto 0) := x"0000000000000000";
 signal divisor_reg, reminder_reg : std_logic_vector(63 downto 0) := x"0000000000000000";
@@ -55,17 +55,17 @@ begin
 -- state transition
 fsm_state : process(clk, reset_n)
 begin 
-    if reset_n = '0' then 
+    if reset_n = 1'b0 then 
         EP  <=  idle; 
         --divisor_reg     <=  x"0000000000000000";
         --quotient_reg    <=  x"00000000";
         --reminder_reg    <=  x"0000000000000000";
-        --shift_cpt_reg   <=  "000000";
+        --shift_cpt_reg   <=  6'b0;
         
     elsif rising_edge(clk) then 
         EP  <=  EF;
 
-        if START_DIV = '1' then 
+        if START_DIV = 1'b1 then 
             cmd_reg <= CMD_RD; 
             op1     <=  OP1_SE; 
             op2     <=  OP2_SE;   
@@ -74,11 +74,11 @@ begin
 
     case EP is 
         when idle   =>  EF  <=  idle;
-            if  START_DIV = '1' and OP2_SE /= x"00000000" and OP1_SE = OP2_SE then 
+            if  START_DIV = 1'b1 and OP2_SE /= x"00000000" and OP1_SE = OP2_SE then 
                 EF  <=  same_ops;    
-            elsif START_DIV = '1' and OP2_SE /= x"00000000" then 
+            elsif START_DIV = 1'b1 and OP2_SE /= x"00000000" then 
                 EF  <=  setup;  
-            elsif START_DIV = '1' and OP2_SE = x"00000000" then 
+            elsif START_DIV = 1'b1 and OP2_SE = x"00000000" then 
                 EF  <=  zero;   
             end if; 
         when setup      =>  EF  <=  run;
@@ -98,62 +98,62 @@ begin
     case EP is 
         when idle => 
             
-            setup_regs      <=  '0';
-            same            <=  '0';
-            zero_div        <=  '0';
-            running         <=  '0';
-            DONE_DIV        <=  '0';
-            BUSY_DIV        <=  '0';   
+            setup_regs      <=  1'b0;
+            same            <=  1'b0;
+            zero_div        <=  1'b0;
+            running         <=  1'b0;
+            DONE_DIV        <=  1'b0;
+            BUSY_DIV        <=  1'b0;   
 
         when setup => 
 
-            setup_regs      <=  '1'; 
-            same            <=  '0';
-            zero_div        <=  '0';
-            running         <=  '0';
-            DONE_DIV        <=  '0';
-            BUSY_DIV        <=  '1'; 
+            setup_regs      <=  1'b1; 
+            same            <=  1'b0;
+            zero_div        <=  1'b0;
+            running         <=  1'b0;
+            DONE_DIV        <=  1'b0;
+            BUSY_DIV        <=  1'b1; 
 
         when same_ops => 
-            setup_regs      <=  '0'; 
-            same            <=  '1';
-            zero_div        <=  '0';
-            running         <=  '0';
-            DONE_DIV        <=  '0';
-            BUSY_DIV        <=  '1'; 
+            setup_regs      <=  1'b0; 
+            same            <=  1'b1;
+            zero_div        <=  1'b0;
+            running         <=  1'b0;
+            DONE_DIV        <=  1'b0;
+            BUSY_DIV        <=  1'b1; 
 
             
         when zero => 
-            setup_regs      <=  '0'; 
-            same            <=  '0';
-            zero_div        <=  '1';
-            running         <=  '0';
-            DONE_DIV        <=  '0';
-            BUSY_DIV        <=  '1'; 
+            setup_regs      <=  1'b0; 
+            same            <=  1'b0;
+            zero_div        <=  1'b1;
+            running         <=  1'b0;
+            DONE_DIV        <=  1'b0;
+            BUSY_DIV        <=  1'b1; 
 
         when run =>       
-            setup_regs      <=  '0'; 
-            same            <=  '0';
-            zero_div        <=  '0';
-            running         <=  '1';
-            DONE_DIV        <=  '0';
-            BUSY_DIV        <=  '1'; 
+            setup_regs      <=  1'b0; 
+            same            <=  1'b0;
+            zero_div        <=  1'b0;
+            running         <=  1'b1;
+            DONE_DIV        <=  1'b0;
+            BUSY_DIV        <=  1'b1; 
 
         when done => 
-            setup_regs      <=  '0'; 
-            same            <=  '0';
-            zero_div        <=  '0';
-            running         <=  '0';  
-            DONE_DIV        <=  '1';
-            BUSY_DIV        <=  '1'; 
+            setup_regs      <=  1'b0; 
+            same            <=  1'b0;
+            zero_div        <=  1'b0;
+            running         <=  1'b0;  
+            DONE_DIV        <=  1'b1;
+            BUSY_DIV        <=  1'b1; 
 
         when others => 
-            setup_regs      <=  '0'; 
-            same            <=  '0';
-            zero_div        <=  '0';
-            running         <=  '0';  
-            DONE_DIV        <=  '0';
-            BUSY_DIV        <=  '0'; 
+            setup_regs      <=  1'b0; 
+            same            <=  1'b0;
+            zero_div        <=  1'b0;
+            running         <=  1'b0;  
+            DONE_DIV        <=  1'b0;
+            BUSY_DIV        <=  1'b0; 
     end case; 
 
 end process; 
@@ -165,64 +165,64 @@ begin
         quotient_reg    <= quotient_se; 
         shift_cpt_reg   <= shift_cpt_se; 
         
-        if setup_regs = '1' or same = '1' or zero_div = '1' then 
+        if setup_regs = 1'b1 or same = 1'b1 or zero_div = 1'b1 then 
             reminder_sign_reg   <=  reminder_sign_se;
             quotient_sign_reg   <=  quotient_sign_se; 
         end if; 
 
-        if setup_regs = '1' or zero_div = '1' or same = '1' or (running = '1' and division = '1') then 
+        if setup_regs = 1'b1 or zero_div = 1'b1 or same = 1'b1 or (running = 1'b1 and division = 1'b1) then 
             reminder_reg    <= reminder_se;
         end if; 
     end if;
         
 end process;
 
-division    <=  '0' when    divisor_reg > reminder_reg  else '1';
+division    <=  1'b0 when    divisor_reg > reminder_reg  else 1'b1;
 
 divisor_setup(62 downto 31)    <= op2_div; 
-divisor_setup(63)              <= '0'; 
-divisor_setup(30 downto 0)     <= (others => '0');
+divisor_setup(63)              <= 1'b0; 
+divisor_setup(30 downto 0)     <= (others => 1'b0);
         
-divisor_se      <=  divisor_setup                           when setup_regs = '1' else 
-                    '0' & divisor_reg(63 downto 1)          when running    = '1' else 
+divisor_se      <=  divisor_setup                           when setup_regs = 1'b1 else 
+                    1'b0 & divisor_reg(63 downto 1)          when running    = 1'b1 else 
                     x"0000000000000000";
 
-quotient_se     <=  x"00000000"                             when setup_regs = '1' else 
-                    x"00000001"                             when same       = '1' else 
-                    x"FFFFFFFF"                             when zero_div   = '1' else 
-                    quotient_reg(30 downto 0) & division    when running    = '1' else 
+quotient_se     <=  x"00000000"                             when setup_regs = 1'b1 else 
+                    x"00000001"                             when same       = 1'b1 else 
+                    x"FFFFFFFF"                             when zero_div   = 1'b1 else 
+                    quotient_reg(30 downto 0) & division    when running    = 1'b1 else 
                     x"00000000"; 
 
-reminder_se     <=  x"00000000" & op1_div                                           when setup_regs = '1' or   zero_div = '1'   else
-                    std_logic_vector(signed(reminder_reg) - signed(divisor_reg))    when running    = '1' and  division = '1'   else
+reminder_se     <=  x"00000000" & op1_div                                           when setup_regs = 1'b1 or   zero_div = 1'b1   else
+                    std_logic_vector(signed(reminder_reg) - signed(divisor_reg))    when running    = 1'b1 and  division = 1'b1   else
                     x"0000000000000000"; 
 
-shift_cpt_se    <=  std_logic_vector(signed(shift_cpt_reg) + signed(one_ext_6)) when    running     = '1' else
-                    "000000";
+shift_cpt_se    <=  std_logic_vector(signed(shift_cpt_reg) + signed(one_ext_6)) when    running     = 1'b1 else
+                    6'b0;
 
 
-op1_div     <=  std_logic_vector(signed(not(op1)) + signed(one_ext_32)) when setup_regs = '1' and signed_inst = '1' and op1(31) = '1' else op1;
+op1_div     <=  std_logic_vector(signed(not(op1)) + signed(one_ext_32)) when setup_regs = 1'b1 and signed_inst = 1'b1 and op1(31) = 1'b1 else op1;
 
-op2_div     <=  std_logic_vector(signed(not(op2)) + signed(one_ext_32)) when setup_regs = '1' and signed_inst = '1' and op2(31) = '1' else op2;   
+op2_div     <=  std_logic_vector(signed(not(op2)) + signed(one_ext_32)) when setup_regs = 1'b1 and signed_inst = 1'b1 and op2(31) = 1'b1 else op2;   
 
 
-signed_inst     <=  '1' when (CMD_RD = "11" or CMD_RD = "01") and setup_regs = '1'  else 
-                    '0'; 
+signed_inst     <=  1'b1 when (CMD_RD = "11" or CMD_RD = 2'b01) and setup_regs = 1'b1  else 
+                    1'b0; 
 
-quotient_sign_se <= (op1(31) xor op2(31)) and signed_inst   when setup_regs = '1'   else 
-                    '0';                     
+quotient_sign_se <= (op1(31) xor op2(31)) and signed_inst   when setup_regs = 1'b1   else 
+                    1'b0;                     
                     
-reminder_sign_se <= op1(31) and signed_inst                 when setup_regs = '1'   else 
-                    '0';  
+reminder_sign_se <= op1(31) and signed_inst                 when setup_regs = 1'b1   else 
+                    1'b0;  
 
 -- Ouput
-remind      <=  reminder_reg(31 downto 0)   when reminder_sign_reg = '0'                else 
+remind      <=  reminder_reg(31 downto 0)   when reminder_sign_reg = 1'b0                else 
                 std_logic_vector(unsigned(not(reminder_reg(31 downto 0))) + unsigned(one_ext_32));
 
-quotient    <=  quotient_reg                when    quotient_sign_reg = '0'             else 
+quotient    <=  quotient_reg                when    quotient_sign_reg = 1'b0             else 
                 std_logic_vector(unsigned(not(quotient_reg)) + unsigned(one_ext_32));    
 
-RES_DIV     <=  remind                      when    (cmd_reg = "11" or cmd_reg = "00")  else 
+RES_DIV     <=  remind                      when    (cmd_reg = "11" or cmd_reg = 2'b00)  else 
                 quotient; 
 
 end archi; 

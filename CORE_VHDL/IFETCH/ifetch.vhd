@@ -105,7 +105,7 @@ signal ret_stack_pointer_si : std_logic_vector(RET_STACK_SIZE-1 downto 0);
 
 signal pred_ret_next_adr : std_logic_vector(31 downto 0) := x"33333300"; 
 
-signal pred_branch_taken, pred_ret_taken : std_logic := '0'; 
+signal pred_branch_taken, pred_ret_taken : std_logic := 1'b0; 
 
 
 signal debug_in_loop : integer := 0;
@@ -128,11 +128,11 @@ if2dec : fifo
 
 stall_si <= IC_STALL_SI or if2dec_full_si or DEC2IF_EMPTY_SD;
 
-if2dec_push_si  <= not stall_si when IF2DEC_FLUSH_SD = '0' and EXCEPTION_SM = '0' else '0'; 
-DEC2IF_POP_SI   <= not stall_si when IF2DEC_FLUSH_SD = '0' and EXCEPTION_SM = '0' else '1';
-ADR_VALID_SI    <= not DEC2IF_EMPTY_SD when IF2DEC_FLUSH_SD = '0' and EXCEPTION_SM = '0' else '0';
+if2dec_push_si  <= not stall_si when IF2DEC_FLUSH_SD = 1'b0 and EXCEPTION_SM = 1'b0 else 1'b0; 
+DEC2IF_POP_SI   <= not stall_si when IF2DEC_FLUSH_SD = 1'b0 and EXCEPTION_SM = 1'b0 else 1'b1;
+ADR_VALID_SI    <= not DEC2IF_EMPTY_SD when IF2DEC_FLUSH_SD = 1'b0 and EXCEPTION_SM = 1'b0 else 1'b0;
 
-ADR_SI  <=  PRED_ADR_SD when    PRED_TAKEN_SD = '1' and PRED_FAILED_RD = '0'    else 
+ADR_SI  <=  PRED_ADR_SD when    PRED_TAKEN_SD = 1'b1 and PRED_FAILED_RD = 1'b0    else 
             PC_RD;
       
 
@@ -141,30 +141,30 @@ ADR_SI  <=  PRED_ADR_SD when    PRED_TAKEN_SD = '1' and PRED_FAILED_RD = '0'    
 ----------------------
 pred_state_updt : process(clk, reset_n)
 begin
-    if reset_n = '0' then 
+    if reset_n = 1'b0 then 
         next_pred_state <= weakly_taken; 
     elsif rising_edge(clk) then 
-        if PRED_FAILED_RD = '1' or PRED_SUCCESS_RD = '1' then 
+        if PRED_FAILED_RD = 1'b1 or PRED_SUCCESS_RD = 1'b1 then 
             l0 : for i in 0 to PRED_REG_SIZE-1 loop
                 if branch_adr_reg(i) /= x"00000000" and BRANCH_INST_ADR_RD /= x"00000000" then -- ????????? 
                     case pred_state_reg(i) is 
                         when strongly_taken     =>  next_pred_state <=  strongly_taken;
-                            if PRED_SUCCESS_RD  = '0' then 
+                            if PRED_SUCCESS_RD  = 1'b0 then 
                                 next_pred_state <=  weakly_taken;
                             end if; 
                         
                         when weakly_taken       =>  next_pred_state <=  strongly_taken;
-                            if PRED_SUCCESS_RD  = '0' then 
+                            if PRED_SUCCESS_RD  = 1'b0 then 
                                 next_pred_state <=  weakly_not_taken;
                             end if; 
 
                         when weakly_not_taken   =>  next_pred_state <=  weakly_taken; 
-                            if PRED_SUCCESS_RD  = '0' then 
+                            if PRED_SUCCESS_RD  = 1'b0 then 
                                 next_pred_state <=  strongly_not_taken; 
                             end if; 
 
                         when strongly_not_taken =>  next_pred_state <=  weakly_not_taken; 
-                            if PRED_SUCCESS_RD  = '0' then 
+                            if PRED_SUCCESS_RD  = 1'b0 then 
                                 next_pred_state <=  strongly_not_taken;
                             end if; 
                     end case; 
@@ -182,26 +182,26 @@ variable pred_write_pointer : std_logic_vector(PRED_POINTER_SIZE-1 downto 0);
 
 begin 
     index := 0;
-    if reset_n = '0' then 
-        pred_write_pointer  :=  (others => '0');
-        pred_valid_reg      <=  (others => '0'); 
+    if reset_n = 1'b0 then 
+        pred_write_pointer  :=  (others => 1'b0);
+        pred_valid_reg      <=  (others => 1'b0); 
     elsif falling_edge(clk) then 
-        if BRANCH_INST_RD = '1' and if2dec_empty = '0' then 
-            found := '0'; 
+        if BRANCH_INST_RD = 1'b1 and if2dec_empty = 1'b0 then 
+            found := 1'b0; 
             l0 : for i in 0 to PRED_REG_SIZE-1 loop 
                 if branch_adr_reg(i) = BRANCH_INST_ADR_RD then 
-                    if found = '0' then 
+                    if found = 1'b0 then 
                         index := i;
                     end if; 
-                    found := '1'; 
+                    found := 1'b1; 
                 end if; 
             end loop;   
 
-            if found = '0' then 
+            if found = 1'b0 then 
                 branch_adr_reg(to_integer(unsigned(pred_write_pointer)))      <=  BRANCH_INST_ADR_RD;
                 predicted_adr_reg(to_integer(unsigned(pred_write_pointer)))   <=  ADR_TO_BRANCH_RD;
                 pred_state_reg(to_integer(unsigned(pred_write_pointer)))      <=  weakly_taken;
-                pred_valid_reg(to_integer(unsigned(pred_write_pointer)))      <=  '1';
+                pred_valid_reg(to_integer(unsigned(pred_write_pointer)))      <=  1'b1;
                 pred_write_pointer                                          :=  std_logic_vector(unsigned(pred_write_pointer) + unsigned(one_ext_pred_size));
             else 
                 PRED_STATE_REG(index)                   <=  next_pred_state;
@@ -216,26 +216,26 @@ end process;
 read_pred_reg : process(PC_RD)
 variable found, pred_good : std_logic;
 begin 
-    found := '0';
-    pred_good := '0'; 
+    found := 1'b0;
+    pred_good := 1'b0; 
     search_branch : for i in 0 to PRED_REG_SIZE-1 loop 
-        if branch_adr_reg(i) = PC_RD and pred_valid_reg(i) = '1' then 
-            if found = '0' then 
-                found := '1';
+        if branch_adr_reg(i) = PC_RD and pred_valid_reg(i) = 1'b1 then 
+            if found = 1'b0 then 
+                found := 1'b1;
                 pred_branch_next_adr    <=  predicted_adr_reg(i);
                 if pred_state_reg(i) = strongly_taken or pred_state_reg(i) = weakly_taken then 
-                    pred_good := '1';
+                    pred_good := 1'b1;
                 else 
-                    pred_good := '0';
+                    pred_good := 1'b0;
                 end if; 
             end if; 
         end if; 
     end loop; 
     
-    if found = '1' and pred_good = '1' then 
-        pred_branch_taken <= '1';
+    if found = 1'b1 and pred_good = 1'b1 then 
+        pred_branch_taken <= 1'b1;
     else 
-        pred_branch_taken <= '0'; 
+        pred_branch_taken <= 1'b0; 
     end if;
 end process;
 
@@ -245,21 +245,21 @@ end process;
 write_pred_ret : process(clk, reset_n)
 variable found : std_logic; 
 begin 
-    if reset_n = '0' then 
+    if reset_n = 1'b0 then 
         ret_write_pointer_si    <=  one_ext_ret_size;
-        ret_valid_reg           <=  (others => '0');
+        ret_valid_reg           <=  (others => 1'b0);
     elsif falling_edge(clk) then 
-        found := '0';
-        if RET_INST_RD = '1' and if2dec_empty = '0' then 
+        found := 1'b0;
+        if RET_INST_RD = 1'b1 and if2dec_empty = 1'b0 then 
             l0 : for i in 0 to RET_PRED_REG_SIZE-1 loop
                 if ret_adr_reg(i) = BRANCH_INST_ADR_RD then 
-                    found := '1';
+                    found := 1'b1;
                 end if; 
             end loop;
-            if found = '0' then 
+            if found = 1'b0 then 
                 ret_adr_reg(to_integer(unsigned(ret_write_pointer_si)))     <=  BRANCH_INST_ADR_RD;
-                ret_valid_reg(to_integer(unsigned(ret_write_pointer_si)))   <=  '1'; 
-                ret_write_pointer_si                                        <=  ret_write_pointer_si(RET_PRED_POINTER_SIZE-2 downto 0) & '0'; 
+                ret_valid_reg(to_integer(unsigned(ret_write_pointer_si)))   <=  1'b1; 
+                ret_write_pointer_si                                        <=  ret_write_pointer_si(RET_PRED_POINTER_SIZE-2 downto 0) & 1'b0; 
             end if; 
         end if; 
     end if; 
@@ -270,63 +270,63 @@ variable found, adr_pushed : std_logic;
 variable ret_stack_pointer : std_logic_vector(RET_STACK_SIZE-1 downto 0);
 
 begin
-    if reset_n = '0' then 
-        pred_ret_taken          <=  '0';
+    if reset_n = 1'b0 then 
+        pred_ret_taken          <=  1'b0;
         ret_stack_pointer       :=  one_ext_ret_stack_size;
 
     elsif falling_edge(clk) then 
-        found               :=  '0';
-        adr_pushed          :=  '0';
+        found               :=  1'b0;
+        adr_pushed          :=  1'b0;
         ret_stack_pointer   :=  ret_stack_pointer_si;
         search_ret : for i in 0 to RET_PRED_REG_SIZE-1 loop
-            if ret_adr_reg(i) = PC_RD and ret_valid_reg(i) = '1' then 
-                found := '1'; 
+            if ret_adr_reg(i) = PC_RD and ret_valid_reg(i) = 1'b1 then 
+                found := 1'b1; 
             end if; 
         end loop;
         pred_ret_taken  <=  found; 
-        if if2dec_empty = '0' then 
-            if PUSH_ADR_RAS_RD = '1' then 
+        if if2dec_empty = 1'b0 then 
+            if PUSH_ADR_RAS_RD = 1'b1 then 
                 ret_inst_search : for i in 0 to RET_STACK_SIZE-1 loop
-                    if ret_stack_pointer(i) = '1' then
+                    if ret_stack_pointer(i) = 1'b1 then
                         ret_stack_reg(i)    <=  ADR_TO_RET_RD;
-                        adr_pushed          :=  '1';
+                        adr_pushed          :=  1'b1;
                     end if;
                 end loop;   
-                ret_stack_pointer   :=  ret_stack_pointer(RET_STACK_SIZE-2 downto 0) & '0'; 
-            elsif POP_ADR_RAS_RD = '1' then 
-                ret_stack_pointer :=    '0' & ret_stack_pointer(RET_STACK_SIZE-1 downto 1);
+                ret_stack_pointer   :=  ret_stack_pointer(RET_STACK_SIZE-2 downto 0) & 1'b0; 
+            elsif POP_ADR_RAS_RD = 1'b1 then 
+                ret_stack_pointer :=    1'b0 & ret_stack_pointer(RET_STACK_SIZE-1 downto 1);
             end if; 
 
-            if found = '1' then 
+            if found = 1'b1 then 
                 found_ret : for i in 0 to RET_STACK_SIZE-2 loop
-                    if ret_stack_pointer(i+1) = '1' then
-                        if adr_pushed = '1' then 
+                    if ret_stack_pointer(i+1) = 1'b1 then
+                        if adr_pushed = 1'b1 then 
                             pred_ret_next_adr <=    ADR_TO_RET_RD;
                         else   
                             pred_ret_next_adr <=    ret_stack_reg(i); 
                         end if;
                     end if; 
                 end loop;
-                ret_stack_pointer :=    '0' & ret_stack_pointer(RET_PRED_REG_SIZE-1 downto 1);
+                ret_stack_pointer :=    1'b0 & ret_stack_pointer(RET_PRED_REG_SIZE-1 downto 1);
             end if; 
         end if;  
     end if;
     ret_stack_pointer_si <= ret_stack_pointer;
 end process; 
 
-EXCEPTION_RI <= '0'; 
+EXCEPTION_RI <= 1'b0; 
 IF2DEC_EMPTY_SI <= if2dec_empty; 
 
 ----------------------
 -- fifo
 ----------------------
 -- Input
-if2dec_din(31 downto 0)     <=  PRED_ADR_SD when    PRED_TAKEN_SD = '1' and PRED_FAILED_RD = '0' else 
+if2dec_din(31 downto 0)     <=  PRED_ADR_SD when    PRED_TAKEN_SD = 1'b1 and PRED_FAILED_RD = 1'b0 else 
                                 PC_RD;
-if2dec_din(63 downto 32)    <=  IC_INST_SI  when    EXCEPTION_SM = '0'  else
+if2dec_din(63 downto 32)    <=  IC_INST_SI  when    EXCEPTION_SM = 1'b0  else
                                 nop_i;
-if2dec_din(95 downto 64)    <=  pred_branch_next_adr    when    pred_branch_taken = '1' else
-                                pred_ret_next_adr       when    pred_ret_taken = '1'    else
+if2dec_din(95 downto 64)    <=  pred_branch_next_adr    when    pred_branch_taken = 1'b1 else
+                                pred_ret_next_adr       when    pred_ret_taken = 1'b1    else
                                 x"44444400"; 
                 
 if2dec_din(96)              <=  pred_branch_taken or pred_ret_taken;

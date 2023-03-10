@@ -39,11 +39,11 @@ begin
 
 DEST_SW <= MEM_DEST_RM; 
 
-WB_SW <= '1' when (WB_RM = '1' and MEM2WBK_EMPTY_SM = '0') else '0';
+WB_SW <= 1'b1 when (WB_RM = 1'b1 and MEM2WBK_EMPTY_SM = 1'b0) else 1'b0;
 
 MEM2WBK_POP_SW <= not MEM2WBK_EMPTY_SM; 
-DATA_SW <=  CSR_RDATA_RM    when CSR_WENABLE_RM = '1'   else 
-            RES_RX2         when MULT_INST_RM = '1'     else
+DATA_SW <=  CSR_RDATA_RM    when CSR_WENABLE_RM = 1'b1   else 
+            RES_RX2         when MULT_INST_RM = 1'b1     else
             MEM_RES_RM; 
 
 end archi;

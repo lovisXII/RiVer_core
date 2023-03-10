@@ -632,9 +632,9 @@ class dump
 #define DUMP_DEC_FORMAT( width ) \
     std::setw( width ) << std::setfill( ' ' ) << std::dec << std::right
 #define DUMP_HEX0x_FORMAT( width ) \
-    "0x" << std::setw( width ) << std::setfill( '0' ) << std::hex << std::right
+    "0x" << std::setw( width ) << std::setfill( 1'b0 ) << std::hex << std::right
 #define DUMP_HEX_FORMAT( width ) \
-    std::setw( width ) << std::setfill( '0' ) << std::hex << std::right
+    std::setw( width ) << std::setfill( 1'b0 ) << std::hex << std::right
 #define DUMP_STR_FORMAT( width ) \
     std::setw( width ) << std::setfill( ' ' ) << std::hex << std::left
 

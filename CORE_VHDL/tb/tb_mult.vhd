@@ -7,7 +7,7 @@ end tb_mult;
 
 architecture simu of tb_mult is 
 
-signal clk, reset_n : std_logic := '0';
+signal clk, reset_n : std_logic := 1'b0;
 
 signal op1, op2 : std_logic_vector(31 downto 0);
 
@@ -71,7 +71,7 @@ end component;
 begin 
 
 clk <= not clk after 5 ns; 
-reset_n <= '0', '1' after 6 ns; 
+reset_n <= 1'b0, 1'b1 after 6 ns; 
 
 x0 : x0_multiplier 
     port map(
@@ -118,8 +118,8 @@ x2 : x2_multiplier
 
 
 op1 <= x"00000003"; 
-op2 <= x"00000004"; 
+op2 <= 32'h4; 
 
-cmd <= "01";
-dec2x0_empty <= '0'; 
+cmd <= 2'b01;
+dec2x0_empty <= 1'b0; 
 end simu; 

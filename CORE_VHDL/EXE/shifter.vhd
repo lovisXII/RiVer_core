@@ -24,51 +24,51 @@ signal bit1   : std_logic;
 begin 
 
 -- select right shifting bits in case of arthmetic shift
-bits16 <= (others => DIN_SE(31)) when CMD_SE(1) = '1' else (others => '0');
-bits8  <= (others => DIN_SE(31)) when CMD_SE(1) = '1' else (others => '0');
-bits4  <= (others => DIN_SE(31)) when CMD_SE(1) = '1' else (others => '0');
-bits2  <= (others => DIN_SE(31)) when CMD_SE(1) = '1' else (others => '0');
-bit1   <= DIN_SE(31) when CMD_SE(1) = '1' else '0';
+bits16 <= (others => DIN_SE(31)) when CMD_SE(1) = 1'b1 else (others => 1'b0);
+bits8  <= (others => DIN_SE(31)) when CMD_SE(1) = 1'b1 else (others => 1'b0);
+bits4  <= (others => DIN_SE(31)) when CMD_SE(1) = 1'b1 else (others => 1'b0);
+bits2  <= (others => DIN_SE(31)) when CMD_SE(1) = 1'b1 else (others => 1'b0);
+bit1   <= DIN_SE(31) when CMD_SE(1) = 1'b1 else 1'b0;
 
 --------------------------------
 --  Shift Right
 --------------------------------
-rshift16 <= (bits16 & DIN_SE(31 downto 16)) when SHIFT_VAL_SE(4) = '1' else
+rshift16 <= (bits16 & DIN_SE(31 downto 16)) when SHIFT_VAL_SE(4) = 1'b1 else
             DIN_SE; 
 
-rshift8  <= (bits8 & rshift16(31 downto 8)) when SHIFT_VAL_SE(3) = '1' else
+rshift8  <= (bits8 & rshift16(31 downto 8)) when SHIFT_VAL_SE(3) = 1'b1 else
             rshift16;
 
-rshift4  <= (bits4 & rshift8(31 downto 4)) when SHIFT_VAL_SE(2) = '1' else
+rshift4  <= (bits4 & rshift8(31 downto 4)) when SHIFT_VAL_SE(2) = 1'b1 else
             rshift8;
 
-rshift2  <= (bits2 & rshift4(31 downto 2)) when SHIFT_VAL_SE(1) = '1' else
+rshift2  <= (bits2 & rshift4(31 downto 2)) when SHIFT_VAL_SE(1) = 1'b1 else
             rshift4;
 
-rshift1  <= (bit1 & rshift2(31 downto 1)) when SHIFT_VAL_SE(0) = '1' else
+rshift1  <= (bit1 & rshift2(31 downto 1)) when SHIFT_VAL_SE(0) = 1'b1 else
             rshift2;
 
 
 --------------------------------
 --  Shift Left
 --------------------------------
-lshift16 <= (DIN_SE(15 downto 0) & x"0000") when SHIFT_VAL_SE(4) = '1' else 
+lshift16 <= (DIN_SE(15 downto 0) & x"0000") when SHIFT_VAL_SE(4) = 1'b1 else 
             DIN_SE;
 
-lshift8 <= (lshift16(23 downto 0) & x"00") when SHIFT_VAL_SE(3) = '1' else 
+lshift8 <= (lshift16(23 downto 0) & x2'b00) when SHIFT_VAL_SE(3) = 1'b1 else 
             lshift16;
 
-lshift4 <= (lshift8(27 downto 0) & x"0") when SHIFT_VAL_SE(2) = '1' else 
+lshift4 <= (lshift8(27 downto 0) & x"0") when SHIFT_VAL_SE(2) = 1'b1 else 
             lshift8;
 
-lshift2 <= (lshift4(29 downto 0) & "00") when SHIFT_VAL_SE(1) = '1' else 
+lshift2 <= (lshift4(29 downto 0) & 2'b00) when SHIFT_VAL_SE(1) = 1'b1 else 
             lshift4;
 
-lshift1 <= (lshift2(30 downto 0) & '0') when SHIFT_VAL_SE(0) = '1' else 
+lshift1 <= (lshift2(30 downto 0) & 1'b0) when SHIFT_VAL_SE(0) = 1'b1 else 
             lshift2;
 
 -- Ouput selection
-DOUT_SE <= lshift1 when CMD_SE = "00" else rshift1;
+DOUT_SE <= lshift1 when CMD_SE = 2'b00 else rshift1;
 
 end archi;
 

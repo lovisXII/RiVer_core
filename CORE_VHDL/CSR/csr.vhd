@@ -66,7 +66,7 @@ begin
 
 csr_write : process(clk, reset_n)
 begin 
-    if reset_n = '0' then 
+    if reset_n = 1'b0 then 
         reg_mvendorid   <= x"00000000";       
         reg_marchid     <= x"00000000";    
         reg_mimpid      <= x"00000000";    
@@ -82,13 +82,13 @@ begin
         reg_mscratch    <= x"00000000";  
     
     elsif rising_edge(clk) then 
-        if EXCEPTION_SM = '1' then 
+        if EXCEPTION_SM = 1'b1 then 
             reg_mstatus      <= MSTATUS_WDATA_SM;
             reg_mepc         <= MEPC_WDATA_SM;
             reg_mcause       <= MCAUSE_WDATA_SM;
             reg_mtval        <= MTVAL_WDATA_SM;
             reg_mip          <= MIP_WDATA_SM;
-        elsif CSR_ENABLE_SM = '1' then 
+        elsif CSR_ENABLE_SM = 1'b1 then 
             case (CSR_WADR_SM) is 
                 when adr_mstatus        =>  reg_mstatus     <= CSR_WDATA_SM;
                 when adr_mie            =>  reg_mie         <= CSR_WDATA_SM;

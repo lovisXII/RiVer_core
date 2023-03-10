@@ -9,21 +9,21 @@ end tb_exec;
 architecture simu of tb_exec is 
 
 -- input
-signal clk, reset_n : std_logic := '0';
+signal clk, reset_n : std_logic := 1'b0;
 signal OP1_RD, OP2_RD : std_logic_vector(31 downto 0);
-signal RADR1_RD, RADR2_RD : std_logic_vector(5 downto 0) := "000000";
+signal RADR1_RD, RADR2_RD : std_logic_vector(5 downto 0) := 6'b0;
 signal MEM_DATA_RD : std_logic_vector(31 downto 0) := x"00000000";
-signal DEST_RD : std_logic_vector(5 downto 0) := "000000";
-signal CMD_RD : std_logic_vector(1 downto 0) := "00"; 
-signal MEM_SIZE_RD : std_logic_vector(1 downto 0) := "00";
-signal NEG_OP2_RD : std_logic := '0';
-signal WB_RD : std_logic := '0';
-signal MEM_SIGN_EXTEND_RD : std_logic := '0';
-signal SELECT_OPERATION_RD : std_logic := '0';
-signal MEM_LOAD_RD, MEM_STORE_RD : std_logic := '0';
-signal EXE2MEM_POP_SM : std_logic := '0';
-signal DEC2EXE_EMPTY_SD : std_logic := '0';
-signal SLT_RD, SLTU_RD : std_logic := '0';
+signal DEST_RD : std_logic_vector(5 downto 0) := 6'b0;
+signal CMD_RD : std_logic_vector(1 downto 0) := 2'b00; 
+signal MEM_SIZE_RD : std_logic_vector(1 downto 0) := 2'b00;
+signal NEG_OP2_RD : std_logic := 1'b0;
+signal WB_RD : std_logic := 1'b0;
+signal MEM_SIGN_EXTEND_RD : std_logic := 1'b0;
+signal SELECT_OPERATION_RD : std_logic := 1'b0;
+signal MEM_LOAD_RD, MEM_STORE_RD : std_logic := 1'b0;
+signal EXE2MEM_POP_SM : std_logic := 1'b0;
+signal DEC2EXE_EMPTY_SD : std_logic := 1'b0;
+signal SLT_RD, SLTU_RD : std_logic := 1'b0;
 
 -- output
 signal EXE_RES_RE : std_logic_vector(31 downto 0);    
@@ -46,16 +46,16 @@ exec_i : entity work.exec
             MEM_LOAD_RE, MEM_STORE_RE, EXE2MEM_EMPTY_SE, DEC2EXE_POP_SE
     );
 
-reset_n <= '0', '1' after 10 ns;
+reset_n <= 1'b0, 1'b1 after 10 ns;
 clk <= not clk after 5 ns;
 
 OP1_RD <= x"0000F000"; 
-OP2_RD <= x"00000004";
-CMD_RD <= "00", "01" after 25 ns, "10" after 35 ns, "11" after 45 ns, "00" after 55 ns, "01" after 65 ns, "10" after 75 ns;
-SLT_RD <= '0', '1' after 85 ns, '0' after 95 ns;
-SLTU_RD <= '0', '1' after 95 ns, '0' after 105 ns;
-NEG_OP2_RD <= '0', '1' after 15 ns, '0' after 25 ns, '1' after 85 ns, '0' after 105 ns; 
-SELECT_OPERATION_RD <= '0', '1' after 55 ns, '0' after 85 ns; 
-EXE2MEM_POP_SM <= '0', '1' after 15 ns; 
+OP2_RD <= 32'h4;
+CMD_RD <= 2'b00, 2'b01 after 25 ns, "10" after 35 ns, "11" after 45 ns, 2'b00 after 55 ns, 2'b01 after 65 ns, "10" after 75 ns;
+SLT_RD <= 1'b0, 1'b1 after 85 ns, 1'b0 after 95 ns;
+SLTU_RD <= 1'b0, 1'b1 after 95 ns, 1'b0 after 105 ns;
+NEG_OP2_RD <= 1'b0, 1'b1 after 15 ns, 1'b0 after 25 ns, 1'b1 after 85 ns, 1'b0 after 105 ns; 
+SELECT_OPERATION_RD <= 1'b0, 1'b1 after 55 ns, 1'b0 after 85 ns; 
+EXE2MEM_POP_SM <= 1'b0, 1'b1 after 15 ns; 
 
 end simu;

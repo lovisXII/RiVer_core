@@ -6,7 +6,7 @@ entity tb_icache is
 end entity;
 
 architecture simu of tb_icache is 
-signal clk, reset_n : std_logic := '0'; 
+signal clk, reset_n : std_logic := 1'b0; 
 
 signal ADR_SI, IC_INST_SI : std_logic_vector(31 downto 0);
 signal ADR_VALID_SI, IC_STALL_SI : std_logic;
@@ -52,12 +52,12 @@ icache_i : icache
 
 
 clk <= not clk after 5 ns;
-reset_n <= '0', '1' after 6 ns;  
+reset_n <= 1'b0, 1'b1 after 6 ns;  
 
-ADR_SI <=   x"00000000", x"00000004" after 35 ns, x"00000008" after 45 ns; 
-ADR_VALID_SI <= '0', '1' after 15 ns; 
+ADR_SI <=   x"00000000", 32'h4 after 35 ns, x"00000008" after 45 ns; 
+ADR_VALID_SI <= 1'b0, 1'b1 after 15 ns; 
 
 RAM_DATA <= x"AAAABBBB", x"ABCDEF01" after 35 ns; 
-RAM_ACK <= '0', '1' after 25 ns, '0' after 55 ns;
+RAM_ACK <= 1'b0, 1'b1 after 25 ns, 1'b0 after 55 ns;
 
 end simu; 

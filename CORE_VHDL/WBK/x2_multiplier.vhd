@@ -28,7 +28,7 @@ begin
 
 res <=  std_logic_vector(unsigned(RES_RX1(63 downto 0)) + unsigned(RES_RX1(127 downto 64)));
 
-RES_RX2 <=  res(63 downto 32)   when SELECT_MSB_RX1 = '1' else 
+RES_RX2 <=  res(63 downto 32)   when SELECT_MSB_RX1 = 1'b1 else 
             res(31 downto 0);
 
 X1X2_POP_SX2 <= not X1X2_EMPTY_SX1;

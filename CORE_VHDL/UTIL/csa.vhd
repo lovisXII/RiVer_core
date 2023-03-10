@@ -24,6 +24,6 @@ shf <=  (A and B) or (AxB and C);
 S0  <=  AxB xor C;
 
 S1(63 downto 1) <=  shf(62 downto 0);
-S1(0)           <=  '0';  
+S1(0)           <=  1'b0;  
 
 end archi; 

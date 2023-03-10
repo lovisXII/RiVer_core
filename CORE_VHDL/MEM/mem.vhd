@@ -104,7 +104,7 @@ signal data_sm, data_store_sm, data_byte_store_sm, data_half_store_sm : std_logi
 signal byt_sel_sm : std_logic_vector(3 downto 0);
 
 -- CSR & Exception 
-signal exception : std_logic := '0'; 
+signal exception : std_logic := 1'b0; 
 signal mode_sm : std_logic_vector(1 downto 0) := "11";
 signal new_mode : std_logic_vector(1 downto 0);
 signal machine_mode_condition : std_logic;
@@ -171,14 +171,14 @@ mem2wbk_push <= (not stall_sm) and wb;
 EXE2MEM_POP_SM <= not stall_sm;
 
 
-data_byte_store_sm(31 downto 8)     <= (others => '0');
+data_byte_store_sm(31 downto 8)     <= (others => 1'b0);
 data_byte_store_sm(7 downto 0)      <= MEM_DATA_RE(7 downto 0);
 
-data_half_store_sm(31 downto 16)    <= (others => '0');
+data_half_store_sm(31 downto 16)    <= (others => 1'b0);
 data_half_store_sm(15 downto 0)     <= MEM_DATA_RE(15 downto 0);
 
 data_store_sm       <=  data_byte_store_sm when MEM_SIZE_RE = "10" else 
-                        data_half_store_sm when MEM_SIZE_RE = "01" else 
+                        data_half_store_sm when MEM_SIZE_RE = 2'b01 else 
                         MEM_DATA_RE;
 
 -- Mcache 
@@ -193,22 +193,22 @@ lb_sign     <=  MCACHE_RESULT_SM(31)    when    byt_sel_sm = "1000" else
                 MCACHE_RESULT_SM(23)    when    byt_sel_sm = "0100" else
                 MCACHE_RESULT_SM(15)    when    byt_sel_sm = "0010" else
                 MCACHE_RESULT_SM(7)     when    byt_sel_sm = "0001" else
-                '0';
+                1'b0;
 
-load_byte(31 downto 8)  <=  x"000000" when SIGN_EXTEND_RE = '0' else 
+load_byte(31 downto 8)  <=  x6'b0 when SIGN_EXTEND_RE = 1'b0 else 
                             (others => lb_sign); 
 
 load_byte(7 downto 0)   <=  MCACHE_RESULT_SM(31 downto 24)  when byt_sel_sm = "1000" else
                             MCACHE_RESULT_SM(23 downto 16)  when byt_sel_sm = "0100" else 
                             MCACHE_RESULT_SM(15 downto 8)   when byt_sel_sm = "0010" else
                             MCACHE_RESULT_SM(7 downto 0)    when byt_sel_sm = "0001" else
-                            x"00"; 
+                            x2'b00; 
 
 lh_sign     <=  MCACHE_RESULT_SM(31)    when    byt_sel_sm = "1100" else 
                 MCACHE_RESULT_SM(15)    when    byt_sel_sm = "0011" else 
-                '0';
+                1'b0;
                                                          
-load_halfword(31 downto 16) <=  x"0000" when SIGN_EXTEND_RE = '0' else 
+load_halfword(31 downto 16) <=  x"0000" when SIGN_EXTEND_RE = 1'b0 else 
                                 (others => lh_sign); 
 
 load_halfword(15 downto 0)  <=  MCACHE_RESULT_SM(15 downto 0)   when byt_sel_sm = "0011" else 
@@ -218,28 +218,28 @@ load_halfword(15 downto 0)  <=  MCACHE_RESULT_SM(15 downto 0)   when byt_sel_sm 
 load_word <= MCACHE_RESULT_SM; 
 
 load_data <= load_byte when MEM_SIZE_RE = "10" else 
-             load_halfword when MEM_SIZE_RE = "01" else
+             load_halfword when MEM_SIZE_RE = 2'b01 else
              load_word; 
 
 -- byte select 
-byt_sel_sm  <=  "0001" when (MEM_SIZE_RE = "10" and RES_RE(1 downto 0) = "00") else 
-                "0010" when (MEM_SIZE_RE = "10" and RES_RE(1 downto 0) = "01") else   
+byt_sel_sm  <=  "0001" when (MEM_SIZE_RE = "10" and RES_RE(1 downto 0) = 2'b00) else 
+                "0010" when (MEM_SIZE_RE = "10" and RES_RE(1 downto 0) = 2'b01) else   
                 "0100" when (MEM_SIZE_RE = "10" and RES_RE(1 downto 0) = "10") else 
                 "1000" when (MEM_SIZE_RE = "10" and RES_RE(1 downto 0) = "11") else
-                "0011" when (MEM_SIZE_RE = "01" and RES_RE(1 downto 0) = "00") else 
-                "1100" when (MEM_SIZE_RE = "01" and RES_RE(1 downto 0) = "10") else
-                "1111" when (MEM_SIZE_RE = "00" and RES_RE(1 downto 0) = "00") else
+                "0011" when (MEM_SIZE_RE = 2'b01 and RES_RE(1 downto 0) = 2'b00) else 
+                "1100" when (MEM_SIZE_RE = 2'b01 and RES_RE(1 downto 0) = "10") else
+                "1111" when (MEM_SIZE_RE = 2'b00 and RES_RE(1 downto 0) = 2'b00) else
                 "0000";   
 byt_sel     <=  byt_sel_sm;     
 -- Data selection to be written in register file
-data_sm <=  load_data when LOAD_RE = '1' else 
+data_sm <=  load_data when LOAD_RE = 1'b1 else 
             RES_RE;
 
 --------------------
 -- CSR & Exception 
 --------------------
-exception <=    '1' when (EXCEPTION_RE = '1' or BUS_ERROR_SX = '1') else 
-                '0'; 
+exception <=    1'b1 when (EXCEPTION_RE = 1'b1 or BUS_ERROR_SX = 1'b1) else 
+                1'b0; 
 
 -- CSR write
 CSR_WADR_SM     <= CSR_WADR_RE; 
@@ -247,35 +247,35 @@ CSR_WDATA_SM    <= RES_RE;
 CSR_ENABLE_SM   <= CSR_WENABLE_RE and not exception;  
 
 -- MSTATUS 
-mstatus_x(31)           <= '0'; 
+mstatus_x(31)           <= 1'b0; 
 mstatus_x(30 downto 13) <= MSTATUS_RC(30 downto 13); 
 mstatus_x(12 downto 11) <= old_mode; 
 mstatus_x(10 downto 8)  <= MSTATUS_RC(10 downto 8);
 mstatus_x(7)            <= MSTATUS_RC(3);
 mstatus_x(6 downto 4)   <= MSTATUS_RC(6 downto 4);
-mstatus_x(3)            <= '0'; 
+mstatus_x(3)            <= 1'b0; 
 mstatus_x(2 downto 0)   <= MSTATUS_RC(2 downto 0);
 
 -- MCAUSE
-mcause_x    <=  x"00000018" when ENV_CALL_WRONG_MODE_RE = '1'           else 
-                x"00000007" when STORE_ACCESS_FAULT_RE  = '1'           else
-                x"00000005" when LOAD_ACCESS_FAULT_RE   = '1'           else 
-                x"00000005" when ENV_CALL_WRONG_MODE_RE = '1'           else 
-                x"00000006" when STORE_ADRESS_MISALIGNED_RE = '1'       else 
-                x"00000004" when LOAD_ADRESS_MISALIGNED_RE = '1'        else 
-                x"0000000B" when ENV_CALL_M_MODE_RE     = '1'           else 
-                x"00000009" when ENV_CALL_S_MODE_RE     = '1'           else 
-                x"00000008" when ENV_CALL_U_MODE_RE     = '1'           else 
-                x"00000003" when EBREAK_RE              = '1'           else 
-                x"00000000" when INSTRUCTION_ADRESS_MISALIGNED_RE = '1' else 
-                x"00000002" when ILLEGAL_INSTRUCTION_RE = '1'           else 
-                x"00000001" when INSTRUCTION_ACCESS_FAULT_RE = '1'      else 
+mcause_x    <=  x"00000018" when ENV_CALL_WRONG_MODE_RE = 1'b1           else 
+                x"00000007" when STORE_ACCESS_FAULT_RE  = 1'b1           else
+                x"00000005" when LOAD_ACCESS_FAULT_RE   = 1'b1           else 
+                x"00000005" when ENV_CALL_WRONG_MODE_RE = 1'b1           else 
+                x"00000006" when STORE_ADRESS_MISALIGNED_RE = 1'b1       else 
+                32'h4 when LOAD_ADRESS_MISALIGNED_RE = 1'b1        else 
+                x"0000000B" when ENV_CALL_M_MODE_RE     = 1'b1           else 
+                x"00000009" when ENV_CALL_S_MODE_RE     = 1'b1           else 
+                x"00000008" when ENV_CALL_U_MODE_RE     = 1'b1           else 
+                x"00000003" when EBREAK_RE              = 1'b1           else 
+                x"00000000" when INSTRUCTION_ADRESS_MISALIGNED_RE = 1'b1 else 
+                x"00000002" when ILLEGAL_INSTRUCTION_RE = 1'b1           else 
+                x"00000001" when INSTRUCTION_ACCESS_FAULT_RE = 1'b1      else 
                 x"00000000"; -- or debug value
 
 -- MTVAL
-mtval_x     <=  RES_RE when ((STORE_ACCESS_FAULT_RE or LOAD_ACCESS_FAULT_RE or STORE_ADRESS_MISALIGNED_RE or LOAD_ADRESS_MISALIGNED_RE) = '1') else 
-                PC_BRANCH_VALUE_RE when INSTRUCTION_ADRESS_MISALIGNED_RE = '1' else
-                PC_EXE2MEM_RE when EBREAK_RE = '1' else
+mtval_x     <=  RES_RE when ((STORE_ACCESS_FAULT_RE or LOAD_ACCESS_FAULT_RE or STORE_ADRESS_MISALIGNED_RE or LOAD_ADRESS_MISALIGNED_RE) = 1'b1) else 
+                PC_BRANCH_VALUE_RE when INSTRUCTION_ADRESS_MISALIGNED_RE = 1'b1 else
+                PC_EXE2MEM_RE when EBREAK_RE = 1'b1 else
                 x"00000000"; 
 
 machine_mode_condition  <=  ENV_CALL_WRONG_MODE_RE              or 
@@ -291,23 +291,23 @@ machine_mode_condition  <=  ENV_CALL_WRONG_MODE_RE              or
                             ILLEGAL_INSTRUCTION_RE              or 
                             INSTRUCTION_ACCESS_FAULT_RE;   
 
-new_mode <= "11" when machine_mode_condition = '1' else 
-            "00";
+new_mode <= "11" when machine_mode_condition = 1'b1 else 
+            2'b00;
 
 reg_mode : process(clk, reset_n)
 begin 
-    if reset_n = '0' then 
+    if reset_n = 1'b0 then 
         old_mode <= "11";
     elsif rising_edge(clk) then 
         old_mode <= mode_sm; 
     end if; 
 end process; 
 
-mode_sm <=  new_mode when exception = '1' else
+mode_sm <=  new_mode when exception = 1'b1 else
             old_mode; 
         
 
-RETURN_ADRESS_SM <= MEPC_SC when MRET_RE = '1' else 
+RETURN_ADRESS_SM <= MEPC_SC when MRET_RE = 1'b1 else 
                     x"00000000";
 
 

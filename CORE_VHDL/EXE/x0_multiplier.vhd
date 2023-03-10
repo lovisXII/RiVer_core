@@ -82,19 +82,19 @@ x0x1 : fifo
     );
 
 -- need clarification
-signed_type     <=  '0' when (MULT_CMD_RD = "10" or MULT_CMD_RD = "01") and (OP1_SE(31) = '1' and OP2_SE(31) = '1')  else 
-                    '1' when (MULT_CMD_RD /= "11") else 
-                    '0';
+signed_type     <=  1'b0 when (MULT_CMD_RD = "10" or MULT_CMD_RD = 2'b01) and (OP1_SE(31) = 1'b1 and OP2_SE(31) = 1'b1)  else 
+                    1'b1 when (MULT_CMD_RD /= "11") else 
+                    1'b0;
 
-signed_res_sx0  <=  '0' when (OP1_SE(31) = '1' and OP2_SE(31) = '1') else '1'; -- else  ?? 
-select_msb_sx0  <=  '1' when MULT_CMD_RD /= "01" else '0'; 
+signed_res_sx0  <=  1'b0 when (OP1_SE(31) = 1'b1 and OP2_SE(31) = 1'b1) else 1'b1; -- else  ?? 
+select_msb_sx0  <=  1'b1 when MULT_CMD_RD /= 2'b01 else 1'b0; 
 
-op1             <=  std_logic_vector(unsigned(not(OP1_SE)) + unsigned(one_ext_32)) when ((OP1_SE(31) = '1' and OP2_SE(31) = '1') and (MULT_CMD_RD = "10" or MULT_CMD_RD = "01")) else 
-                    OP2_SE when (OP1_SE(31) = '0' and OP2_SE(31) = '1') and (MULT_CMD_RD = "10" or MULT_CMD_RD = "01") else 
+op1             <=  std_logic_vector(unsigned(not(OP1_SE)) + unsigned(one_ext_32)) when ((OP1_SE(31) = 1'b1 and OP2_SE(31) = 1'b1) and (MULT_CMD_RD = "10" or MULT_CMD_RD = 2'b01)) else 
+                    OP2_SE when (OP1_SE(31) = 1'b0 and OP2_SE(31) = 1'b1) and (MULT_CMD_RD = "10" or MULT_CMD_RD = 2'b01) else 
                     OP1_SE; 
 
-op2             <=  std_logic_vector(unsigned(not(OP2_SE)) + unsigned(one_ext_32)) when ((OP1_SE(31) = '1' and OP2_SE(31) = '1') and (MULT_CMD_RD = "10" or MULT_CMD_RD = "01")) else 
-                    OP1_SE when (OP1_SE(31) = '0' and OP2_SE(31) = '1') and (MULT_CMD_RD = "10" or MULT_CMD_RD = "01") else 
+op2             <=  std_logic_vector(unsigned(not(OP2_SE)) + unsigned(one_ext_32)) when ((OP1_SE(31) = 1'b1 and OP2_SE(31) = 1'b1) and (MULT_CMD_RD = "10" or MULT_CMD_RD = 2'b01)) else 
+                    OP1_SE when (OP1_SE(31) = 1'b0 and OP2_SE(31) = 1'b1) and (MULT_CMD_RD = "10" or MULT_CMD_RD = 2'b01) else 
                     OP2_SE; 
 
 partial_product : process(clk, op1, op2, signed_type)
@@ -102,13 +102,13 @@ variable prod : std_logic_vector(63 downto 0) := x"0000000000000000";
 begin 
     l0 : for i in 0 to 31 loop 
         prod := x"0000000000000000";
-        if op2(i) /= '0' then 
+        if op2(i) /= 1'b0 then 
             l1 : for j in i to i+31 loop 
                 prod(j) := op1(j-i) and op2(i);
             end loop; 
-            if signed_type = '1' and op1(31) = '1' then 
+            if signed_type = 1'b1 and op1(31) = 1'b1 then 
                 l2 : for k in i+32 to 63 loop
-                    prod(k) := '1'; 
+                    prod(k) := 1'b1; 
                 end loop; 
             end if; 
         end if; 

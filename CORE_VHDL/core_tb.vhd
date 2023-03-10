@@ -74,8 +74,8 @@ end function;
 -- core signals instance
 ------------------------------
 -- global interface
-signal clk : std_logic := '1';
-signal reset_n : std_logic := '0';
+signal clk : std_logic := 1'b1;
+signal reset_n : std_logic := 1'b0;
 
 -- Mcache interface
 signal MCACHE_RESULT_SM : std_logic_vector(31 downto 0);
@@ -128,7 +128,7 @@ end component;
 constant NCYCLES : integer := 100000000; 
 signal CYCLES : integer := 0; 
 signal good_adr, bad_adr, exception_adr : std_logic_vector(31 downto 0);
-signal end_simu : std_logic := '0'; 
+signal end_simu : std_logic := 1'b0; 
 signal result : integer := 0;  
 signal timeout : integer := 0; 
 signal time : integer := 0; 
@@ -175,9 +175,9 @@ clk_gen : process
 variable r0 : integer;
 variable un : integer := 1;
 begin         
-    clk <= '0'; 
+    clk <= 1'b0; 
     wait for 5 ns; 
-    clk <= '1'; 
+    clk <= 1'b1; 
      CYCLES <= CYCLES + 1; 
     wait for 5 ns; 
     if CYCLES = 1 then 
@@ -187,7 +187,7 @@ begin
             assert false report "simulation begin" severity note; 
         end if;
     end if; 
-    if end_simu = '1' or cpt_end = cpt_max then 
+    if end_simu = 1'b1 or cpt_end = cpt_max then 
         assert false report "end of simulation, done in " & integer'image(CYCLES) & " cycles" severity note; 
         r0 := end_simulation(result,un);
         wait; 
@@ -214,11 +214,11 @@ begin
     time <= time + 5; 
 end process; 
 
-reset_n <= '0', '1' after 6 ns;
+reset_n <= 1'b0, 1'b1 after 6 ns;
 
-MCACHE_STALL_SM <= '0';
+MCACHE_STALL_SM <= 1'b0;
 
-IC_STALL_SI <= '0';
+IC_STALL_SI <= 1'b0;
 PC_INIT <= std_logic_vector(to_signed(get_startpc(0), 32));
 
 icache : process(ADR_SI, ADR_VALID_SI)
@@ -226,20 +226,20 @@ variable adr_int : integer;
 variable inst_int : integer; 
 variable intermed : signed(ADR_SI'range); 
 begin
-    if riscof_end_adr = (riscof_end_adr'range => '0') then
-        if ADR_VALID_SI = '1' then 
+    if riscof_end_adr = (riscof_end_adr'range => 1'b0) then
+        if ADR_VALID_SI = 1'b1 then 
             if ADR_SI = bad_adr then 
                 assert false report "Test failed" severity error; 
                 result <= 1;
-                end_simu <= '1';              
+                end_simu <= 1'b1;              
             elsif ADR_SI = good_adr then 
                 assert false report "Test success" severity note; 
                 result <= 0;
-                end_simu <= '1';  
+                end_simu <= 1'b1;  
             elsif ADR_SI = exception_adr then 
                 assert false report "Exception occured" severity warning; 
                 result <= 2;    
-                end_simu <= '1'; 
+                end_simu <= 1'b1; 
             else
                 intermed    := signed(ADR_SI); 
                 adr_int     := to_integer(intermed);
@@ -250,7 +250,7 @@ begin
 
         end if; 
     else 
-        if ADR_VALID_SI = '1' then 
+        if ADR_VALID_SI = 1'b1 then 
             if ADR_SI = riscof_end_adr then 
                 assert false report "RISCOF test end" severity note; 
                 result <= 0 ;
@@ -282,13 +282,13 @@ begin
     byt_sel_u   := unsigned(byt_sel);
     byt_sel_i   := to_integer(byt_sel_u);
 
-    if reset_n = '0' then 
+    if reset_n = 1'b0 then 
     -- hoping to find a better solution to avoid not wanted mem access
     elsif falling_edge(clk) then 
-        if MCACHE_ADR_VALID_SM = '1' then 
-            if MCACHE_STORE_SM = '1' then  
+        if MCACHE_ADR_VALID_SM = 1'b1 then 
+            if MCACHE_STORE_SM = 1'b1 then  
                 read0 := write_mem(adr_int, data_int, byt_sel_i, time);
-            elsif MCACHE_LOAD_SM = '1' then 
+            elsif MCACHE_LOAD_SM = 1'b1 then 
                 MCACHE_RESULT_SM <= std_logic_vector(to_signed(read_mem(adr_int), 32));
             else 
                 assert false report "Adr mem access valid but no command" severity error; 

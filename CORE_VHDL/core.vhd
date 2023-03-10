@@ -96,7 +96,7 @@ signal BLOCK_BP_RD : std_logic;
 signal CSR_WADR_SM         : std_logic_vector(11 downto 0);
 signal CSR_WDATA_SM        : std_logic_vector(31 downto 0);
 signal CSR_ENABLE_SM, CSR_WENABLE_RD : std_logic;
-signal EXCEPTION_SM        : std_logic := '0';
+signal EXCEPTION_SM        : std_logic := 1'b0;
 signal mstatus_wdata_sm    : std_logic_vector(31 downto 0);
 signal MIP_WDATA_SM        : std_logic_vector(31 downto 0);
 signal MEPC_WDATA_SM       : std_logic_vector(31 downto 0);
@@ -526,7 +526,7 @@ component wbk
     );
 end component; 
 
-component reg 
+component logic 
     port(
         -- global interface
         clk, reset_n : in std_logic;
@@ -1027,7 +1027,7 @@ wbk_i : wbk
         WB_SW           => REG_WB_SW 
     );
  
-reg_i : reg 
+reg_i : logic 
     port map(
         -- global interface
         clk                 => clk,
@@ -1131,6 +1131,6 @@ x2_mult : x2_multiplier
     );
 
 DEBUG_PC_READ   <= READ_PC_SR; 
-BUS_ERROR_SX    <= '0';
+BUS_ERROR_SX    <= 1'b0;
 
 end archi;

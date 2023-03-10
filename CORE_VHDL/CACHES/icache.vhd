@@ -35,7 +35,7 @@ signal adr_tag      :   std_logic_vector(19 downto 0);
 signal adr_index    :   std_logic_vector(7 downto 0);
 signal adr_offset   :   std_logic_vector(3 downto 0);
 
-signal hit : std_logic := '0';
+signal hit : std_logic := 1'b0;
 
 type state is (idle, wait_mem, update);
 signal EP, EF : state; 
@@ -47,11 +47,11 @@ adr_index   <=  ADR_SI(11 downto 4);
 adr_offset  <=  ADR_SI(3 downto 0);
 
 -- miss detection 
-hit <=  '1' when    adr_tag = tags(to_integer(unsigned(adr_index))) and data_valid(to_integer(unsigned(adr_index))) = '1' else 
-        '0';
+hit <=  1'b1 when    adr_tag = tags(to_integer(unsigned(adr_index))) and data_valid(to_integer(unsigned(adr_index))) = 1'b1 else 
+        1'b0;
 
-IC_INST_SI  <=  data0(to_integer(unsigned(adr_index)))  when adr_offset(3 downto 2) = "00"  else 
-                data1(to_integer(unsigned(adr_index)))  when adr_offset(3 downto 2) = "01"  else
+IC_INST_SI  <=  data0(to_integer(unsigned(adr_index)))  when adr_offset(3 downto 2) = 2'b00  else 
+                data1(to_integer(unsigned(adr_index)))  when adr_offset(3 downto 2) = 2'b01  else
                 data2(to_integer(unsigned(adr_index)))  when adr_offset(3 downto 2) = "10"  else
                 data3(to_integer(unsigned(adr_index)))  when adr_offset(3 downto 2) = "11"  else
                 x"00000000";
@@ -61,7 +61,7 @@ IC_STALL_SI <=  not(hit);
 -- succession des etats 
 fsm_transition : process(clk, reset_n)
 begin  
-    if reset_n = '0' then 
+    if reset_n = 1'b0 then 
         EP  <=  idle; 
     elsif rising_edge(clk) then 
         EP  <=  EF; 
@@ -77,17 +77,17 @@ variable cpt : integer;
 begin 
     case EP is 
         when idle =>        EF  <=  idle; 
-            if ADR_VALID_SI = '1' and reset_n = '1' and hit = '0' then 
+            if ADR_VALID_SI = 1'b1 and reset_n = 1'b1 and hit = 1'b0 then 
                 EF <= wait_mem;
                 RAM_ADR(31 downto 4)    <=  ADR_SI(31 downto 4);
                 RAM_ADR(3 downto 0)     <=  "0000";
-                RAM_VALID   <=  '1';
+                RAM_VALID   <=  1'b1;
                 current_adr_tag         :=  adr_tag;
                 current_adr_index       :=  adr_index;
                 cpt := 0;
             end if; 
         when wait_mem =>    EF  <=  wait_mem; 
-            if RAM_ACK = '1' then 
+            if RAM_ACK = 1'b1 then 
                 EF <= update; 
 
                 if cpt = 0 then 
@@ -103,15 +103,15 @@ begin
                 end if; 
 
                 tags(to_integer(unsigned(current_adr_index)))       <=  current_adr_tag; 
-                data_valid(to_integer(unsigned(current_adr_index))) <=  '0';  
+                data_valid(to_integer(unsigned(current_adr_index))) <=  1'b0;  
                 
                 cpt := cpt + 1;
 
             end if; 
         when update =>      
-            if RAM_ACK = '0' then 
+            if RAM_ACK = 1'b0 then 
                 EF <= idle; 
-                data_valid(to_integer(unsigned(current_adr_index))) <=  '1';  
+                data_valid(to_integer(unsigned(current_adr_index))) <=  1'b1;  
             else 
                 EF <= update;
                 if cpt = 0 then 

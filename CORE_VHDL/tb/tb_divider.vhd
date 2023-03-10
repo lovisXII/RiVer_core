@@ -7,7 +7,7 @@ end entity;
 
 architecture simu of tb_divider is 
 
-signal clk, reset_n : std_logic := '0'; 
+signal clk, reset_n : std_logic := 1'b0; 
 signal op1, op2 : std_logic_vector(31 downto 0);
 
 signal cmd : std_logic_vector(1 downto 0);
@@ -54,10 +54,10 @@ div : divider
 
 
 clk <= not clk after 5 ns;
-reset_n <= '0', '1' after 6 ns; 
+reset_n <= 1'b0, 1'b1 after 6 ns; 
 
 
-START_DIV   <= '0', '1' after 45 ns, '0' after 55 ns; 
+START_DIV   <= 1'b0, 1'b1 after 45 ns, 1'b0 after 55 ns; 
 cmd      <= "10";
 
 op1         <=  x"0000000A";
