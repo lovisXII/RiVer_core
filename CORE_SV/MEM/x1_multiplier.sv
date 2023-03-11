@@ -14,7 +14,7 @@ module x1_multiplier (
 );
 
    logic [63:0] x0_data[6];
-   logic [63:0] product_s6, product_s7, product_s8;
+   logic [63:0] product_s6[2], product_s7[2], product_s8[2];
 
    
   logic stall_sx1;
@@ -85,7 +85,7 @@ assign X0X1_POP_SX1 = ~stall_sx1;
 // fifo x1x2 input
 assign x1x2_din[129] = SIGNED_RES_RX0;
 assign x1x2_din[128] = SELECT_MSB_RX0;
-assign x1x2_din[127:64] = {product_s8[1],{64{1'b0}}};
+assign x1x2_din[127:64] = product_s8[1];
 assign x1x2_din[63:0] = product_s8[0];
 
 // fifo x1x2 output

@@ -53,11 +53,11 @@ module mem (
     output logic [31:0] MCAUSE_WDATA_SM,
     output logic [31:0] MTVAL_WDATA_SM,
 
-    input logic MEPC_SC[31:0],
-    input logic MSTATUS_RC[31:0],
-    input logic MTVEC_VALUE_RC[31:0],
-    input logic MIP_VALUE_RC[31:0],
-    input logic MIE_VALUE_RC[31:0],
+    input logic[31:0] MEPC_SC,
+    input logic[31:0] MSTATUS_RC,
+    input logic[31:0] MTVEC_VALUE_RC,
+    input logic[31:0] MIP_VALUE_RC,
+    input logic[31:0] MIE_VALUE_RC,
 
 
     // Exception

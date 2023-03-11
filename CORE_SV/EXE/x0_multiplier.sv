@@ -11,12 +11,12 @@ module x0_multiplier (
 );
 
 
-    logic [31:0] product   [0:31]; 
-    logic [19:0] product_s1[0:19];
-    logic [13:0] product_s2[0:13];
-    logic [9:0] product_s3 [0:9];
-    logic [5:0] product_s4 [0:5];
-    logic [3:0] product_s5 [0:3];
+    logic [63:0] product   [32]; 
+    logic [63:0] product_s1[20];
+    logic [63:0] product_s2[14];
+    logic [63:0] product_s3 [10];
+    logic [63:0] product_s4 [6];
+    logic [63:0] product_s5 [4];
 
     logic [31:0] op1, op2;
     logic [63:0] prod;

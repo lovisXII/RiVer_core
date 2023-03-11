@@ -79,16 +79,34 @@ module csr
             reg_mip <= MIP_WDATA_SM;
         end 
         else if (CSR_ENABLE_SM) begin
-        case (CSR_WADR_SM)
-            adr_mstatus: reg_mstatus <= CSR_WDATA_SM;
-            adr_mie: reg_mie <= CSR_WDATA_SM;
-            adr_mtvec: reg_mtvec <= CSR_WDATA_SM;
-            adr_mepc: reg_mepc <= CSR_WDATA_SM;
-            adr_mcause: reg_mcause <= CSR_WDATA_SM;
-            adr_mtval: reg_mtval <= CSR_WDATA_SM;
-            adr_mip: reg_mip <= CSR_WDATA_SM;
-            adr_mscratch: reg_mscratch <= CSR_WDATA_SM;
-        endcase
+            case (CSR_WADR_SM)
+                adr_mstatus: begin
+                    reg_mstatus <= CSR_WDATA_SM;
+                end
+                adr_mie: begin
+                    reg_mie <= CSR_WDATA_SM;
+                end
+                adr_mtvec: begin
+                    reg_mtvec <= CSR_WDATA_SM;
+                end
+                adr_mepc: begin
+                    reg_mepc <= CSR_WDATA_SM;
+                end
+                adr_mcause: begin
+                    reg_mcause <= CSR_WDATA_SM;
+                end
+                adr_mtval: begin
+                    reg_mtval <= CSR_WDATA_SM;
+                end
+                adr_mip: begin
+                    reg_mip <= CSR_WDATA_SM;
+                end
+                adr_mscratch: begin
+                    reg_mscratch <= CSR_WDATA_SM;
+                end
+                default : begin
+                end
+            endcase
         end
         end
     end

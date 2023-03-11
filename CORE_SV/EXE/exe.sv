@@ -182,10 +182,10 @@ divider divider_i (
 assign alu_op2 = (NEG_OP2_RD == 1'b1) ? ~op2 : op2;
 
 // SLT/SLTU operation
-assign slt_res = ((op1[31] == 1'b1) && (op2[31] == 1'b0)) ? 32'b1 :
-((op1[31] == 1'b0) && (op2[31] == 1'b1)) ? 32'b0 :
-(op1 == op2) ? 32'b0 :
-{alu_res[31], {3'b0, alu_res[30:0]}};
+assign slt_res =    ((op1[31] == 1'b1) && (op2[31] == 1'b0)) ? 32'b1 :
+                    ((op1[31] == 1'b0) && (op2[31] == 1'b1)) ? 32'b0 :
+                    (op1 == op2) ? 32'b0 :
+                    {31'b0,alu_res[31]};
 
 assign sltu_res =   ((op1[31]) && (!op2[31])) ? 32'b0 :
                     ((!op1[31]) && (op2[31])) ? 32'b1 :
