@@ -374,7 +374,7 @@ assign env_call_wrong_mode = (CURRENT_MODE_SM != 2'b11) && mret_i_sd ? 1'b1 : 1'
 assign radr1_sd = ((r_type_sd || i_type_sd || s_type_sd || b_type_sd || jalr_type_sd || m_type_sd) == 1) ? {1'b0, INSTR_RI[19:15]} : 6'h00;
 assign radr2_sd = ((r_type_sd || s_type_sd || b_type_sd || m_type_sd) == 1) ? {1'b0, INSTR_RI[24:20]} : 6'h00;
 assign rdest_sd = ((r_type_sd || i_type_sd || u_type_sd || j_type_sd || jalr_type_sd || m_type_sd) == 1 || (csrrw_i_sd || csrrs_i_sd || csrrc_i_sd || csrrwi_i_sd || csrrsi_i_sd || csrrci_i_sd) == 1) ? {1'b0, INSTR_RI[11:7]} : 6'h00;
-assign csr_radr = (system_inst_sd == 1 && (csrrw_i_sd || csrrs_i_sd || csrrc_i_sd || csrrwi_i_sd || csrrsi_i_sd || csrrci_i_sd) == 1) ? INSTR_RI[31:20] : 32'h0;
+assign csr_radr = (system_inst_sd && (csrrw_i_sd || csrrs_i_sd || csrrc_i_sd || csrrwi_i_sd || csrrsi_i_sd || csrrci_i_sd)) ? INSTR_RI[31:20] : 12'h0;
 
 
 // Operand 1 selection
@@ -412,24 +412,24 @@ assign neg_op2_sd = sub_i_sd || slt_i_sd || slti_i_sd || sltu_i_sd || sltiu_i_sd
 // exe command 
 assign alu_cmd =  (and_i_sd || andi_i_sd || srl_i_sd || srli_i_sd || csrrc_i_sd || csrrci_i_sd) ? 2'b01 :
                   (or_i_sd || ori_i_sd || sra_i_sd || srai_i_sd || csrrs_i_sd || csrrsi_i_sd) ? 2'b10 :
-                  (xor_i_sd || xori_i_sd) ? "11" : 2'b00;
+                  (xor_i_sd || xori_i_sd) ? 2'b11 : 2'b00;
 
 assign mult_cmd = (mul_i_sd) ? 2'b01 :
                   (mulh_i_sd) ? 2'b10 :
-                  (mulhu_i_sd) ? "11" : 2'b00;
+                  (mulhu_i_sd) ? 2'b11 : 2'b00;
 
 assign div_cmd =  (div_i_sd) ? 2'b01 :
                   (divu_i_sd) ? 2'b10 :
-                  (rem_i_sd) ? "11" : 2'b00;  
+                  (rem_i_sd) ? 2'b11 : 2'b00;  
 
-assign exe_cmd_sd = (select_operation_sd == "1000") ? div_cmd :
-                    (select_operation_sd == "0100") ? mult_cmd :
+assign exe_cmd_sd = (select_operation_sd == 4'b1000) ? div_cmd :
+                    (select_operation_sd == 4'b0100) ? mult_cmd :
                     alu_cmd;
 
-assign select_operation_sd =  (div_i_sd || divu_i_sd || rem_i_sd || remu_i_sd) ? "1000" :
-                             (mul_i_sd || mulh_i_sd || mulhsu_i_sd || mulhu_i_sd) ? "0100" :
-                             (sll_i_sd || slli_i_sd || srl_i_sd || srli_i_sd || sra_i_sd || srai_i_sd) ? "0010" :
-                             "0001";
+assign select_operation_sd =  (div_i_sd || divu_i_sd || rem_i_sd || remu_i_sd) ? 4'b1000 :
+                             (mul_i_sd || mulh_i_sd || mulhsu_i_sd || mulhu_i_sd) ? 4'b0100 :
+                             (sll_i_sd || slli_i_sd || srl_i_sd || srli_i_sd || sra_i_sd || srai_i_sd) ? 4'b0010 :
+                             4'b0001;
 
 assign wb_sd = r_type_sd || i_type_sd || u_type_sd || b_type_sd || j_type_sd || jalr_type_sd || 
                csrrw_i_sd || csrrs_i_sd || csrrc_i_sd || csrrwi_i_sd || csrrsi_i_sd || csrrci_i_sd;
@@ -442,7 +442,7 @@ assign mem_store_sd = sw_i_sd || sh_i_sd || sb_i_sd;
 assign mem_size_sd =  (lw_i_sd || sw_i_sd) ? 2'b00 :  // word size 
                       (lh_i_sd || lhu_i_sd || sh_i_sd) ? 2'b01 : // halfword size
                       (lb_i_sd || lbu_i_sd || sb_i_sd) ? 2'b10 : // byte size
-                      "11"; // not a mem access
+                      2'b11; // not a mem access
 
 assign mem_sign_extend_sd = lh_i_sd || lb_i_sd; 
 
@@ -451,7 +451,7 @@ assign csr_wenable_sd = csrrw_i_sd || csrrs_i_sd || csrrc_i_sd || csrrwi_i_sd ||
 //-------------------------
 // Branch offset
 //-------------------------
-assign offset_branch_b[31:12] = {12{INSTR_RI[31]}};
+assign offset_branch_b[31:12] = {20{INSTR_RI[31]}};
 assign offset_branch_b[11] = INSTR_RI[7];
 assign offset_branch_b[10:5] = INSTR_RI[30:25];
 assign offset_branch_b[4:1] = INSTR_RI[11:8];
@@ -527,7 +527,7 @@ assign pc = resetting_sd ? READ_PC_SR :
        (add_offset_to_pc == 1 && !dec2if_full_sd && !stall_sd && reset_n) ? pc_jump :
         32'hABCDEF00;
 
-assign instruction_access_fault_sd = (EXCEPTION_SM == 0 && CURRENT_MODE_SM != 2'b11 && pc > kernel_adr) ? 1'b1 : 1'b0;
+assign instruction_access_fault_sd = (EXCEPTION_SM == 0 && CURRENT_MODE_SM != 2'b11 && pc > 32'hF0000000) ? 1'b1 : 1'b0;
 assign instruction_adress_misaligned_sd = (pc[1:0] != 2'b00 || (RETURN_ADRESS_SM[1:0] != 2'b00 && EXCEPTION_SM == 1)) ? 1'b1 : 1'b0;
 
 assign mtvec_value[31:1] = MTVEC_VALUE_RC[31:1];
@@ -559,7 +559,7 @@ assign rs1_link = (radr1_sd == 6'b000001 || radr1_sd == 6'b000101) ? 1'b1 : 1'b0
 assign pop_adr_ras_sd = (PRED_TAKEN_RI == 1'b0 && ((rd_link == 1'b0 && rs1_link == 1'b1) || (rd_link == 1'b1 && rs1_link == 1'b1 && (rdest_sd != radr1_sd)))) ? 1'b1 : 1'b0;
 assign push_adr_ras_sd = (rd_link == 1'b1 && (jal_i_sd || jalr_i_sd)) ? 1'b1 : 1'b0;
 
-assign ret_sd = (jalr_type_sd && rdest_sd == 6'b0 && offset_branch_sd == 32'h4 && radr1_sd == 1'b1) ? 1'b1 : 1'b0;
+assign ret_sd = (jalr_type_sd && rdest_sd == 6'b0 && offset_branch_sd == 32'h4 && radr1_sd == 6'b1) ? 1'b1 : 1'b0;
 
 //-------------------------
 // Bypass

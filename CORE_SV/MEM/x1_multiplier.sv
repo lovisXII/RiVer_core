@@ -13,11 +13,10 @@ module x1_multiplier (
   output logic X0X1_POP_SX1
 );
 
-  typedef logic [63:0] tab_2_t;
-  typedef logic [4][63:0] tab_5_t;
+   logic [63:0] x0_data[6];
+   logic [63:0] product_s6, product_s7, product_s8;
 
-  tab_5_t x0_data;
-  tab_2_t product_s6, product_s7, product_s8;
+   
   logic stall_sx1;
   logic [129:0] x1x2_din, x1x2_dout;
   logic x1x2_push, x1x2_full;
@@ -31,30 +30,6 @@ module x1_multiplier (
     .FULL(x1x2_full),
     .EMPTY(X1X2_EMPTY_SX1),
     .DOUT(x1x2_dout)
-  );
-
-  csa csa6 (
-    .A(x0_data[0]),
-    .B(x0_data[1]),
-    .C(x0_data[2]),
-    .S0(product_s6[0]),
-    .S1(product_s6[1])
-  );
-
-  csa csa7 (
-    .A(product_s6[0]),
-    .B(product_s6[1]),
-    .C(x0_data[3]),
-    .S0(product_s7[0]),
-    .S1(product_s7[1])
-  );
-
-  csa csa8 (
-    .A(product_s7[0]),
-    .B(product_s7[1]),
-    .C(x0_data[4]),
-    .S0(product_s8[0]),
-    .S1(product_s8[1])
   );
 
   assign stall_sx1 = x1x2_full || X0X1_EMPTY_SX0;
@@ -105,7 +80,7 @@ csa csa8 (
 
 assign stall_sx1 = x1x2_full || X0X1_EMPTY_SX0;
 assign x1x2_push = ~stall_sx1;
-assign x0x1_POP_SX1 = ~stall_sx1;
+assign X0X1_POP_SX1 = ~stall_sx1;
 
 // fifo x1x2 input
 assign x1x2_din[129] = SIGNED_RES_RX0;

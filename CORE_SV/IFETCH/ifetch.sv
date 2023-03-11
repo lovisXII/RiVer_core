@@ -66,7 +66,7 @@ module ifetch(
     logic [31:0] predicted_adr_reg[PRED_REG_SIZE-1:0];
 
     logic [1:0] pred_state_reg [PRED_REG_SIZE-1:0];
-    logic       pred_valid_reg [PRED_REG_SIZE-1:0];
+    logic [PRED_REG_SIZE-1:0]      pred_valid_reg ;
 
     logic [31:0] pred_next_adr_si = 32'h11111100;
     logic [PRED_POINTER_SIZE-1:0] pred_write_pointer_si;
@@ -76,7 +76,7 @@ module ifetch(
     //logic [31:0] ret_stack_reg[0:RET_STACK_SIZE-1];
     //logic [RET_PRED_REG_SIZE-1:0] ret_valid_reg;
     //logic [RET_PRED_POINTER_SIZE-1:0] ret_write_pointer_si;
-    //logic [31:0] pred_branch_next_adr = 32'h22222200;
+    logic [31:0] pred_branch_next_adr = 32'h22222200;
     //logic [RET_STACK_SIZE-1:0] ret_stack_pointer_si;
     //logic [31:0] pred_ret_next_adr = 32'h33333300;
 
@@ -129,7 +129,7 @@ module ifetch(
                             end
                             
                             weakly_not_taken: begin
-                                next_pred_state = weakly_taken;
+                                next_pred_state <= weakly_taken;
                                 if (!PRED_SUCCESS_RD) begin
                                     next_pred_state <= strongly_not_taken;
                                 end
@@ -296,7 +296,7 @@ assign IF2DEC_EMPTY_SI = if2dec_empty;
 //----------------------
 //-- Input
 
-assign if2dec_din[31:0] = PRED_ADR_SD ? ((PRED_TAKEN_SD && !PRED_FAILED_RD) ? PRED_ADR_SD : PC_RD) : PC_RD;
+assign if2dec_din[31:0] = (PRED_TAKEN_SD && !PRED_FAILED_RD) ? PRED_ADR_SD : PC_RD ;
 assign if2dec_din[63:32] = EXCEPTION_SM ? nop_i : IC_INST_SI;
 
 assign if2dec_din[95:64] =  pred_branch_next_adr;//pred_branch_taken ? pred_branch_next_adr : pred_ret_taken ? pred_ret_next_adr : 32'h44444400;

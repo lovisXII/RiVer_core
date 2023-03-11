@@ -37,13 +37,15 @@ module x0_multiplier (
         .DOUT(x0x1_dout)
     );
 
+/*
 
-    function unsigned one_ext_32;
+    function unsigned 32'h1;
         input logic [31:0] in_val;
         begin
-            one_ext_32 = {in_val[31], {28{in_val[31]}}, in_val};
+            32'h1 = {in_val[31], {28{in_val[31]}}, in_val};
         end
     endfunction
+    */
 // need clarification
 assign signed_type = (MULT_CMD_RD == 2'b10 || MULT_CMD_RD == 2'b01) && (OP1_SE[31] && OP2_SE[31]) ? 1'b0 :
 (MULT_CMD_RD != 2'b11) ? 1'b1 : 1'b0;

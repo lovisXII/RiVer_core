@@ -1,0 +1,1 @@
+obj_dir/Vdecod.cpp obj_dir/Vdecod.h obj_dir/Vdecod.mk obj_dir/Vdecod__Slow.cpp obj_dir/Vdecod__Syms.cpp obj_dir/Vdecod__Syms.h obj_dir/Vdecod__ver.d obj_dir/Vdecod_classes.mk  : /usr/bin/verilator_bin /usr/bin/verilator_bin DECOD/decod.sv USEFULL/fifo.sv 

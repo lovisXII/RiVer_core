@@ -1,0 +1,13 @@
+# DESCRIPTION: Verilator output: Timestamp data for --skip-identical.  Delete at will.
+C "-cc EXE/divider.sv"
+S   7892640  3684495  1678479134    30023799  1598506306           0 "/usr/bin/verilator_bin"
+S      5468  1590803  1678556593   581089144  1678556593   581089144 "EXE/divider.sv"
+T     15750  1609599  1678556595   113114057  1678556595   113114057 "obj_dir/Vdivider.cpp"
+T      4752  1609597  1678556595   109113992  1678556595   109113992 "obj_dir/Vdivider.h"
+T      1437  1609601  1678556595   113114057  1678556595   113114057 "obj_dir/Vdivider.mk"
+T     12672  1609598  1678556595   113114057  1678556595   113114057 "obj_dir/Vdivider__Slow.cpp"
+T       549  1609584  1678556595   109113992  1678556595   109113992 "obj_dir/Vdivider__Syms.cpp"
+T       795  1609596  1678556595   109113992  1678556595   109113992 "obj_dir/Vdivider__Syms.h"
+T       256  1609607  1678556595   113114057  1678556595   113114057 "obj_dir/Vdivider__ver.d"
+T         0        0  1678556595   113114057  1678556595   113114057 "obj_dir/Vdivider__verFiles.dat"
+T      1554  1609600  1678556595   113114057  1678556595   113114057 "obj_dir/Vdivider_classes.mk"

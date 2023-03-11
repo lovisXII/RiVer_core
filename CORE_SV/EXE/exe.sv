@@ -182,15 +182,15 @@ divider divider_i (
 assign alu_op2 = (NEG_OP2_RD == 1'b1) ? ~op2 : op2;
 
 // SLT/SLTU operation
-assign slt_res = ((op1[31] == 1'b1) && (op2[31] == 1'b0)) ? 32'b00000000000000000000000000000001 :
-((op1[31] == 1'b0) && (op2[31] == 1'b1)) ? 32'b00000000000000000000000000000000 :
-(op1 == op2) ? 32'b00000000000000000000000000000000 :
+assign slt_res = ((op1[31] == 1'b1) && (op2[31] == 1'b0)) ? 32'b1 :
+((op1[31] == 1'b0) && (op2[31] == 1'b1)) ? 32'b0 :
+(op1 == op2) ? 32'b0 :
 {alu_res[31], {3'b0, alu_res[30:0]}};
 
-assign sltu_res = ((op1[31] == 1'b1) && (op2[31] == 1'b0)) ? 32'b00000000000000000000000000000000 :
-((op1[31] == 1'b0) && (op2[31] == 1'b1)) ? 32'b00000000000000000000000000000001 :
-(op1 == op2) ? 32'b00000000000000000000000000000000 :
-{alu_res[31], {3'b0, alu_res[30:0]}};
+assign sltu_res =   ((op1[31]) && (!op2[31])) ? 32'b0 :
+                    ((!op1[31]) && (op2[31])) ? 32'b1 :
+                    (op1 == op2) ? 32'b0 :
+                    {31'b0,alu_res[31]};
 
 // exe result selection
 always_comb begin
@@ -254,7 +254,7 @@ assign adress_misaligned = ((alu_res[1:0] != 2'b00 && MEM_SIZE_RD == 2'b00) ||
 assign load_adress_misaligned_se = MEM_LOAD_RD & adress_misaligned;
 assign store_adress_misaligned_se = MEM_STORE_RD & adress_misaligned;
 
-assign access_fault = (alu_res > kernel_adr && CURRENT_MODE_SM == 2'b00) ? 1'b1 : 1'b0;
+assign access_fault = (alu_res > 32'hF0000000 && CURRENT_MODE_SM == 2'b00) ? 1'b1 : 1'b0;
 assign load_access_fault_se = MEM_LOAD_RD & access_fault;
 assign store_access_fault_se = MEM_STORE_RD & access_fault;
 

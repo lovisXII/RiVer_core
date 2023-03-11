@@ -7,7 +7,6 @@ package river_pkg;
     localparam int unsigned RET_STACK_SIZE         =  16;
 
     localparam logic [31:0] kernel_adr  = 32'hF0000000; 
-    localparam logic [31:0] one_ext_32  = 32'h1;
 
     localparam logic zero_ext_pred_size[PRED_POINTER_SIZE]    = 0;
     localparam logic zero_ext_ret_size[RET_PRED_POINTER_SIZE] = 0;

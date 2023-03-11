@@ -35,12 +35,7 @@ logic setup_regs, same, zero_div, running;
 always_ff @(posedge clk, negedge reset_n)
 begin 
     if (!reset_n) begin
-        EP  <=  idle; 
-        //divisor_reg     <=  x"0000000000000000";
-        //quotient_reg    <=  x"00000000";
-        //reminder_reg    <=  x"0000000000000000";
-        //shift_cpt_reg   <=  6'b0;
-        
+        EP  <=  idle;         
     end else begin 
         EP  <=  EF;
 
@@ -85,63 +80,64 @@ begin
     endcase 
 end 
 
-always_ff @ (posedge EP) begin 
+always_comb 
+ begin 
     case (EP)
         idle: begin 
-            setup_regs <= 1'b0;
-            same <= 1'b0;
-            zero_div <= 1'b0;
-            running <= 1'b0;
-            DONE_DIV <= 1'b0;
-            BUSY_DIV <= 1'b0;
+            setup_regs = 1'b0;
+            same = 1'b0;
+            zero_div = 1'b0;
+            running = 1'b0;
+            DONE_DIV = 1'b0;
+            BUSY_DIV = 1'b0;
         end
         setup: begin
-            setup_regs <= 1'b1;
-            same <= 1'b0;
-            zero_div <= 1'b0;
-            running <= 1'b0;
-            DONE_DIV <= 1'b0;
-            BUSY_DIV <= 1'b1;
+            setup_regs = 1'b1;
+            same = 1'b0;
+            zero_div = 1'b0;
+            running = 1'b0;
+            DONE_DIV = 1'b0;
+            BUSY_DIV = 1'b1;
         end
         same_ops: begin
-            setup_regs <= 1'b0;
-            same <= 1'b1;
-            zero_div <= 1'b0;
-            running <= 1'b0;
-            DONE_DIV <= 1'b0;
-            BUSY_DIV <= 1'b1;
+            setup_regs = 1'b0;
+            same = 1'b1;
+            zero_div = 1'b0;
+            running = 1'b0;
+            DONE_DIV = 1'b0;
+            BUSY_DIV = 1'b1;
         end
         zero: begin
-            setup_regs <= 1'b0;
-            same <= 1'b0;
-            zero_div <= 1'b1;
-            running <= 1'b0;
-            DONE_DIV <= 1'b0;
-            BUSY_DIV <= 1'b1;
+            setup_regs = 1'b0;
+            same = 1'b0;
+            zero_div = 1'b1;
+            running = 1'b0;
+            DONE_DIV = 1'b0;
+            BUSY_DIV = 1'b1;
         end
         run: begin
-            setup_regs <= 1'b0;
-            same <= 1'b0;
-            zero_div <= 1'b0;
-            running <= 1'b1;
-            DONE_DIV <= 1'b0;
-            BUSY_DIV <= 1'b1;
+            setup_regs = 1'b0;
+            same = 1'b0;
+            zero_div = 1'b0;
+            running = 1'b1;
+            DONE_DIV = 1'b0;
+            BUSY_DIV = 1'b1;
         end
         done: begin
-            setup_regs <= 1'b0;
-            same <= 1'b0;
-            zero_div <= 1'b0;
-            running <= 1'b0;
-            DONE_DIV <= 1'b1;
-            BUSY_DIV <= 1'b1;
+            setup_regs = 1'b0;
+            same = 1'b0;
+            zero_div = 1'b0;
+            running = 1'b0;
+            DONE_DIV = 1'b1;
+            BUSY_DIV = 1'b1;
         end
         default: begin
-            setup_regs <= 1'b0;
-            same <= 1'b0;
-            zero_div <= 1'b0;
-            running <= 1'b0;
-            DONE_DIV <= 1'b0;
-            BUSY_DIV <= 1'b0;
+            setup_regs = 1'b0;
+            same = 1'b0;
+            zero_div = 1'b0;
+            running = 1'b0;
+            DONE_DIV = 1'b0;
+            BUSY_DIV = 1'b0;
         end
     endcase
 end
@@ -161,40 +157,42 @@ end
 
 assign division = (divisor_reg > reminder_reg) ? 1'b1 : 1'b0;
 
-divisor_setup[62:31] <= op2_div; 
-divisor_setup[63]    <= 1'b0; 
-divisor_setup[30:0]  <= '0;
+assign divisor_setup[62:31] = op2_div; 
+assign divisor_setup[63]    = 1'b0; 
+assign divisor_setup[30:0]  = '0;
 
-divisor_se = (setup_regs) ? divisor_setup :
+assign divisor_se = (setup_regs) ? divisor_setup :
               (running) ? {1'b0, divisor_reg[63:1]} :
-              64'h0000000000000000;
+              64'b0;
 
-quotient_se = (setup_regs) ? 32'h0 :
-               (same) ? 32'h00000001 :
-               (zero_div) ? 32'hFFFFFFFF :
-               {quotient_reg[30:0], division} when running else
-               32'h0;
+assign quotient_se = (setup_regs) ? 32'h0 :
+                      (same) ? 32'h00000001 :
+                      (zero_div) ? 32'hFFFFFFFF :
+                      (running) ? {quotient_reg[30:0], division} :
+                      32'h0;
 
-reminder_se = (setup_regs || zero_div) ? {32'h0, op1_div} :
+
+assign reminder_se = (setup_regs || zero_div) ? {32'h0, op1_div} :
                (running && division) ? $signed(reminder_reg) - $signed(divisor_reg) :
                64'h0000000000000000;
 
-shift_cpt_se = (running) ? $signed(shift_cpt_reg) + $signed(one_ext_6) :
+assign shift_cpt_se = (running) ? $signed(shift_cpt_reg) + $signed(6'b1) :
                 6'b000000;
 
-op1_div = (setup_regs && signed_inst && op1[31]) ? $signed(~op1) + $signed(one_ext_32) : op1;
+assign op1_div = (setup_regs && signed_inst && op1[31]) ? $signed(~op1) + $signed(32'h1) : op1;
 
-op2_div = (setup_regs && signed_inst && op2[31]) ? $signed(~op2) + $signed(one_ext_32) : op2;
+assign op2_div = (setup_regs && signed_inst && op2[31]) ? $signed(~op2) + $signed(32'h1) : op2;
 
-signed_inst = (setup_regs && (CMD_RD == 2'b11 || CMD_RD == 2'b01)) ? 1'b1 : 1'b0;
+assign signed_inst = (setup_regs && (CMD_RD == 2'b11 || CMD_RD == 2'b01)) ? 1'b1 : 1'b0;
 
-quotient_sign_se = (op1[31] ^ op2[31]) && signed_inst ? 1'b1 : 1'b0;
+assign quotient_sign_se = (op1[31] ^ op2[31]) && signed_inst ? 1'b1 : 1'b0;
 
-reminder_sign_se = op1[31] && signed_inst ? 1'b1 : 1'b0;
+assign reminder_sign_se = op1[31] && signed_inst ? 1'b1 : 1'b0;
 
 // Output
-remind = (reminder_sign_reg) ? std_logic_vector(unsigned(~reminder_reg[31:0]) + unsigned(one_ext_32)) : reminder_reg[31:0];
-quotient = (quotient_sign_reg) ? std_logic_vector(unsigned(~quotient_reg) + unsigned(one_ext_32)) : quotient_reg;
-RES_DIV = (cmd_reg == 2'b11 || cmd_reg == 2'b00) ? remind : quotient;
+assign remind = (reminder_sign_reg) ? ~(reminder_reg[31:0] + 1'b1) : reminder_reg[31:0];
+assign quotient = (quotient_sign_reg) ? ~(quotient_reg + 1'b1) : quotient_reg;
+
+assign RES_DIV = (cmd_reg == 2'b11 || cmd_reg == 2'b00) ? remind : quotient;
 
 endmodule
