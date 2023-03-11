@@ -22,7 +22,7 @@ end divider;
 
 architecture archi of divider is 
 
-constant one_ext_6 : std_logic_vector(5 downto 0) := 1'b1;
+constant 6'b1 : std_logic_vector(5 downto 0) := 1'b1;
     
 type state is (idle, setup, zero, same_ops, run, done);
 signal EP, EF : state; 
@@ -197,16 +197,16 @@ reminder_se     <=  x"00000000" & op1_div                                       
                     std_logic_vector(signed(reminder_reg) - signed(divisor_reg))    when running    = 1'b1 and  division = 1'b1   else
                     x"0000000000000000"; 
 
-shift_cpt_se    <=  std_logic_vector(signed(shift_cpt_reg) + signed(one_ext_6)) when    running     = 1'b1 else
+shift_cpt_se    <=  std_logic_vector(signed(shift_cpt_reg) + signed(6'b1)) when    running     = 1'b1 else
                     6'b0;
 
 
-op1_div     <=  std_logic_vector(signed(not(op1)) + signed(one_ext_32)) when setup_regs = 1'b1 and signed_inst = 1'b1 and op1(31) = 1'b1 else op1;
+op1_div     <=  std_logic_vector(signed(~op1) + signed(32'h1)) when setup_regs = 1'b1 and signed_inst = 1'b1 and op1(31) = 1'b1 else op1;
 
-op2_div     <=  std_logic_vector(signed(not(op2)) + signed(one_ext_32)) when setup_regs = 1'b1 and signed_inst = 1'b1 and op2(31) = 1'b1 else op2;   
+op2_div     <=  std_logic_vector(signed(~op2) + signed(32'h1)) when setup_regs = 1'b1 and signed_inst = 1'b1 and op2(31) = 1'b1 else op2;   
 
 
-signed_inst     <=  1'b1 when (CMD_RD = "11" or CMD_RD = 2'b01) and setup_regs = 1'b1  else 
+signed_inst     <=  1'b1 when (CMD_RD = 2'b11 or CMD_RD = 2'b01) and setup_regs = 1'b1  else 
                     1'b0; 
 
 quotient_sign_se <= (op1(31) xor op2(31)) and signed_inst   when setup_regs = 1'b1   else 
@@ -217,12 +217,12 @@ reminder_sign_se <= op1(31) and signed_inst                 when setup_regs = 1'
 
 -- Ouput
 remind      <=  reminder_reg(31 downto 0)   when reminder_sign_reg = 1'b0                else 
-                std_logic_vector(unsigned(not(reminder_reg(31 downto 0))) + unsigned(one_ext_32));
+                std_logic_vector(unsigned(not(reminder_reg(31 downto 0))) + unsigned(32'h1));
 
 quotient    <=  quotient_reg                when    quotient_sign_reg = 1'b0             else 
-                std_logic_vector(unsigned(not(quotient_reg)) + unsigned(one_ext_32));    
+                std_logic_vector(unsigned(~quotient_reg) + unsigned(32'h1));    
 
-RES_DIV     <=  remind                      when    (cmd_reg = "11" or cmd_reg = 2'b00)  else 
+RES_DIV     <=  remind                      when    (cmd_reg = 2'b11 or cmd_reg = 2'b00)  else 
                 quotient; 
 
 end archi; 

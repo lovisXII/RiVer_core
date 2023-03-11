@@ -246,7 +246,7 @@ write_pred_ret : process(clk, reset_n)
 variable found : std_logic; 
 begin 
     if reset_n = 1'b0 then 
-        ret_write_pointer_si    <=  one_ext_ret_size;
+        ret_write_pointer_si    <=  { { RET_PRED_POINTER_SIZE - 2 {1'b0} }, 1'b1 };
         ret_valid_reg           <=  (others => 1'b0);
     elsif falling_edge(clk) then 
         found := 1'b0;

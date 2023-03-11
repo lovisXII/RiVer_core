@@ -51,7 +51,7 @@ clk <= not clk after 5 ns;
 
 OP1_RD <= x"0000F000"; 
 OP2_RD <= 32'h4;
-CMD_RD <= 2'b00, 2'b01 after 25 ns, "10" after 35 ns, "11" after 45 ns, 2'b00 after 55 ns, 2'b01 after 65 ns, "10" after 75 ns;
+CMD_RD <= 2'b00, 2'b01 after 25 ns, 2'b10 after 35 ns, 2'b11 after 45 ns, 2'b00 after 55 ns, 2'b01 after 65 ns, 2'b10 after 75 ns;
 SLT_RD <= 1'b0, 1'b1 after 85 ns, 1'b0 after 95 ns;
 SLTU_RD <= 1'b0, 1'b1 after 95 ns, 1'b0 after 105 ns;
 NEG_OP2_RD <= 1'b0, 1'b1 after 15 ns, 1'b0 after 25 ns, 1'b1 after 85 ns, 1'b0 after 105 ns; 

@@ -52,11 +52,11 @@ hit <=  1'b1 when    adr_tag = tags(to_integer(unsigned(adr_index))) and data_va
 
 IC_INST_SI  <=  data0(to_integer(unsigned(adr_index)))  when adr_offset(3 downto 2) = 2'b00  else 
                 data1(to_integer(unsigned(adr_index)))  when adr_offset(3 downto 2) = 2'b01  else
-                data2(to_integer(unsigned(adr_index)))  when adr_offset(3 downto 2) = "10"  else
-                data3(to_integer(unsigned(adr_index)))  when adr_offset(3 downto 2) = "11"  else
+                data2(to_integer(unsigned(adr_index)))  when adr_offset(3 downto 2) = 2'b10  else
+                data3(to_integer(unsigned(adr_index)))  when adr_offset(3 downto 2) = 2'b11  else
                 x"00000000";
 
-IC_STALL_SI <=  not(hit);
+IC_STALL_SI <=  ~hit;
 
 -- succession des etats 
 fsm_transition : process(clk, reset_n)

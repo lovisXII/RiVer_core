@@ -413,14 +413,14 @@ illegal_inst    <=  not (add_i_sd or sub_i_sd or slt_i_sd or sltu_i_sd or and_i_
                     mul_i_sd or mulh_i_sd or mulhu_i_sd or mulhsu_i_sd or 
                     ecall_i_sd or ebreak_i_sd or csrrw_i_sd or csrrs_i_sd or csrrc_i_sd or csrrwi_i_sd or csrrsi_i_sd or csrrci_i_sd or mret_i_sd or sret_i_sd or fence_i_sd);
 
-illegal_inst_sd <=  illegal_inst and not(IF2DEC_EMPTY_SI);
+illegal_inst_sd <=  illegal_inst and ~IF2DEC_EMPTY_SI;
 
 -- Env call  
 env_call_u_mode_sd  <= 1'b1 when CURRENT_MODE_SM = 2'b00 and ecall_i_sd = 1'b1 else 1'b0;  
-env_call_s_mode_sd  <= 1'b1 when CURRENT_MODE_SM /= "10" and sret_i_sd = 1'b1 else 1'b0; 
-env_call_m_mode_sd  <= 1'b1 when CURRENT_MODE_SM = "11" and ecall_i_sd = 1'b1 else 1'b0; 
+env_call_s_mode_sd  <= 1'b1 when CURRENT_MODE_SM /= 2'b10 and sret_i_sd = 1'b1 else 1'b0; 
+env_call_m_mode_sd  <= 1'b1 when CURRENT_MODE_SM = 2'b11 and ecall_i_sd = 1'b1 else 1'b0; 
 
-env_call_wrong_mode <= 1'b1 when CURRENT_MODE_SM /= "11" and mret_i_sd = 1'b1 else 1'b0; 
+env_call_wrong_mode <= 1'b1 when CURRENT_MODE_SM /= 2'b11 and mret_i_sd = 1'b1 else 1'b0; 
 
 ------------------------------------
 -- Registers and operands selection
@@ -448,9 +448,9 @@ op1_csri_type_sd(31 downto 5)   <= (others => 1'b0);
 op1_csri_type_sd(4 downto 0)    <= INSTR_RI(19 downto 15);
 
 dec2exe_op1_sd <=   rdata1_sd               when ((r_type_sd or i_type_sd or s_type_sd or b_type_sd or csrrw_i_sd or csrrs_i_sd or m_type_sd) = 1'b1) else 
-                    not(rdata1_sd)          when csrrc_i_sd = 1'b1 else 
+                    ~rdata1_sd          when csrrc_i_sd = 1'b1 else 
                     op1_csri_type_sd        when ((csrrwi_i_sd or csrrsi_i_sd) = 1'b1) else
-                    not(op1_csri_type_sd)   when csrrci_i_sd = 1'b1 else 
+                    ~op1_csri_type_sd   when csrrci_i_sd = 1'b1 else 
                     op1_u_type_sd           when u_type_sd = 1'b1 else 
                     READ_PC_SR              when ((j_type_sd or jalr_type_sd) = 1'b1) else 
                     x"00000000";
@@ -463,7 +463,7 @@ op2_s_type_sd(31 downto 12) <=  (others => INSTR_RI(31));
 op2_s_type_sd(11 downto 5)  <= INSTR_RI(31 downto 25);
 op2_s_type_sd(4 downto 0)   <= INSTR_RI(11 downto 7);
 
-dec2exe_op2_sd <=   rdata2_sd       when ((r_type_sd  or b_type_sd or (u_type_sd and not(auipc_i_sd)) or m_type_sd) = 1'b1) else 
+dec2exe_op2_sd <=   rdata2_sd       when ((r_type_sd  or b_type_sd or (u_type_sd and ~auipc_i_sd) or m_type_sd) = 1'b1) else 
                     CSR_RDATA_SC    when ((csrrs_i_sd or csrrc_i_sd or csrrsi_i_sd or csrrci_i_sd) = 1'b1) else
                     op2_i_type_sd   when i_type_sd = 1'b1 else
                     op2_s_type_sd   when s_type_sd = 1'b1 else
@@ -477,28 +477,28 @@ dec2exe_op2_sd <=   rdata2_sd       when ((r_type_sd  or b_type_sd or (u_type_sd
 neg_op2_sd <= sub_i_sd or slt_i_sd or slti_i_sd or sltu_i_sd or sltiu_i_sd; 
 -- exe command 
 alu_cmd     <=  2'b01    when    ((and_i_sd or andi_i_sd or srl_i_sd or srli_i_sd or csrrc_i_sd or csrrci_i_sd) = 1'b1) else 
-                "10"    when    ((or_i_sd or ori_i_sd or sra_i_sd or srai_i_sd or csrrs_i_sd or csrrsi_i_sd) = 1'b1) else
-                "11"    when    ((xor_i_sd or xori_i_sd) = 1'b1) else 
+                2'b10    when    ((or_i_sd or ori_i_sd or sra_i_sd or srai_i_sd or csrrs_i_sd or csrrsi_i_sd) = 1'b1) else
+                2'b11    when    ((xor_i_sd or xori_i_sd) = 1'b1) else 
                 2'b00;
 
 mult_cmd    <=  2'b01    when    mul_i_sd = 1'b1      else 
-                "10"    when    mulh_i_sd = 1'b1     else 
-                "11"    when    mulhu_i_sd = 1'b1    else
+                2'b10    when    mulh_i_sd = 1'b1     else 
+                2'b11    when    mulhu_i_sd = 1'b1    else
                 2'b00;
 
 div_cmd     <=  2'b01    when    div_i_sd = 1'b1      else 
-                "10"    when    divu_i_sd = 1'b1     else
-                "11"    when    rem_i_sd = 1'b1      else 
+                2'b10    when    divu_i_sd = 1'b1     else
+                2'b11    when    rem_i_sd = 1'b1      else 
                 2'b00;  
 
-exe_cmd_sd  <=  div_cmd     when    select_operation_sd = "1000" else 
-                mult_cmd    when    select_operation_sd = "0100" else 
+exe_cmd_sd  <=  div_cmd     when    select_operation_sd = 4'b1000 else 
+                mult_cmd    when    select_operation_sd = 4'b0100 else 
                 alu_cmd;
 
-select_operation_sd <=  "1000"  when    ((div_i_sd or divu_i_sd or rem_i_sd or remu_i_sd) = 1'b1) else 
-                        "0100"  when    ((mul_i_sd or mulh_i_sd or mulhsu_i_sd or mulhu_i_sd) = 1'b1)                        else 
-                        "0010"  when    ((sll_i_sd or slli_i_sd or srl_i_sd or srli_i_sd or sra_i_sd or srai_i_sd) = 1'b1)   else 
-                        "0001";
+select_operation_sd <=  4'b1000  when    ((div_i_sd or divu_i_sd or rem_i_sd or remu_i_sd) = 1'b1) else 
+                        4'b0100  when    ((mul_i_sd or mulh_i_sd or mulhsu_i_sd or mulhu_i_sd) = 1'b1)                        else 
+                        4'b0010  when    ((sll_i_sd or slli_i_sd or srl_i_sd or srli_i_sd or sra_i_sd or srai_i_sd) = 1'b1)   else 
+                        4'b0001;
 
 wb_sd <=    r_type_sd or i_type_sd or u_type_sd or b_type_sd or j_type_sd or jalr_type_sd or 
             csrrw_i_sd or csrrs_i_sd or csrrc_i_sd or csrrwi_i_sd or csrrsi_i_sd or csrrci_i_sd;
@@ -511,8 +511,8 @@ mem_store_sd <= sw_i_sd or sh_i_sd or sb_i_sd;
 
 mem_size_sd <=  2'b00 when ((lw_i_sd or sw_i_sd)= 1'b1) else              -- word size 
                 2'b01 when ((lh_i_sd or lhu_i_sd or sh_i_sd) = 1'b1) else -- halfword size
-                "10" when ((lb_i_sd or lbu_i_sd or sb_i_sd) = 1'b1) else -- byte size
-                "11";                                                   -- not a mem access
+                2'b10 when ((lb_i_sd or lbu_i_sd or sb_i_sd) = 1'b1) else -- byte size
+                2'b11;                                                   -- not a mem access
  
 mem_sign_extend_sd <= lh_i_sd or lb_i_sd; 
 
@@ -571,7 +571,7 @@ jump_sd <=  1'b1 when b_type_sd = 1'b1    and (   (bne_i_sd = 1'b1 and (res /= x
             (j_type_sd or jalr_type_sd);
                 
 
-add_offset_to_pc <= jump_sd and not(IF2DEC_EMPTY_SI);
+add_offset_to_pc <= jump_sd and ~IF2DEC_EMPTY_SI;
 
 -- PC 
 WRITE_PC_ENABLE_SD  <=  1'b1 when    ((add_offset_to_pc = 1'b0 and dec2if_full_sd = 1'b0) 
@@ -602,7 +602,7 @@ pc  <=  READ_PC_SR  when resetting_sd = 1'b1 else
         pc_jump     when add_offset_to_pc = 1'b1 and dec2if_full_sd = 1'b0 and stall_sd = 1'b0 and reset_n = 1'b1 else
         x"ABCDEF00"; 
 
-instruction_access_fault_sd <= 1'b1 when EXCEPTION_SM = 1'b0 and CURRENT_MODE_SM /= "11" and pc > kernel_adr else 1'b0; 
+instruction_access_fault_sd <= 1'b1 when EXCEPTION_SM = 1'b0 and CURRENT_MODE_SM /= 2'b11 and pc > kernel_adr else 1'b0; 
 instruction_adress_misaligned_sd <= 1'b1 when pc(1 downto 0) /= 2'b00 or (RETURN_ADRESS_SM(1 downto 0) /= 2'b00 and EXCEPTION_SM = 1'b1) else 1'b0;  
 
 mtvec_value(31 downto 1)    <= MTVEC_VALUE_RC(31 downto 1);

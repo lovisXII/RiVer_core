@@ -82,19 +82,19 @@ x0x1 : fifo
     );
 
 -- need clarification
-signed_type     <=  1'b0 when (MULT_CMD_RD = "10" or MULT_CMD_RD = 2'b01) and (OP1_SE(31) = 1'b1 and OP2_SE(31) = 1'b1)  else 
-                    1'b1 when (MULT_CMD_RD /= "11") else 
+signed_type     <=  1'b0 when (MULT_CMD_RD = 2'b10 or MULT_CMD_RD = 2'b01) and (OP1_SE(31) = 1'b1 and OP2_SE(31) = 1'b1)  else 
+                    1'b1 when (MULT_CMD_RD /= 2'b11) else 
                     1'b0;
 
 signed_res_sx0  <=  1'b0 when (OP1_SE(31) = 1'b1 and OP2_SE(31) = 1'b1) else 1'b1; -- else  ?? 
 select_msb_sx0  <=  1'b1 when MULT_CMD_RD /= 2'b01 else 1'b0; 
 
-op1             <=  std_logic_vector(unsigned(not(OP1_SE)) + unsigned(one_ext_32)) when ((OP1_SE(31) = 1'b1 and OP2_SE(31) = 1'b1) and (MULT_CMD_RD = "10" or MULT_CMD_RD = 2'b01)) else 
-                    OP2_SE when (OP1_SE(31) = 1'b0 and OP2_SE(31) = 1'b1) and (MULT_CMD_RD = "10" or MULT_CMD_RD = 2'b01) else 
+op1             <=  std_logic_vector(unsigned(~OP1_SE) + unsigned(32'h1)) when ((OP1_SE(31) = 1'b1 and OP2_SE(31) = 1'b1) and (MULT_CMD_RD = 2'b10 or MULT_CMD_RD = 2'b01)) else 
+                    OP2_SE when (OP1_SE(31) = 1'b0 and OP2_SE(31) = 1'b1) and (MULT_CMD_RD = 2'b10 or MULT_CMD_RD = 2'b01) else 
                     OP1_SE; 
 
-op2             <=  std_logic_vector(unsigned(not(OP2_SE)) + unsigned(one_ext_32)) when ((OP1_SE(31) = 1'b1 and OP2_SE(31) = 1'b1) and (MULT_CMD_RD = "10" or MULT_CMD_RD = 2'b01)) else 
-                    OP1_SE when (OP1_SE(31) = 1'b0 and OP2_SE(31) = 1'b1) and (MULT_CMD_RD = "10" or MULT_CMD_RD = 2'b01) else 
+op2             <=  std_logic_vector(unsigned(~OP2_SE) + unsigned(32'h1)) when ((OP1_SE(31) = 1'b1 and OP2_SE(31) = 1'b1) and (MULT_CMD_RD = 2'b10 or MULT_CMD_RD = 2'b01)) else 
+                    OP1_SE when (OP1_SE(31) = 1'b0 and OP2_SE(31) = 1'b1) and (MULT_CMD_RD = 2'b10 or MULT_CMD_RD = 2'b01) else 
                     OP2_SE; 
 
 partial_product : process(clk, op1, op2, signed_type)

@@ -105,7 +105,7 @@ signal byt_sel_sm : std_logic_vector(3 downto 0);
 
 -- CSR & Exception 
 signal exception : std_logic := 1'b0; 
-signal mode_sm : std_logic_vector(1 downto 0) := "11";
+signal mode_sm : std_logic_vector(1 downto 0) := 2'b11;
 signal new_mode : std_logic_vector(1 downto 0);
 signal machine_mode_condition : std_logic;
 signal old_mode : std_logic_vector(1 downto 0);
@@ -177,7 +177,7 @@ data_byte_store_sm(7 downto 0)      <= MEM_DATA_RE(7 downto 0);
 data_half_store_sm(31 downto 16)    <= (others => 1'b0);
 data_half_store_sm(15 downto 0)     <= MEM_DATA_RE(15 downto 0);
 
-data_store_sm       <=  data_byte_store_sm when MEM_SIZE_RE = "10" else 
+data_store_sm       <=  data_byte_store_sm when MEM_SIZE_RE = 2'b10 else 
                         data_half_store_sm when MEM_SIZE_RE = 2'b01 else 
                         MEM_DATA_RE;
 
@@ -186,22 +186,22 @@ MCACHE_DATA_SM <= data_store_sm;
 MCACHE_ADR_SM <= RES_RE;
 MCACHE_LOAD_SM <= LOAD_RE;
 MCACHE_STORE_SM <= STORE_RE;
-MCACHE_ADR_VALID_SM <= (not(EXE2MEM_EMPTY_SE) or not(mem_fifo_mult_inst)) and (STORE_RE or LOAD_RE);
+MCACHE_ADR_VALID_SM <= (~EXE2MEM_EMPTY_SE or ~mem_fifo_mult_inst) and (STORE_RE or LOAD_RE);
 
 -- sign extend and load size 
-lb_sign     <=  MCACHE_RESULT_SM(31)    when    byt_sel_sm = "1000" else
-                MCACHE_RESULT_SM(23)    when    byt_sel_sm = "0100" else
-                MCACHE_RESULT_SM(15)    when    byt_sel_sm = "0010" else
-                MCACHE_RESULT_SM(7)     when    byt_sel_sm = "0001" else
+lb_sign     <=  MCACHE_RESULT_SM(31)    when    byt_sel_sm = 4'b1000 else
+                MCACHE_RESULT_SM(23)    when    byt_sel_sm = 4'b0100 else
+                MCACHE_RESULT_SM(15)    when    byt_sel_sm = 4'b0010 else
+                MCACHE_RESULT_SM(7)     when    byt_sel_sm = 4'b0001 else
                 1'b0;
 
 load_byte(31 downto 8)  <=  x6'b0 when SIGN_EXTEND_RE = 1'b0 else 
                             (others => lb_sign); 
 
-load_byte(7 downto 0)   <=  MCACHE_RESULT_SM(31 downto 24)  when byt_sel_sm = "1000" else
-                            MCACHE_RESULT_SM(23 downto 16)  when byt_sel_sm = "0100" else 
-                            MCACHE_RESULT_SM(15 downto 8)   when byt_sel_sm = "0010" else
-                            MCACHE_RESULT_SM(7 downto 0)    when byt_sel_sm = "0001" else
+load_byte(7 downto 0)   <=  MCACHE_RESULT_SM(31 downto 24)  when byt_sel_sm = 4'b1000 else
+                            MCACHE_RESULT_SM(23 downto 16)  when byt_sel_sm = 4'b0100 else 
+                            MCACHE_RESULT_SM(15 downto 8)   when byt_sel_sm = 4'b0010 else
+                            MCACHE_RESULT_SM(7 downto 0)    when byt_sel_sm = 4'b0001 else
                             x2'b00; 
 
 lh_sign     <=  MCACHE_RESULT_SM(31)    when    byt_sel_sm = "1100" else 
@@ -217,17 +217,17 @@ load_halfword(15 downto 0)  <=  MCACHE_RESULT_SM(15 downto 0)   when byt_sel_sm 
 
 load_word <= MCACHE_RESULT_SM; 
 
-load_data <= load_byte when MEM_SIZE_RE = "10" else 
+load_data <= load_byte when MEM_SIZE_RE = 2'b10 else 
              load_halfword when MEM_SIZE_RE = 2'b01 else
              load_word; 
 
 -- byte select 
-byt_sel_sm  <=  "0001" when (MEM_SIZE_RE = "10" and RES_RE(1 downto 0) = 2'b00) else 
-                "0010" when (MEM_SIZE_RE = "10" and RES_RE(1 downto 0) = 2'b01) else   
-                "0100" when (MEM_SIZE_RE = "10" and RES_RE(1 downto 0) = "10") else 
-                "1000" when (MEM_SIZE_RE = "10" and RES_RE(1 downto 0) = "11") else
+byt_sel_sm  <=  4'b0001 when (MEM_SIZE_RE = 2'b10 and RES_RE(1 downto 0) = 2'b00) else 
+                4'b0010 when (MEM_SIZE_RE = 2'b10 and RES_RE(1 downto 0) = 2'b01) else   
+                4'b0100 when (MEM_SIZE_RE = 2'b10 and RES_RE(1 downto 0) = 2'b10) else 
+                4'b1000 when (MEM_SIZE_RE = 2'b10 and RES_RE(1 downto 0) = 2'b11) else
                 "0011" when (MEM_SIZE_RE = 2'b01 and RES_RE(1 downto 0) = 2'b00) else 
-                "1100" when (MEM_SIZE_RE = 2'b01 and RES_RE(1 downto 0) = "10") else
+                "1100" when (MEM_SIZE_RE = 2'b01 and RES_RE(1 downto 0) = 2'b10) else
                 "1111" when (MEM_SIZE_RE = 2'b00 and RES_RE(1 downto 0) = 2'b00) else
                 "0000";   
 byt_sel     <=  byt_sel_sm;     
@@ -291,13 +291,13 @@ machine_mode_condition  <=  ENV_CALL_WRONG_MODE_RE              or
                             ILLEGAL_INSTRUCTION_RE              or 
                             INSTRUCTION_ACCESS_FAULT_RE;   
 
-new_mode <= "11" when machine_mode_condition = 1'b1 else 
+new_mode <= 2'b11 when machine_mode_condition = 1'b1 else 
             2'b00;
 
 reg_mode : process(clk, reset_n)
 begin 
     if reset_n = 1'b0 then 
-        old_mode <= "11";
+        old_mode <= 2'b11;
     elsif rising_edge(clk) then 
         old_mode <= mode_sm; 
     end if; 

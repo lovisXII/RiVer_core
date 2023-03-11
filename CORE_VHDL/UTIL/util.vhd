@@ -9,7 +9,7 @@ package util is
     constant RET_STACK_SIZE         :   integer :=  16;
 
     constant kernel_adr : std_logic_vector(31 downto 0) := x"F0000000"; 
-    constant one_ext_32 : std_logic_vector(31 downto 0) := x"00000001";
+    constant 32'h1 : std_logic_vector(31 downto 0) := x"00000001";
 
     constant zero_ext_pred_size     :   std_logic_vector(PRED_POINTER_SIZE-1 downto 0) := (others => 1'b0);
     constant zero_ext_ret_size      :   std_logic_vector(RET_PRED_POINTER_SIZE-1 downto 0) := (others => 1'b0);

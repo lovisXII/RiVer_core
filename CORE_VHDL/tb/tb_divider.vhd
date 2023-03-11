@@ -58,7 +58,7 @@ reset_n <= 1'b0, 1'b1 after 6 ns;
 
 
 START_DIV   <= 1'b0, 1'b1 after 45 ns, 1'b0 after 55 ns; 
-cmd      <= "10";
+cmd      <= 2'b10;
 
 op1         <=  x"0000000A";
 op2         <=  x"00000002";

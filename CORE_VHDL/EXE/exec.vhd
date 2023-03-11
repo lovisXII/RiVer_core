@@ -251,18 +251,18 @@ sltu_res <= x"00000000" when (op1(31) = 1'b1 and op2(31) = 1'b0) else
 
 -- exe result selection
 
-exe_res <=  res_div     when SELECT_OPERATION_RD = "1000"                   else 
-            shifter_res when SELECT_OPERATION_RD = "0010"                   else 
-            slt_res     when SELECT_OPERATION_RD = "0001" and SLT_RD = 1'b1  else
-            sltu_res    when SELECT_OPERATION_RD = "0001" and SLTU_RD = 1'b1 else
+exe_res <=  res_div     when SELECT_OPERATION_RD = 4'b1000                   else 
+            shifter_res when SELECT_OPERATION_RD = 4'b0010                   else 
+            slt_res     when SELECT_OPERATION_RD = 4'b0001 and SLT_RD = 1'b1  else
+            sltu_res    when SELECT_OPERATION_RD = 4'b0001 and SLTU_RD = 1'b1 else
             alu_res;
 
 
-start_div   <=  1'b1     when SELECT_OPERATION_RD = "1000" and DEC2EXE_EMPTY_SD = 1'b0 and (busy_div = 1'b0 and done_div = 1'b0) else 1'b0; --and (done_div = 1'b0) else 1'b0; 
+start_div   <=  1'b1     when SELECT_OPERATION_RD = 4'b1000 and DEC2EXE_EMPTY_SD = 1'b0 and (busy_div = 1'b0 and done_div = 1'b0) else 1'b0; --and (done_div = 1'b0) else 1'b0; 
 
 
 -- fifo 
-stall_se <= exe2mem_full or DEC2EXE_EMPTY_SD or blocked_se or not(r1_valid_se) or not(r2_valid_se) or (busy_div and (not(done_div)));
+stall_se <= exe2mem_full or DEC2EXE_EMPTY_SD or blocked_se or ~r1_valid_se or ~r2_valid_se or (busy_div and (~done_div));
 exe2mem_push <= not stall_se; 
 DEC2EXE_POP_SE <= not (stall_se or start_div);
 
@@ -272,8 +272,8 @@ r1_valid_se <=  1'b1 when    (   (RADR1_RD = 6'b0 or BLOCK_BP_RD = 1'b1)        
                                 (RADR1_RD = MEM_DEST_RM and CSR_WENABLE_RM = 1'b1)   or 
                                 (RADR1_RD = exe_fifo_dest and exe_fifo_mem_load = 1'b1 and exe2mem_empty = 1'b0)
                             ) else 
-                (not(exe_fifo_mult_inst) or exe2mem_empty) when (RADR1_RD = exe_fifo_dest and exe_fifo_mem_load = 1'b0) else 
-                (not(MULT_INST_RM) or BP_MEM2WBK_EMPTY_SM) when (RADR1_RD = MEM_DEST_RM) else 
+                (~exe_fifo_mult_inst or exe2mem_empty) when (RADR1_RD = exe_fifo_dest and exe_fifo_mem_load = 1'b0) else 
+                (~MULT_INST_RM or BP_MEM2WBK_EMPTY_SM) when (RADR1_RD = MEM_DEST_RM) else 
                 1'b1; 
 
 r2_valid_se <=  1'b1;

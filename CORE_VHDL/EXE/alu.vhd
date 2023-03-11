@@ -24,8 +24,8 @@ begin
     case CMD_SE is
         when 2'b00 => RES_SE <= std_logic_vector(signed(OP1_SE) + signed(OP2_SE) + signed(carry));
         when 2'b01 => RES_SE <= OP1_SE and OP2_SE;
-        when "10" => RES_SE <= OP1_SE or OP2_SE;
-        when "11" => RES_SE <= OP1_SE xor OP2_SE;
+        when 2'b10 => RES_SE <= OP1_SE or OP2_SE;
+        when 2'b11 => RES_SE <= OP1_SE xor OP2_SE;
         when others => RES_SE <= (others => 1'b0);
     end case; 
 end process; 

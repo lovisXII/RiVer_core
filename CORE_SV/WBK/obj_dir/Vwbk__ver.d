@@ -1,1 +1,0 @@
-obj_dir/Vwbk.cpp obj_dir/Vwbk.h obj_dir/Vwbk.mk obj_dir/Vwbk__Slow.cpp obj_dir/Vwbk__Syms.cpp obj_dir/Vwbk__Syms.h obj_dir/Vwbk__ver.d obj_dir/Vwbk_classes.mk  : /usr/bin/verilator_bin /usr/bin/verilator_bin wbk.sv 
