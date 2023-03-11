@@ -169,13 +169,13 @@ divisor_se = (setup_regs) ? divisor_setup :
               (running) ? {1'b0, divisor_reg[63:1]} :
               64'h0000000000000000;
 
-quotient_se = (setup_regs) ? 32'h00000000 :
+quotient_se = (setup_regs) ? 32'h0 :
                (same) ? 32'h00000001 :
                (zero_div) ? 32'hFFFFFFFF :
                {quotient_reg[30:0], division} when running else
-               32'h00000000;
+               32'h0;
 
-reminder_se = (setup_regs || zero_div) ? {32'h00000000, op1_div} :
+reminder_se = (setup_regs || zero_div) ? {32'h0, op1_div} :
                (running && division) ? $signed(reminder_reg) - $signed(divisor_reg) :
                64'h0000000000000000;
 

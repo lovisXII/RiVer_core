@@ -88,9 +88,12 @@ module mem (
 logic [72:0] mem2wbk_din, mem2wbk_dout;
 logic mem2wbk_push, mem2wbk_full, stall_sm, wb;
 logic [31:0] load_data, load_byte, load_halfword, load_word, data_sm, data_store_sm, data_byte_store_sm, data_half_store_sm;
-logic lb_sign, lh_sign, byt_sel_sm [3:0];
+logic lb_sign;
+logic lh_sign;
+logic [3:0] byt_sel_sm ;
 logic exception, machine_mode_condition;
-logic [1:0] mode_sm, new_mode, old_mode;
+logic [1:0] mode_sm, new_mode;
+logic [1:0] old_mode;
 logic [31:0] mstatus_x, mcause_x, mtval_x;
 logic mem_fifo_mult_inst;
 
@@ -151,8 +154,8 @@ assign lb_sign = (byt_sel_sm == 4'b1000) ? MCACHE_RESULT_SM[31] :
                  (byt_sel_sm == 4'b0001) ? MCACHE_RESULT_SM[7]  :
                  1'b0;
 
-assign load_byte[31:8] = (SIGN_EXTEND_RE == 1'b0) ? 24'd0 :
-                         {lb_sign, {24{lb_sign[7]}}};
+assign load_byte[31:8] = (SIGN_EXTEND_RE == 1'b0) ? 24'b0 :
+                         {24{lb_sign}};
 
 assign load_byte[7:0] = (byt_sel_sm == 4'b1000) ? MCACHE_RESULT_SM[31:24] :
                         (byt_sel_sm == 4'b0100) ? MCACHE_RESULT_SM[23:16] :
@@ -165,7 +168,7 @@ assign lh_sign = (byt_sel_sm == 4'b1100) ? MCACHE_RESULT_SM[31] :
                  1'b0;
 
 assign load_halfword[31:16] = (SIGN_EXTEND_RE == 1'b0) ? 16'd0 :
-                             {lh_sign, {16{lh_sign[7]}}};
+                             {16{lh_sign}};
 
 assign load_halfword[15:0] = (byt_sel_sm == 4'b0011) ? MCACHE_RESULT_SM[15:0] :
                              (byt_sel_sm == 4'b1100) ? MCACHE_RESULT_SM[31:16] :
@@ -190,7 +193,7 @@ assign byt_sel_sm = (MEM_SIZE_RE == 2'b10 && RES_RE[1:0] == 2'b00) ? 4'b0001 :
 assign byt_sel = byt_sel_sm;
 
 // Data selection to be written in register file
-assign data_sm = (LOAD_RE == 1'b1) ? load_data :
+assign data_sm = (LOAD_RE) ? load_data :
                  RES_RE;
 
 // CSR & Exception
@@ -222,16 +225,16 @@ assign mcause_x    =  (ENV_CALL_WRONG_MODE_RE)           ? 32'h00000018 :
                     (ENV_CALL_S_MODE_RE)               ? 32'h00000009 : 
                     (ENV_CALL_U_MODE_RE)               ? 32'h00000008 : 
                     (EBREAK_RE)                        ? 32'h00000003 : 
-                    (INSTRUCTION_ADRESS_MISALIGNED_RE) ? 32'h00000000 : 
+                    (INSTRUCTION_ADRESS_MISALIGNED_RE) ? 32'h0 : 
                     (ILLEGAL_INSTRUCTION_RE)           ? 32'h00000002 : 
                     (INSTRUCTION_ACCESS_FAULT_RE)      ? 32'h00000001 : 
-                                                      32'h00000000; // or debug value
+                                                      32'h0; // or debug value
 
 // MTVAL
 assign mtval_x     =  ((STORE_ACCESS_FAULT_RE || LOAD_ACCESS_FAULT_RE || STORE_ADRESS_MISALIGNED_RE || LOAD_ADRESS_MISALIGNED_RE) ? RES_RE : 
                     (INSTRUCTION_ADRESS_MISALIGNED_RE) ? PC_BRANCH_VALUE_RE : 
                     (EBREAK_RE) ? PC_EXE2MEM_RE : 
-                    32'h00000000); 
+                    32'h0); 
 
 assign machine_mode_condition  =  ENV_CALL_WRONG_MODE_RE              || 
                             STORE_ACCESS_FAULT_RE               || 
@@ -259,31 +262,31 @@ end
 assign mode_sm = (exception) ? new_mode : old_mode; 
 
 // RETURN_ADRESS_SM
-assign RETURN_ADRESS_SM = (MRET_RE == 1) ? MEPC_SC : 32'h00000000;
+assign RETURN_ADRESS_SM = (MRET_RE) ? MEPC_SC : 32'h0;
 
 // Ouput affectation 
-assign EXCEPTION_SM     = (EXCEPTION_RE == 1 || BUS_ERROR_SX == 1) ? 1'b1 : 1'b0;
+assign EXCEPTION_SM     = (EXCEPTION_RE || BUS_ERROR_SX ) ? 1'b1 : 1'b0;
 assign MEPC_WDATA_SM    = PC_EXE2MEM_RE;
-assign MSTATUS_WDATA_SM = {1'b0, MSTATUS_RC[30:13], old_mode, MSTATUS_RC[10:8], MSTATUS_RC[3], MSTATUS_RC[6:4], 1'b0, MSTATUS_RC[2:0]};
-assign CURRENT_MODE_SM  = (exception == 1) ? new_mode : old_mode;
-assign MRET_SM          = (MRET_RE == 1 && exception == 1) ? 1'b1 : 1'b0;
-assign MIP_WDATA_SM     = 32'h00000000;
-assign MTVAL_WDATA_SM   = ((STORE_ACCESS_FAULT_RE || LOAD_ACCESS_FAULT_RE || STORE_ADRESS_MISALIGNED_RE || LOAD_ADRESS_MISALIGNED_RE) == 1) ? RES_RE : 
-                         (INSTRUCTION_ADRESS_MISALIGNED_RE == 1) ? PC_BRANCH_VALUE_RE :
-                         (EBREAK_RE == 1) ? PC_EXE2MEM_RE : 32'h00000000;
-assign MCAUSE_WDATA_SM  = (ENV_CALL_WRONG_MODE_RE == 1) ? 32'h00000018 :
-                         (STORE_ACCESS_FAULT_RE == 1) ? 32'h00000007 :
-                         (LOAD_ACCESS_FAULT_RE == 1) ? 32'h00000005 :
-                         (ENV_CALL_WRONG_MODE_RE == 1) ? 32'h00000005 :
-                         (STORE_ADRESS_MISALIGNED_RE == 1) ? 32'h00000006 :
-                         (LOAD_ADRESS_MISALIGNED_RE == 1) ? 32'h00000004 :
-                         (ENV_CALL_M_MODE_RE == 1) ? 32'h0000000B :
-                         (ENV_CALL_S_MODE_RE == 1) ? 32'h00000009 :
-                         (ENV_CALL_U_MODE_RE == 1) ? 32'h00000008 :
-                         (EBREAK_RE == 1) ? 32'h00000003 :
-                         (INSTRUCTION_ADRESS_MISALIGNED_RE == 1) ? 32'h00000000 :
-                         (ILLEGAL_INSTRUCTION_RE == 1) ? 32'h00000002 :
-                         (INSTRUCTION_ACCESS_FAULT_RE == 1) ? 32'h00000001 : 32'h00000000;
+assign MSTATUS_WDATA_SM = mstatus_x;
+assign CURRENT_MODE_SM  = (exception) ? new_mode : old_mode;
+assign MRET_SM          = (MRET_RE && exception) ? 1'b1 : 1'b0;
+assign MIP_WDATA_SM     = 32'h0;
+assign MTVAL_WDATA_SM   = (STORE_ACCESS_FAULT_RE || LOAD_ACCESS_FAULT_RE || STORE_ADRESS_MISALIGNED_RE || LOAD_ADRESS_MISALIGNED_RE) ? RES_RE : 
+                         (INSTRUCTION_ADRESS_MISALIGNED_RE) ? PC_BRANCH_VALUE_RE :
+                         (EBREAK_RE ) ? PC_EXE2MEM_RE : 32'h0;
+assign MCAUSE_WDATA_SM  = (ENV_CALL_WRONG_MODE_RE ) ? 32'h00000018 :
+                         (STORE_ACCESS_FAULT_RE ) ? 32'h00000007 :
+                         (LOAD_ACCESS_FAULT_RE ) ? 32'h00000005 :
+                         (ENV_CALL_WRONG_MODE_RE ) ? 32'h00000005 :
+                         (STORE_ADRESS_MISALIGNED_RE ) ? 32'h00000006 :
+                         (LOAD_ADRESS_MISALIGNED_RE ) ? 32'h00000004 :
+                         (ENV_CALL_M_MODE_RE ) ? 32'h0000000B :
+                         (ENV_CALL_S_MODE_RE ) ? 32'h00000009 :
+                         (ENV_CALL_U_MODE_RE ) ? 32'h00000008 :
+                         (EBREAK_RE ) ? 32'h00000003 :
+                         (INSTRUCTION_ADRESS_MISALIGNED_RE ) ? 32'h0 :
+                         (ILLEGAL_INSTRUCTION_RE ) ? 32'h00000002 :
+                         (INSTRUCTION_ACCESS_FAULT_RE ) ? 32'h00000001 : 32'h0;
 assign MULT_INST_RM     = mem_fifo_mult_inst;
 
 endmodule;

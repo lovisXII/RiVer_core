@@ -62,29 +62,26 @@ module ifetch(
 
     logic [1:0] next_pred_state ;
 
-    logic [PRED_REG_SIZE-1:0] branch_adr_reg[31:0];
-    logic [PRED_REG_SIZE-1:0] predicted_adr_reg[31:0];
+    logic [31:0] branch_adr_reg   [PRED_REG_SIZE-1:0];
+    logic [31:0] predicted_adr_reg[PRED_REG_SIZE-1:0];
 
-    logic [PRED_REG_SIZE-1:0] pred_state_reg;
-    logic [PRED_REG_SIZE-1:0] pred_valid_reg;
+    logic [1:0] pred_state_reg [PRED_REG_SIZE-1:0];
+    logic       pred_valid_reg [PRED_REG_SIZE-1:0];
 
     logic [31:0] pred_next_adr_si = 32'h11111100;
     logic [PRED_POINTER_SIZE-1:0] pred_write_pointer_si;
 
     // Ret prediction 
-    logic [31:0] ret_adr_reg[0:RET_PRED_REG_SIZE-1];
+    //logic [31:0] ret_adr_reg[0:RET_PRED_REG_SIZE-1];
+    //logic [31:0] ret_stack_reg[0:RET_STACK_SIZE-1];
+    //logic [RET_PRED_REG_SIZE-1:0] ret_valid_reg;
+    //logic [RET_PRED_POINTER_SIZE-1:0] ret_write_pointer_si;
+    //logic [31:0] pred_branch_next_adr = 32'h22222200;
+    //logic [RET_STACK_SIZE-1:0] ret_stack_pointer_si;
+    //logic [31:0] pred_ret_next_adr = 32'h33333300;
 
-    logic [31:0] ret_stack_reg[0:RET_STACK_SIZE-1];
-
-    logic [RET_PRED_REG_SIZE-1:0] ret_valid_reg;
-
-    logic [RET_PRED_POINTER_SIZE-1:0] ret_write_pointer_si;
-    logic [31:0] pred_branch_next_adr = 32'h22222200;
-    logic [RET_STACK_SIZE-1:0] ret_stack_pointer_si;
-    logic [31:0] pred_ret_next_adr = 32'h33333300;
-
-    logic pred_branch_taken = 1'b0;
-    logic pred_ret_taken = 1'b0;
+    logic pred_branch_taken;
+    //logic pred_ret_taken;
 
     fifo #(.N(97)) if2dec (
         .clk(clk),
@@ -115,7 +112,7 @@ module ifetch(
         else begin
             if (PRED_FAILED_RD || PRED_SUCCESS_RD) begin
                 for (integer i=0; i<PRED_REG_SIZE; i++) begin
-                    if ((branch_adr_reg[i] != 32'h00000000) && (BRANCH_INST_ADR_RD != 32'h00000000)) begin
+                    if ((branch_adr_reg[i] != 32'h0) && (BRANCH_INST_ADR_RD != 32'h0)) begin
                         case (pred_state_reg[i])
                             strongly_taken: begin
                                 next_pred_state <= strongly_taken;
@@ -176,7 +173,7 @@ module ifetch(
                     predicted_adr_reg[pred_write_pointer] <= ADR_TO_BRANCH_RD;
                     pred_state_reg[pred_write_pointer] <= weakly_taken;
                     pred_valid_reg[pred_write_pointer] <= 1;
-                    pred_write_pointer <= pred_write_pointer + one_ext_pred_size;
+                    pred_write_pointer <= pred_write_pointer + { { PRED_POINTER_SIZE - 2 {1'b0} }, 1'b1 };
                 end
                 else begin
                     pred_state_reg[index] <= next_pred_state;
@@ -212,6 +209,9 @@ module ifetch(
             pred_branch_taken = 1'b0;
         end
     end
+
+
+    /*
     //----------------------
     //-- Ret prediction
     //----------------------
@@ -219,7 +219,7 @@ module ifetch(
     logic found;
     
     if (!reset_n) begin
-        ret_write_pointer_si <= one_ext_ret_size;
+        ret_write_pointer_si <= { { PRED_POINTER_SIZE - 2 {1'b0} }, 1'b1 };
         ret_valid_reg <= '0;
     end else begin
         found = 0;
@@ -244,7 +244,7 @@ always_ff @(posedge clk or negedge reset_n) begin
     
     if (!reset_n) begin 
         pred_ret_taken <= 1'b0;
-        ret_stack_pointer <= one_ext_ret_stack_size;
+        ret_stack_pointer <= { { RET_STACK_SIZE - 2 {1'b0} }, 1'b1 };
     end else begin 
         found = 0;
         adr_pushed = 0;
@@ -287,7 +287,7 @@ always_ff @(posedge clk or negedge reset_n) begin
     end
     ret_stack_pointer_si <= ret_stack_pointer;
 end
-
+*/
 assign EXCEPTION_RI = 1'b0; 
 assign IF2DEC_EMPTY_SI = if2dec_empty; 
 
@@ -299,10 +299,9 @@ assign IF2DEC_EMPTY_SI = if2dec_empty;
 assign if2dec_din[31:0] = PRED_ADR_SD ? ((PRED_TAKEN_SD && !PRED_FAILED_RD) ? PRED_ADR_SD : PC_RD) : PC_RD;
 assign if2dec_din[63:32] = EXCEPTION_SM ? nop_i : IC_INST_SI;
 
-assign if2dec_din[95:64] = pred_branch_taken ? pred_branch_next_adr :
-pred_ret_taken ? pred_ret_next_adr : 32'h44444400;
+assign if2dec_din[95:64] =  pred_branch_next_adr;//pred_branch_taken ? pred_branch_next_adr : pred_ret_taken ? pred_ret_next_adr : 32'h44444400;
 
-assign if2dec_din[96] = pred_branch_taken || pred_ret_taken;
+assign if2dec_din[96] = pred_branch_taken; //| pred_ret_taken;
 
 // Output
 assign PC_IF2DEC_RI = if2dec_dout[31:0];

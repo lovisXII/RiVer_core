@@ -181,7 +181,7 @@ logic different_sign;
 logic [31:0] res;
 logic [31:0] res_compare;
 logic add_offset_to_pc;
-logic [31:0] pc = 32'h00000000;
+logic [31:0] pc = 32'h0;
 logic [31:0] init_pc;
 logic [31:0] new_pc;
 logic [31:0] pc_branch_value_sd;
@@ -434,7 +434,7 @@ assign select_operation_sd =  (div_i_sd || divu_i_sd || rem_i_sd || remu_i_sd) ?
 assign wb_sd = r_type_sd || i_type_sd || u_type_sd || b_type_sd || j_type_sd || jalr_type_sd || 
                csrrw_i_sd || csrrs_i_sd || csrrc_i_sd || csrrwi_i_sd || csrrsi_i_sd || csrrci_i_sd;
 
-assign mem_data_sd = (s_type_sd) ? rdata2_sd : 32'h00000000;
+assign mem_data_sd = (s_type_sd) ? rdata2_sd : 32'h0;
 assign mem_load_sd = lw_i_sd || lh_i_sd || lhu_i_sd || lb_i_sd || lbu_i_sd;
 
 assign mem_store_sd = sw_i_sd || sh_i_sd || sb_i_sd;

@@ -27,7 +27,7 @@ module register_file(
         if (~reset_n) begin
             // init all registers except PC to 0
             for (int i = 0; i < 32; i++) begin 
-                registers[i] <= 32'h00000000;
+                registers[i] <= 32'h0;
             end
             registers[32] <= PC_INIT; 
         end else begin

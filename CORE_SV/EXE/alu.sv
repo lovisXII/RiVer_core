@@ -6,7 +6,7 @@ module alu(
     output logic [31:0] RES_SE
 );
 
-    logic [31:0] carry = {32'd0, CIN_SE};
+    logic [31:0] carry = {31'd0, CIN_SE};
 
     always_comb begin
         case (CMD_SE)

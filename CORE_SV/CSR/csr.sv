@@ -1,4 +1,7 @@
-module csr (
+import river_pkg::*;
+
+module csr 
+(
     input logic clk,
     input logic reset_n,
     input logic [11:0] CSR_WADR_SM,
@@ -53,19 +56,19 @@ module csr (
 
     always_ff @(posedge clk, negedge reset_n) begin
         if (~reset_n) begin
-            reg_mvendorid <= 32'h00000000;
-            reg_marchid <= 32'h00000000;
-            reg_mimpid <= 32'h00000000;
-            reg_mstatus <= 32'h00000000;
+            reg_mvendorid <= 32'h0;
+            reg_marchid <= 32'h0;
+            reg_mimpid <= 32'h0;
+            reg_mstatus <= 32'h0;
             reg_misa <= 32'h40100100;
-            reg_mie <= 32'h00000000;
-            reg_mtvec <= 32'h00000000;
-            reg_mstatush <= 32'h00000000;
-            reg_mepc <= 32'h00000000;
-            reg_mcause <= 32'h00000000;
-            reg_mtval <= 32'h00000000;
-            reg_mip <= 32'h00000000;
-            reg_mscratch <= 32'h00000000;
+            reg_mie <= 32'h0;
+            reg_mtvec <= 32'h0;
+            reg_mstatush <= 32'h0;
+            reg_mepc <= 32'h0;
+            reg_mcause <= 32'h0;
+            reg_mtval <= 32'h0;
+            reg_mip <= 32'h0;
+            reg_mscratch <= 32'h0;
             end 
         else begin
             if (EXCEPTION_SM) begin
@@ -103,7 +106,7 @@ assign CSR_RDATA_SC = (CSR_RADR_SD == adr_mvendorid) ? reg_mvendorid :
                       (CSR_RADR_SD == adr_mtval) ? reg_mtval :
                       (CSR_RADR_SD == adr_mip) ? reg_mip :
                       (CSR_RADR_SD == adr_mscratch) ? reg_mscratch :
-                      32'h00000000;
+                      32'h0;
 
 assign MEPC_SC = reg_mepc;
 assign MSTATUS_RC = reg_mstatus;
