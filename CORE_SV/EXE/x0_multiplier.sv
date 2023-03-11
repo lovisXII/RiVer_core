@@ -10,12 +10,13 @@ module x0_multiplier (
     output logic X0X1_EMPTY_SX0
 );
 
-    typedef logic [31:0] tab_32_t [0:31];
-    typedef logic [19:0] tab_20_t [0:19];
-    typedef logic [13:0] tab_14_t [0:13];
-    typedef logic [9:0] tab_10_t [0:9];
-    typedef logic [5:0] tab_6_t [0:5];
-    typedef logic [3:0] tab_4_t [0:3];
+
+    logic [31:0] product   [0:31]; 
+    logic [19:0] product_s1[0:19];
+    logic [13:0] product_s2[0:13];
+    logic [9:0] product_s3 [0:9];
+    logic [5:0] product_s4 [0:5];
+    logic [3:0] product_s5 [0:3];
 
     logic [31:0] op1, op2;
     logic [63:0] prod;

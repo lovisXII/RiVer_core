@@ -149,8 +149,8 @@ alu alu_i (
 );
 
 shifter shifter_i (
-    .DIN_SE(OP1),
-    .SHIFT_VAL_SE(OP2[4:0]),
+    .DIN_SE(op1),
+    .SHIFT_VAL_SE(op2[4:0]),
     .CMD_SE(CMD_RD),
     .DOUT_SE(shifter_res)
 );

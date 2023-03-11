@@ -27,7 +27,7 @@ module dec (
 
     output logic CSR_WENABLE_RD, 
     output logic [11:0] CSR_WADR_RD,
-    input [31:0] CSR_RDATA_RD,
+    output [31:0] CSR_RDATA_RD,
 
     // dec2if interface
     input DEC2IF_POP_SI,
@@ -95,6 +95,8 @@ module dec (
     input logic [31:0] MTVEC_VALUE_RC, MCAUSE_WDATA_SM, RETURN_ADRESS_SM,
     input logic MRET_SM
 );
+
+const logic [31:0] inc_value = 32'h4;
 
 // Declare signals
 logic reset_sync_sd;
