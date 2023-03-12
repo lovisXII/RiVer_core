@@ -239,7 +239,7 @@ inline std::string to_hex_string( uint64_t value )
     while ( value ) {
         auto digit = value & 0xF;
         if ( digit < 0xA ) {
-            str = char( 1'b0 + digit ) + str;
+            str = char( '0' + digit ) + str;
         }
         else {
             str = char( 'A' + digit - 0xA ) + str;

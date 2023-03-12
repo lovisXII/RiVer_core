@@ -5,6 +5,8 @@
 #include <unordered_map>
 #include "elfio/elfio.hpp"
 #include "systemc.h"
+#include "include/colors.h"
+#include "obj_dir/Vcore.h"
 
 using namespace std;
 using namespace ELFIO;
@@ -267,7 +269,7 @@ int sc_main(int argc, char* argv[]) {
     ##############################################################
 */
 
-    core core_inst("core_inst");
+    Vcore core_inst("core_inst");
 
 #ifdef ICACHE_ON
     icache icache_inst("icache");
