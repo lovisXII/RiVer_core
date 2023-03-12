@@ -34,7 +34,8 @@ logic [31:0] PC_RD, INSTR_RI, PC_IF2DEC_RI;
 logic DEC2EXE_POP_SE, DEC2EXE_EMPTY_SD;
 logic [31:0] OP1_RD, OP2_RD;
 logic [5:0] RADR1_RD, RADR2_RD;
-logic [31:0] MEM_DATA_RD, DEST_RD;
+logic [31:0] MEM_DATA_RD;
+logic [5:0] DEST_RD;
 logic [1:0] CMD_RD;
 logic [1:0] MEM_SIZE_RD;
 logic NEG_OP2_RD, WB_RD;
@@ -51,7 +52,8 @@ logic [31:0] READ_PC_SR;
 
 // exe2mem
 logic EXE2MEM_POP_SM, EXE2MEM_EMPTY_SE;
-logic [31:0] RES_RE, MEM_DATA_RE, DEST_RE;
+logic [31:0] RES_RE, MEM_DATA_RE;
+logic [5:0] DEST_RE;
 logic [1:0] MEM_SIZE_RE;
 logic WB_RE, MEM_SIGN_EXTEND_RE, MEM_LOAD_RE, MEM_STORE_RE;
 
@@ -83,7 +85,7 @@ logic [11:0] CSR_WADR_SM;
 logic [31:0] CSR_WDATA_SM;
 logic CSR_ENABLE_SM, CSR_WENABLE_RD;
 logic EXCEPTION_SM = 1'b0;
-logic [31:0] mstatus_wdata_sm;
+logic [31:0] MSTATUS_WDATA_SM;
 logic [31:0] MIP_WDATA_SM;
 logic [31:0] MEPC_WDATA_SM;
 logic [31:0] MCAUSE_WDATA_SM;
@@ -100,7 +102,7 @@ logic [31:0] CSR_RDATA_SC, CSR_RDATA_RD;
 // Exception
 logic ILLEGAL_INSTRUCTION_RD, ADRESS_MISALIGNED_RD, INSTRUCTION_ACCESS_FAULT_RD, EBREAK_RD;
 logic ILLEGAL_INSTRUCTION_RE, ADRESS_MISALIGNED_RE, INSTRUCTION_ACCESS_FAULT_RE, EBREAK_RE;
-logic EXCEPTION_RE;
+logic EXCEPTION_RI, EXCEPTION_RD, EXCEPTION_RE;
 logic STORE_ADRESS_MISALIGNED_RE, STORE_ACCESS_FAULT_RE;
 logic LOAD_ADRESS_MISALIGNED_RE, LOAD_ACCESS_FAULT_RE;
 logic ENV_CALL_U_MODE_RD, ENV_CALL_S_MODE_RD, ENV_CALL_M_MODE_RD;
@@ -142,7 +144,8 @@ logic [31:0] RES_RX2;
 
 // Branch prediction
 logic PRED_FAILED_RD, PRED_SUCCESS_RD;
-logic BRANCH_INST_RD, BRANCH_INST_ADR_RD;
+logic BRANCH_INST_RD;
+logic [31:0] BRANCH_INST_ADR_RD;
 logic [31:0] ADR_TO_BRANCH_RD;
 
 logic [31:0] PRED_ADR_SD;
@@ -322,7 +325,7 @@ dec dec_i
     .RETURN_ADRESS_SM(RETURN_ADRESS_SM)
 );
 
-exec exec_i (
+exe exec_i (
     // global interface
     .clk(clk),
     .reset_n(reset_n),
@@ -367,7 +370,7 @@ exec exec_i (
     .CSR_WENABLE_RM(CSR_WENABLE_RM),
     .CSR_RDATA_RM(CSR_RDATA_RM),
 
-    .MEM2WBK_EMPTY_SM(BP_MEM2WBK_EMPTY_SM),
+    .BP_MEM2WBK_EMPTY_SM(MEM2WBK_EMPTY_SM),
 
     // CSR 
     .CSR_WENABLE_RD(CSR_WENABLE_RD),
@@ -479,7 +482,7 @@ csr csr_i (
     .CSR_ENABLE_SM(CSR_ENABLE_SM),
 
     .EXCEPTION_SM(EXCEPTION_SM),
-    .mstatus_wdata_sm(mstatus_wdata_sm),
+    .MSTATUS_WDATA_SM(MSTATUS_WDATA_SM),
     .MIP_WDATA_SM(MIP_WDATA_SM),
     .MEPC_WDATA_SM(MEPC_WDATA_SM),
     .MCAUSE_WDATA_SM(MCAUSE_WDATA_SM),
@@ -495,6 +498,47 @@ csr csr_i (
     .CSR_RADR_SD(CSR_RADR_SD),
     .CSR_RDATA_SC(CSR_RDATA_SC)
 );
+
+x0_multiplier x0_mult (
+    .clk                (clk),
+    .reset_n            (reset_n),
+    .OP1_SE             (OP1_SE),
+    .OP2_SE             (OP2_SE),
+    .MULT_CMD_RD        (CMD_RD),
+    .X0X1_POP_SX1       (X0X1_POP_SX1),
+    .DEC2X0_EMPTY_SD   (DEC2EXE_EMPTY_SD),
+    .RES_RX0            (RES_RX0),
+    .SELECT_MSB_RX0     (SELECT_MSB_RX0),
+    .SIGNED_RES_RX0     (SIGNED_RES_RX0),
+    .X0X1_EMPTY_SX0     (X0X1_EMPTY_SX0)
+);
+
+x1_multiplier x1_mult (
+    .clk                (clk),
+    .reset_n            (reset_n),
+    .RES_RX0            (RES_RX0),
+    .SELECT_MSB_RX0     (SELECT_MSB_RX0),
+    .SIGNED_RES_RX0     (SIGNED_RES_RX0),
+    .X0X1_EMPTY_SX0     (X0X1_EMPTY_SX0),
+    .X1X2_POP_SX2       (X1X2_POP_SX2),
+    .RES_RX1            (RES_RX1),
+    .SELECT_MSB_RX1     (SELECT_MSB_RX1),
+    .SIGNED_RES_RX1     (SIGNED_RES_RX1),
+    .X1X2_EMPTY_SX1     (X1X2_EMPTY_SX1),
+    .X0X1_POP_SX1       (X0X1_POP_SX1)
+);
+
+x2_multiplier x2_mult (
+    .clk                (clk),
+    .reset_n            (reset_n),
+    .RES_RX1            (RES_RX1),
+    .SELECT_MSB_RX1     (SELECT_MSB_RX1),
+    .SIGNED_RES_RX1     (SIGNED_RES_RX1),
+    .X1X2_EMPTY_SX1     (X1X2_EMPTY_SX1),
+    .RES_RX2            (RES_RX2),
+    .X1X2_POP_SX2       (X1X2_POP_SX2)
+);
+
 
 assign DEBUG_PC_READ = READ_PC_SR;
 assign BUS_ERROR_SX = 1'b0;
