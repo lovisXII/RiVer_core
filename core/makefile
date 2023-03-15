@@ -5,7 +5,7 @@ SRC= $(shell find . -type f -name '*.sv') core_tb.cpp
 TOP=core
 
 # SYSTEMC?=/usr/local/systemc-2.3.3/
-INCLUDE_PATH= -I../ELFIO
+INCLUDE_PATH= -I../../ELFIO
 
 # LINK_PATH=-L $(SYSTEMC)/lib-linux64
 # LINKER_ARGS=-rpath=$(SYSTEMC)/lib-linux64 
