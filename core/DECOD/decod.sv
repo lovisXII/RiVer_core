@@ -371,9 +371,12 @@ assign env_call_wrong_mode = (CURRENT_MODE_SM != 2'b11) && mret_i_sd ? 1'b1 : 1'
 // Registers and operands selection
 // Registers affectation 
 
-assign radr1_sd = ((r_type_sd || i_type_sd || s_type_sd || b_type_sd || jalr_type_sd || m_type_sd) == 1) ? {1'b0, INSTR_RI[19:15]} : 6'h00;
-assign radr2_sd = ((r_type_sd || s_type_sd || b_type_sd || m_type_sd) == 1) ? {1'b0, INSTR_RI[24:20]} : 6'h00;
-assign rdest_sd = ((r_type_sd || i_type_sd || u_type_sd || j_type_sd || jalr_type_sd || m_type_sd) == 1 || (csrrw_i_sd || csrrs_i_sd || csrrc_i_sd || csrrwi_i_sd || csrrsi_i_sd || csrrci_i_sd) == 1) ? {1'b0, INSTR_RI[11:7]} : 6'h00;
+assign radr1_sd = (r_type_sd || i_type_sd || s_type_sd || b_type_sd || jalr_type_sd || m_type_sd  || csrrw_i_sd || csrrs_i_sd || csrrc_i_sd) 
+                    ? {1'b0, INSTR_RI[19:15]} : 6'h00;
+
+assign radr2_sd = (r_type_sd || s_type_sd || b_type_sd || m_type_sd) ? {1'b0, INSTR_RI[24:20]} : 6'h00;
+assign rdest_sd = (r_type_sd || i_type_sd || u_type_sd || j_type_sd || jalr_type_sd || m_type_sd || csrrw_i_sd || csrrs_i_sd || csrrc_i_sd || csrrwi_i_sd 
+                || csrrsi_i_sd || csrrci_i_sd) ? {1'b0, INSTR_RI[11:7]} : 6'h00;
 assign csr_radr = (system_inst_sd && (csrrw_i_sd || csrrs_i_sd || csrrc_i_sd || csrrwi_i_sd || csrrsi_i_sd || csrrci_i_sd)) ? INSTR_RI[31:20] : 12'h0;
 
 
@@ -385,9 +388,9 @@ assign op1_csri_type_sd[31:5] = 27'd0;
 assign op1_csri_type_sd[4:0] = INSTR_RI[19:15];
 
 assign dec2exe_op1_sd = (r_type_sd || i_type_sd || s_type_sd || b_type_sd || csrrw_i_sd || csrrs_i_sd || m_type_sd) ? rdata1_sd :
-                    (csrrc_i_sd ? ~rdata1_sd : (csrrwi_i_sd || csrrsi_i_sd ? op1_csri_type_sd : 
-                    (csrrci_i_sd ? ~op1_csri_type_sd : (u_type_sd ? op1_u_type_sd : 
-                    ((j_type_sd || jalr_type_sd) ? READ_PC_SR : 32'h0)))));
+                    (csrrc_i_sd) ? ~rdata1_sd : (csrrwi_i_sd || csrrsi_i_sd) ? op1_csri_type_sd : 
+                    (csrrci_i_sd) ? ~op1_csri_type_sd : (u_type_sd) ? op1_u_type_sd : 
+                    (j_type_sd || jalr_type_sd) ? READ_PC_SR : 32'h0;
 
 // Operand 2 selection
 assign op2_i_type_sd[31:12] = {20{INSTR_RI[31]}};
@@ -398,9 +401,9 @@ assign op2_s_type_sd[11:5] = INSTR_RI[31:25];
 assign op2_s_type_sd[4:0] = INSTR_RI[11:7];
 
 assign dec2exe_op2_sd = (r_type_sd || b_type_sd || (u_type_sd && !auipc_i_sd) || m_type_sd) ? rdata2_sd :
-                    (csrrs_i_sd || csrrc_i_sd || csrrsi_i_sd || csrrci_i_sd ? CSR_RDATA_SC :
-                    (i_type_sd ? op2_i_type_sd : (s_type_sd ? op2_s_type_sd : 
-                    (auipc_i_sd ? PC_IF2DEC_RI : 32'h0)))); 
+                    (csrrs_i_sd || csrrc_i_sd || csrrsi_i_sd || csrrci_i_sd) ? CSR_RDATA_SC :
+                    (i_type_sd) ? op2_i_type_sd : (s_type_sd) ? op2_s_type_sd : 
+                    (auipc_i_sd) ? PC_IF2DEC_RI : 32'h0; 
 
 //-------------------------
 //-- Exec commands  

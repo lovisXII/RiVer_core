@@ -9776,17 +9776,6 @@ VL_INLINE_OPT void Vcore::_sequent__TOP__6(Vcore__Syms* __restrict vlSymsp) {
                                                    == 
                                                    (0x7fU 
                                                     & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U])));
-    vlTOPp->core__DOT__dec_i__DOT__csrrw_i_sd = ((0x73U 
-                                                  == 
-                                                  (0x7fU 
-                                                   & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U])) 
-                                                 & (1U 
-                                                    == 
-                                                    (7U 
-                                                     & ((vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[2U] 
-                                                         << 0x14U) 
-                                                        | (vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U] 
-                                                           >> 0xcU)))));
     vlTOPp->core__DOT__dec_i__DOT__csrrwi_i_sd = ((0x73U 
                                                    == 
                                                    (0x7fU 
@@ -9798,28 +9787,6 @@ VL_INLINE_OPT void Vcore::_sequent__TOP__6(Vcore__Syms* __restrict vlSymsp) {
                                                           << 0x14U) 
                                                          | (vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U] 
                                                             >> 0xcU)))));
-    vlTOPp->core__DOT__dec_i__DOT__csrrs_i_sd = ((0x73U 
-                                                  == 
-                                                  (0x7fU 
-                                                   & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U])) 
-                                                 & (2U 
-                                                    == 
-                                                    (7U 
-                                                     & ((vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[2U] 
-                                                         << 0x14U) 
-                                                        | (vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U] 
-                                                           >> 0xcU)))));
-    vlTOPp->core__DOT__dec_i__DOT__csrrc_i_sd = ((0x73U 
-                                                  == 
-                                                  (0x7fU 
-                                                   & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U])) 
-                                                 & (3U 
-                                                    == 
-                                                    (7U 
-                                                     & ((vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[2U] 
-                                                         << 0x14U) 
-                                                        | (vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U] 
-                                                           >> 0xcU)))));
     vlTOPp->core__DOT__dec_i__DOT__csrrsi_i_sd = ((0x73U 
                                                    == 
                                                    (0x7fU 
@@ -9850,6 +9817,39 @@ VL_INLINE_OPT void Vcore::_sequent__TOP__6(Vcore__Syms* __restrict vlSymsp) {
                                                    == 
                                                    (0x7fU 
                                                     & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U])));
+    vlTOPp->core__DOT__dec_i__DOT__csrrw_i_sd = ((0x73U 
+                                                  == 
+                                                  (0x7fU 
+                                                   & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U])) 
+                                                 & (1U 
+                                                    == 
+                                                    (7U 
+                                                     & ((vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[2U] 
+                                                         << 0x14U) 
+                                                        | (vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U] 
+                                                           >> 0xcU)))));
+    vlTOPp->core__DOT__dec_i__DOT__csrrs_i_sd = ((0x73U 
+                                                  == 
+                                                  (0x7fU 
+                                                   & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U])) 
+                                                 & (2U 
+                                                    == 
+                                                    (7U 
+                                                     & ((vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[2U] 
+                                                         << 0x14U) 
+                                                        | (vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U] 
+                                                           >> 0xcU)))));
+    vlTOPp->core__DOT__dec_i__DOT__csrrc_i_sd = ((0x73U 
+                                                  == 
+                                                  (0x7fU 
+                                                   & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U])) 
+                                                 & (3U 
+                                                    == 
+                                                    (7U 
+                                                     & ((vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[2U] 
+                                                         << 0x14U) 
+                                                        | (vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U] 
+                                                           >> 0xcU)))));
     vlTOPp->core__DOT__dec_i__DOT__m_type_sd = ((0x33U 
                                                  == 
                                                  (0x7fU 
@@ -9925,27 +9925,27 @@ VL_INLINE_OPT void Vcore::_sequent__TOP__6(Vcore__Syms* __restrict vlSymsp) {
                                                          >> 0x14U)))
                                                 : 0U);
     vlTOPp->core__DOT__dec_i__DOT__rdest_sd = (((((
-                                                   (((0x33U 
-                                                      == 
-                                                      (0x7fU 
-                                                       & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U])) 
-                                                     | (IData)(vlTOPp->core__DOT__dec_i__DOT__i_type_sd)) 
-                                                    | (IData)(vlTOPp->core__DOT__dec_i__DOT__u_type_sd)) 
-                                                   | (0x6fU 
-                                                      == 
-                                                      (0x7fU 
-                                                       & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U]))) 
-                                                  | (0x67U 
-                                                     == 
-                                                     (0x7fU 
-                                                      & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U]))) 
-                                                 | (IData)(vlTOPp->core__DOT__dec_i__DOT__m_type_sd)) 
-                                                | ((((((IData)(vlTOPp->core__DOT__dec_i__DOT__csrrw_i_sd) 
-                                                       | (IData)(vlTOPp->core__DOT__dec_i__DOT__csrrs_i_sd)) 
-                                                      | (IData)(vlTOPp->core__DOT__dec_i__DOT__csrrc_i_sd)) 
-                                                     | (IData)(vlTOPp->core__DOT__dec_i__DOT__csrrwi_i_sd)) 
-                                                    | (IData)(vlTOPp->core__DOT__dec_i__DOT__csrrsi_i_sd)) 
-                                                   | (IData)(vlTOPp->core__DOT__dec_i__DOT__csrrci_i_sd)))
+                                                   ((((((((0x33U 
+                                                           == 
+                                                           (0x7fU 
+                                                            & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U])) 
+                                                          | (IData)(vlTOPp->core__DOT__dec_i__DOT__i_type_sd)) 
+                                                         | (IData)(vlTOPp->core__DOT__dec_i__DOT__u_type_sd)) 
+                                                        | (0x6fU 
+                                                           == 
+                                                           (0x7fU 
+                                                            & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U]))) 
+                                                       | (0x67U 
+                                                          == 
+                                                          (0x7fU 
+                                                           & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U]))) 
+                                                      | (IData)(vlTOPp->core__DOT__dec_i__DOT__m_type_sd)) 
+                                                     | (IData)(vlTOPp->core__DOT__dec_i__DOT__csrrw_i_sd)) 
+                                                    | (IData)(vlTOPp->core__DOT__dec_i__DOT__csrrs_i_sd)) 
+                                                   | (IData)(vlTOPp->core__DOT__dec_i__DOT__csrrc_i_sd)) 
+                                                  | (IData)(vlTOPp->core__DOT__dec_i__DOT__csrrwi_i_sd)) 
+                                                 | (IData)(vlTOPp->core__DOT__dec_i__DOT__csrrsi_i_sd)) 
+                                                | (IData)(vlTOPp->core__DOT__dec_i__DOT__csrrci_i_sd))
                                                 ? (0x1fU 
                                                    & ((vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[2U] 
                                                        << 0x19U) 
@@ -10028,24 +10028,27 @@ VL_INLINE_OPT void Vcore::_sequent__TOP__6(Vcore__Syms* __restrict vlSymsp) {
                                                          >> 0x14U)))
                                                 : 0U);
     vlTOPp->core__DOT__dec_i__DOT__radr1_sd = (((((
-                                                   ((0x33U 
-                                                     == 
-                                                     (0x7fU 
-                                                      & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U])) 
-                                                    | (IData)(vlTOPp->core__DOT__dec_i__DOT__i_type_sd)) 
-                                                   | (0x23U 
-                                                      == 
-                                                      (0x7fU 
-                                                       & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U]))) 
-                                                  | (0x63U 
-                                                     == 
-                                                     (0x7fU 
-                                                      & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U]))) 
-                                                 | (0x67U 
-                                                    == 
-                                                    (0x7fU 
-                                                     & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U]))) 
-                                                | (IData)(vlTOPp->core__DOT__dec_i__DOT__m_type_sd))
+                                                   (((((0x33U 
+                                                        == 
+                                                        (0x7fU 
+                                                         & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U])) 
+                                                       | (IData)(vlTOPp->core__DOT__dec_i__DOT__i_type_sd)) 
+                                                      | (0x23U 
+                                                         == 
+                                                         (0x7fU 
+                                                          & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U]))) 
+                                                     | (0x63U 
+                                                        == 
+                                                        (0x7fU 
+                                                         & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U]))) 
+                                                    | (0x67U 
+                                                       == 
+                                                       (0x7fU 
+                                                        & vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[1U]))) 
+                                                   | (IData)(vlTOPp->core__DOT__dec_i__DOT__m_type_sd)) 
+                                                  | (IData)(vlTOPp->core__DOT__dec_i__DOT__csrrw_i_sd)) 
+                                                 | (IData)(vlTOPp->core__DOT__dec_i__DOT__csrrs_i_sd)) 
+                                                | (IData)(vlTOPp->core__DOT__dec_i__DOT__csrrc_i_sd))
                                                 ? (0x1fU 
                                                    & ((vlTOPp->core__DOT__ifetch_i__DOT__if2dec__DOT__data[2U] 
                                                        << 0x11U) 

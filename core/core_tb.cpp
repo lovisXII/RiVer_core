@@ -315,7 +315,7 @@ int sc_main(int argc, char* argv[]) {
 
     int NB_CYCLES = 0;
     int cycles = 0;
-    int countdown ;
+    int countdown = 5000;
 
     int if_adr;
     int if_result;

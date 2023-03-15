@@ -227,9 +227,9 @@ assign r1_valid_se = ((RADR1_RD == 6'h00 || BLOCK_BP_RD) ||
                      (RADR1_RD == exe_fifo_dest && exe_fifo_csr_wenable) ||
                      (RADR1_RD == MEM_DEST_RM && CSR_WENABLE_RM) ||
                      (RADR1_RD == exe_fifo_dest && exe_fifo_mem_load && !exe2mem_empty)) ? 1'b1 :
-                    ((~exe_fifo_mult_inst || exe2mem_empty) && RADR1_RD == exe_fifo_dest && !exe_fifo_mem_load) ? 1'b1 :
-                    ((~MULT_INST_RM || BP_MEM2WBK_EMPTY_SM) && RADR1_RD == MEM_DEST_RM) ? 1'b1 :
-                    1'b0;
+                    (RADR1_RD == exe_fifo_dest && !exe_fifo_mem_load) ? (~exe_fifo_mult_inst || exe2mem_empty):
+                    (RADR1_RD == MEM_DEST_RM) ? (~MULT_INST_RM || BP_MEM2WBK_EMPTY_SM) :
+                    1'b1;
 
 assign bpc_disable1 = (RADR1_RD == 6'h00 || BLOCK_BP_RD == 1'b1) ? 1'b1 : 1'b0;
 assign bpc_disable2 = ((RADR2_RD == 6'h00) || (BLOCK_BP_RD == 1'b1) || (MEM_LOAD_RD == 1'b1)) ? 1'b1 : 1'b0;

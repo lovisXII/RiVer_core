@@ -165,8 +165,6 @@ SC_MODULE(Vcore) {
         CData/*0:0*/ core__DOT__dec_i__DOT__dec2if__DOT__data_v;
         CData/*0:0*/ core__DOT__dec_i__DOT__dec2exe__DOT__data_v;
         CData/*0:0*/ core__DOT__exec_i__DOT__stall_se;
-        CData/*0:0*/ core__DOT__exec_i__DOT__r1_valid_se;
-        CData/*0:0*/ core__DOT__exec_i__DOT__r2_valid_se;
         CData/*0:0*/ core__DOT__exec_i__DOT__bpc_disable1;
         CData/*0:0*/ core__DOT__exec_i__DOT__bpc_disable2;
         CData/*0:0*/ core__DOT__exec_i__DOT__adress_misaligned;
@@ -177,10 +175,10 @@ SC_MODULE(Vcore) {
         CData/*0:0*/ core__DOT__exec_i__DOT__store_access_fault_se;
         CData/*0:0*/ core__DOT__exec_i__DOT__exception_se;
         CData/*0:0*/ core__DOT__exec_i__DOT__start_div;
-    };
-    struct {
         CData/*0:0*/ core__DOT__exec_i__DOT__done_div;
         CData/*0:0*/ core__DOT__exec_i__DOT__busy_div;
+    };
+    struct {
         CData/*0:0*/ core__DOT__exec_i__DOT__exe2mem__DOT__data_v;
         CData/*2:0*/ core__DOT__exec_i__DOT__divider_i__DOT__EP;
         CData/*2:0*/ core__DOT__exec_i__DOT__divider_i__DOT__EF;
@@ -243,10 +241,10 @@ SC_MODULE(Vcore) {
         IData/*31:0*/ core__DOT__dec_i__DOT__op1_u_type_sd;
         IData/*31:0*/ core__DOT__dec_i__DOT__op2_i_type_sd;
         IData/*31:0*/ core__DOT__dec_i__DOT__op2_s_type_sd;
-    };
-    struct {
         IData/*31:0*/ core__DOT__dec_i__DOT__rdata1_sd;
         IData/*31:0*/ core__DOT__dec_i__DOT__rdata2_sd;
+    };
+    struct {
         IData/*31:0*/ core__DOT__dec_i__DOT__offset_branch_sd;
         IData/*31:0*/ core__DOT__dec_i__DOT__offset_branch_j;
         IData/*31:0*/ core__DOT__dec_i__DOT__offset_branch_jalr;
@@ -309,10 +307,10 @@ SC_MODULE(Vcore) {
         IData/*31:0*/ core__DOT__x0_mult__DOT__op2;
         WData/*321:0*/ core__DOT__x0_mult__DOT__x0x1_din[11];
         IData/*31:0*/ core__DOT__x0_mult__DOT__unnamedblk1__DOT__i;
-    };
-    struct {
         IData/*31:0*/ core__DOT__x0_mult__DOT__unnamedblk1__DOT__unnamedblk2__DOT__unnamedblk3__DOT__j;
         IData/*31:0*/ core__DOT__x0_mult__DOT__unnamedblk1__DOT__unnamedblk2__DOT__unnamedblk4__DOT__k;
+    };
+    struct {
         WData/*321:0*/ core__DOT__x0_mult__DOT__x0x1__DOT__data[11];
         WData/*129:0*/ core__DOT__x1_mult__DOT__x1x2_din[5];
         WData/*129:0*/ core__DOT__x1_mult__DOT__x1x2__DOT__data[5];
@@ -375,10 +373,10 @@ SC_MODULE(Vcore) {
         QData/*63:0*/ core__DOT__x0_mult__DOT__stage4__BRA__2__KET____DOT__csa4__DOT__shf;
         QData/*63:0*/ core__DOT__x0_mult__DOT__stage5__BRA__0__KET____DOT__csa5__DOT__AxB;
         QData/*63:0*/ core__DOT__x0_mult__DOT__stage5__BRA__0__KET____DOT__csa5__DOT__shf;
-    };
-    struct {
         QData/*63:0*/ core__DOT__x0_mult__DOT__stage5__BRA__1__KET____DOT__csa5__DOT__AxB;
         QData/*63:0*/ core__DOT__x0_mult__DOT__stage5__BRA__1__KET____DOT__csa5__DOT__shf;
+    };
+    struct {
         QData/*63:0*/ core__DOT__x1_mult__DOT__csa6__DOT__AxB;
         QData/*63:0*/ core__DOT__x1_mult__DOT__csa6__DOT__shf;
         QData/*63:0*/ core__DOT__x1_mult__DOT__csa7__DOT__AxB;

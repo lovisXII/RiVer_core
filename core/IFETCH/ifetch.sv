@@ -96,9 +96,9 @@ module ifetch(
 
     assign stall_si = IC_STALL_SI || if2dec_full_si || DEC2IF_EMPTY_SD;
 
-    assign if2dec_push_si = (IF2DEC_FLUSH_SD && !EXCEPTION_SM) ? !stall_si : 1'b0;
-    assign DEC2IF_POP_SI = (!IF2DEC_FLUSH_SD && !EXCEPTION_SM) ? !stall_si : 1'b1;
-    assign ADR_VALID_SI = (!DEC2IF_EMPTY_SD && (IF2DEC_FLUSH_SD == 1'b0) && (EXCEPTION_SM == 1'b0)) ? 1'b1 : 1'b0;
+    assign if2dec_push_si = (!IF2DEC_FLUSH_SD & !EXCEPTION_SM) ? !stall_si : 1'b0;
+    assign DEC2IF_POP_SI  = (!IF2DEC_FLUSH_SD & !EXCEPTION_SM) ? !stall_si : 1'b1;
+    assign ADR_VALID_SI   = (!DEC2IF_EMPTY_SD & (IF2DEC_FLUSH_SD == 1'b0) && (EXCEPTION_SM == 1'b0)) ? 1'b1 : 1'b0;
 
     assign ADR_SI = (PRED_TAKEN_SD && !PRED_FAILED_RD) ? PRED_ADR_SD : PC_RD;
 
