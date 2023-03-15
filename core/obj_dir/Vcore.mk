@@ -12,9 +12,9 @@ PERL = perl
 # Path to Verilator kit (from $VERILATOR_ROOT)
 VERILATOR_ROOT = /usr/share/verilator
 # SystemC include directory with systemc.h (from $SYSTEMC_INCLUDE)
-SYSTEMC_INCLUDE ?= /usr/local/systemc-2.3.3/include/
+SYSTEMC_INCLUDE ?= /usr/include
 # SystemC library directory with libsystemc.a (from $SYSTEMC_LIBDIR)
-SYSTEMC_LIBDIR ?= /usr/local/systemc-2.3.3/lib-linux64/
+SYSTEMC_LIBDIR ?= /usr/lib/x86_64-linux-gnu
 
 ### Switches...
 # SystemC output mode?  0/1 (from --sc)
