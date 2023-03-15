@@ -421,6 +421,98 @@ exe exec_i (
     .CSR_RDATA_RE                (CSR_RDATA_RE)
 );
 
+mem mem_i (
+        //-- global interface
+        .clk( clk),
+        .reset_n( reset_n), 
+
+        //-- Mcache interface
+        .MCACHE_RESULT_SM( MCACHE_RESULT_SM),
+        .MCACHE_STALL_SM( MCACHE_STALL_SM),
+        .MCACHE_ADR_SM( MCACHE_ADR_SM), 
+        .MCACHE_DATA_SM( MCACHE_DATA_SM),
+        .MCACHE_ADR_VALID_SM(MCACHE_ADR_VALID_SM), 
+        .MCACHE_STORE_SM( MCACHE_STORE_SM), 
+        .MCACHE_LOAD_SM( MCACHE_LOAD_SM),
+        .byt_sel( byt_sel), 
+
+        //-- Exe interface
+        .RES_RE( RES_RE),
+        .MEM_DATA_RE( MEM_DATA_RE),
+        .DEST_RE( DEST_RE),
+        .MEM_SIZE_RE( MEM_SIZE_RE),      
+        .WB_RE( WB_RE), 
+        .SIGN_EXTEND_RE( MEM_SIGN_EXTEND_RE), 
+        .LOAD_RE( MEM_LOAD_RE),
+        .STORE_RE( MEM_STORE_RE),
+        .PC_EXE2MEM_RE( PC_EXE2MEM_RE),
+
+        //-- Multiplier
+        .MULT_INST_RE( MULT_INST_RE),
+        .MULT_INST_RM( MULT_INST_RM),
+
+        //-- exe2mem interface
+        .EXE2MEM_EMPTY_SE( EXE2MEM_EMPTY_SE),
+        .EXE2MEM_POP_SM( EXE2MEM_POP_SM),
+
+        //-- mem2wbk interface
+        .MEM2WBK_POP_SW( MEM2WBK_POP_SW), 
+        .MEM2WBK_EMPTY_SM( MEM2WBK_EMPTY_SM),
+        
+        //-- Wbk interface
+        .MEM_RES_RM( MEM_RES_RM),
+        .MEM_DEST_RM( MEM_DEST_RM),
+        .WB_RM( WB_RM),
+        .CSR_RDATA_RM( CSR_RDATA_RM),
+        .CSR_WENABLE_RM( CSR_WENABLE_RM),
+
+
+        //-- CSR 
+        .CSR_WENABLE_RE( CSR_WENABLE_RE),
+        .CSR_WADR_RE( CSR_WADR_RE),     
+        .CSR_RDATA_RE( CSR_RDATA_RE),    
+
+        .CSR_WADR_SM( CSR_WADR_SM),
+        .CSR_WDATA_SM( CSR_WDATA_SM),   
+        .CSR_ENABLE_SM( CSR_ENABLE_SM), 
+
+        .MSTATUS_WDATA_SM( mstatus_wdata_sm),    
+        .MIP_WDATA_SM( MIP_WDATA_SM),    
+        .MEPC_WDATA_SM( MEPC_WDATA_SM),    
+        .MCAUSE_WDATA_SM( MCAUSE_WDATA_SM),    
+        .MTVAL_WDATA_SM( MTVAL_WDATA_SM),    
+
+        .MEPC_SC( MEPC_SC),      
+        .MSTATUS_RC( MSTATUS_RC),      
+        .MTVEC_VALUE_RC( MTVEC_VALUE_RC),      
+        .MIP_VALUE_RC( MIP_VALUE_RC),      
+        .MIE_VALUE_RC( MIE_VALUE_RC),      
+
+        //-- Exception 
+        .EXCEPTION_RE (EXCEPTION_RE),    
+        .LOAD_ADRESS_MISALIGNED_RE (LOAD_ADRESS_MISALIGNED_RE), 
+        .LOAD_ACCESS_FAULT_RE (LOAD_ACCESS_FAULT_RE), 
+        .ILLEGAL_INSTRUCTION_RE (ILLEGAL_INSTRUCTION_RE), 
+        .INSTRUCTION_ADRESS_MISALIGNED_RE (ADRESS_MISALIGNED_RE), 
+        .INSTRUCTION_ACCESS_FAULT_RE (INSTRUCTION_ACCESS_FAULT_RE),
+        .STORE_ADRESS_MISALIGNED_RE (STORE_ADRESS_MISALIGNED_RE), 
+        .STORE_ACCESS_FAULT_RE (STORE_ACCESS_FAULT_RE), 
+        .ENV_CALL_U_MODE_RE (ENV_CALL_U_MODE_RE), 
+        .ENV_CALL_S_MODE_RE (ENV_CALL_S_MODE_RE),
+        .ENV_CALL_M_MODE_RE (ENV_CALL_M_MODE_RE),
+        .ENV_CALL_WRONG_MODE_RE (ENV_CALL_WRONG_MODE_RE),
+        .MRET_RE (MRET_RE),
+        .EBREAK_RE (EBREAK_RE),
+        .PC_BRANCH_VALUE_RE (PC_BRANCH_VALUE_RE),
+
+        .BUS_ERROR_SX (BUS_ERROR_SX), 
+
+        .EXCEPTION_SM( EXCEPTION_SM),
+        .CURRENT_MODE_SM( CURRENT_MODE_SM),
+        .RETURN_ADRESS_SM( RETURN_ADRESS_SM),
+        .MRET_SM( MRET_SM)
+);
+
 wbk wbk_i (
     // global interface
     .clk(clk),

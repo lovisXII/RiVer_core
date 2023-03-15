@@ -257,22 +257,26 @@ int sc_main(int argc, char* argv[]) {
     sc_signal<uint32_t> MCACHE_DATA_SM;
     sc_signal<uint32_t> MCACHE_ADR_SM;
     sc_signal<uint32_t> IC_INST_SI;
-    sc_signal<uint32_t> ADR_SI;
-    sc_signal<uint32_t> PC_INIT;
+    sc_signal<uint32_t> ADR_SI;             // PC from ifetch
+    sc_signal<uint32_t> PC_INIT;            // tells if pc if valid
     sc_signal<uint32_t> DEBUG_PC_READ;
 
     core_inst.clk(clk);
     core_inst.reset_n(reset_n);
+
     core_inst.MCACHE_STALL_SM(MCACHE_STALL_SM);
     core_inst.MCACHE_ADR_VALID_SM(MCACHE_ADR_VALID_SM);
     core_inst.MCACHE_STORE_SM(MCACHE_STORE_SM);
     core_inst.MCACHE_LOAD_SM(MCACHE_LOAD_SM);
     core_inst.byt_sel(byt_sel);
+    
     core_inst.IC_STALL_SI(IC_STALL_SI);
     core_inst.ADR_VALID_SI(ADR_VALID_SI);
+    
     core_inst.MCACHE_RESULT_SM(MCACHE_RESULT_SM);
     core_inst.MCACHE_DATA_SM(MCACHE_DATA_SM);
     core_inst.MCACHE_ADR_SM(MCACHE_ADR_SM);
+    
     core_inst.IC_INST_SI(IC_INST_SI);
     core_inst.ADR_SI(ADR_SI);
     core_inst.PC_INIT(PC_INIT);
@@ -301,19 +305,21 @@ int sc_main(int argc, char* argv[]) {
     int mem_adr;
     int mem_size;
 
-    // while (1) 
-    // {
-    //     if (countdown) countdown--;
-    //     cycles++;
-    //     mem_adr       = MEM_ADR.read() & 0XfffffffC; // removing the least 2 significant bits
-    //     mem_size      = MEM_SIZE_SM.read() ;
-    //     bool         mem_adr_valid = MEM_ADR_VALID.read();
-    //     unsigned int mem_data      = MEM_DATA.read();
-    //     bool         mem_store     = MEM_STORE.read();
-    //     bool         mem_load      = MEM_LOAD.read();
-    //     unsigned int mem_result;
-    //     if_adr       = IF_ADR.read();
-    //     bool         if_afr_valid = IF_ADR_VALID.read();
+    while (1) 
+    {
+//         if (countdown) countdown--;
+//         cycles++;
+//         // mem interface
+//         mem_adr       = MCACHE_ADR_SM.read() & 0XfffffffC; // removing the least 2 significant bits
+//         mem_size      = byt_sel.read() ;
+//         bool         mem_adr_valid = MCACHE_ADR_VALID_SM.read();
+//         unsigned int mem_data      = MEM_DATA.read();
+//         bool         mem_store     = MCACHE_STORE_SM.read();
+//         bool         mem_load      = MCACHE_LOAD_SM.read();
+//         unsigned int mem_result;
+//         // Ifetch interface
+//         if_adr       = ADR_SI.read();
+//         bool         if_afr_valid = ADR_SI.read();
 
 
 // /*
@@ -322,7 +328,7 @@ int sc_main(int argc, char* argv[]) {
 //     ##############################################################
 // */
 
-//         unsigned int pc_adr = PC_VALUE.read();
+//         unsigned int pc_adr = ADR_SI.read();
 //         NB_CYCLES = sc_time_stamp().to_double()/1000;
         
 //         if (signature_name == "" && pc_adr == bad_adr) {
@@ -378,7 +384,6 @@ int sc_main(int argc, char* argv[]) {
 //     ##############################################################
 // */
 
-// #ifndef DCACHE_ON
 //         if (mem_store && mem_adr_valid) {
 //             int temporary_value = ram[mem_adr] ; 
 //             unsigned int temporary_store_value = mem_data;
@@ -437,15 +442,11 @@ int sc_main(int argc, char* argv[]) {
 //         mem_result = ram[mem_adr];
 //         MEM_RESULT.write(mem_result);
 //         MEM_STALL.write(false);
-// #endif
-
-// #ifndef ICACHE_ON
 //         if_result = ram[if_adr];
 //         INST_SIC.write(if_result);
 //         STALL_SIC.write(false);
-// #endif
 
-//         sc_start(500, SC_PS);
-// }
+        sc_start(500, SC_PS);
+}
     return 0;
 }
