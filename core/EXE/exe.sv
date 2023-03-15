@@ -215,11 +215,22 @@ end
 assign start_div = ((SELECT_OPERATION_RD == 4'b1000) && (DEC2EXE_EMPTY_SD == 1'b0) && (busy_div == 1'b0) && (done_div == 1'b0)) ? 1'b1 : 1'b0;
 
 // fifo
-assign stall_se = (exe2mem_full || DEC2EXE_EMPTY_SD || blocked_se || !r1_valid_se || !r2_valid_se || (busy_div && !done_div));
+assign stall_se = exe2mem_full || DEC2EXE_EMPTY_SD || blocked_se || !r1_valid_se || !r2_valid_se || (busy_div && !done_div);
 assign exe2mem_push = !stall_se;
 assign DEC2EXE_POP_SE = !(stall_se || start_div);
 
 // bypasses
+
+assign r2_valid_se = 1'b1;
+
+assign r1_valid_se = ((RADR1_RD == 6'h00 || BLOCK_BP_RD) ||
+                     (RADR1_RD == exe_fifo_dest && exe_fifo_csr_wenable) ||
+                     (RADR1_RD == MEM_DEST_RM && CSR_WENABLE_RM) ||
+                     (RADR1_RD == exe_fifo_dest && exe_fifo_mem_load && !exe2mem_empty)) ? 1'b1 :
+                    ((~exe_fifo_mult_inst || exe2mem_empty) && RADR1_RD == exe_fifo_dest && !exe_fifo_mem_load) ? 1'b1 :
+                    ((~MULT_INST_RM || BP_MEM2WBK_EMPTY_SM) && RADR1_RD == MEM_DEST_RM) ? 1'b1 :
+                    1'b0;
+
 assign bpc_disable1 = (RADR1_RD == 6'h00 || BLOCK_BP_RD == 1'b1) ? 1'b1 : 1'b0;
 assign bpc_disable2 = ((RADR2_RD == 6'h00) || (BLOCK_BP_RD == 1'b1) || (MEM_LOAD_RD == 1'b1)) ? 1'b1 : 1'b0;
 

@@ -243,7 +243,7 @@ fifo #(
 // fifo gestion 
 assign csr_in_progress = (csr_wenable_fifo & !dec2exe_empty) || (CSR_WENABLE_RE & !BP_EXE2MEM_EMPTY_SE);
 
-assign stall_sd = ((csr_in_progress || (!r1_valid_sd || !r2_valid_sd) && (b_type_sd || jalr_type_sd || j_type_sd || block_in_dec || mult_dependency)) || IF2DEC_EMPTY_SI || dec2exe_full_sd) ? 1'b1 : 1'b0;
+assign stall_sd = ((csr_in_progress || ((!r1_valid_sd || !r2_valid_sd) && (b_type_sd || jalr_type_sd || j_type_sd || block_in_dec || mult_dependency))) || IF2DEC_EMPTY_SI || dec2exe_full_sd) ? 1'b1 : 1'b0;
 
 // if2dec 
 assign IF2DEC_POP_SD = !stall_sd;

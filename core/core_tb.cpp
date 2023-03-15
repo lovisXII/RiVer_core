@@ -205,7 +205,7 @@ int sc_main(int argc, char* argv[]) {
                 symbols.get_symbol(j, name, value, size, bind, type, section_index, other);
                 if (name == "_reset") {
                     cout << "Found reset" << endl;
-                    reset_adr = value - 4;  // minus 4 to acount for init inc_pc
+                    reset_adr = value ;  // minus 4 to acount for init inc_pc
                 }
                 if (name == "_start") {
                     cout << "Found start" << endl;
@@ -229,7 +229,7 @@ int sc_main(int argc, char* argv[]) {
                 }
                 if (name == "rvtest_entry_point") {
                     cout << "Found rvtest_entry_point" << endl;
-                    reset_adr = value - 4;
+                    reset_adr = value ;
                 }
                 if (name == "begin_signature") {
                     cout << "Found begin_signature" << endl;
