@@ -5,25 +5,23 @@ a.out:     file format elf32-littleriscv
 Disassembly of section seg_text:
 
 00010054 <_start>:
-   10054:	01700293          	li	t0,23
-   10058:	02e00313          	li	t1,46
-   1005c:	00a00093          	li	ra,10
-   10060:	00c00113          	li	sp,12
-   10064:	07d00193          	li	gp,125
-   10068:	01700213          	li	tp,23
-   1006c:	00402023          	sw	tp,0(zero) # 0 <_bad-0x10>
-   10070:	000000b3          	add	ra,zero,zero
-   10074:	004000b3          	add	ra,zero,tp
-   10078:	00000013          	nop
-   1007c:	00002183          	lw	gp,0(zero) # 0 <_bad-0x10>
-   10080:	00000013          	nop
-   10084:	00308133          	add	sp,ra,gp
-   10088:	00000013          	nop
-   1008c:	00518463          	beq	gp,t0,10094 <_start+0x40>
+   10054:	07800093          	li	ra,120
+   10058:	09800113          	li	sp,152
+   1005c:	00000013          	nop
+   10060:	00000013          	nop
+   10064:	00000013          	nop
+   10068:	00000013          	nop
+   1006c:	00000013          	nop
+   10070:	00000013          	nop
+   10074:	00a00093          	li	ra,10
+   10078:	00a00113          	li	sp,10
+   1007c:	00209463          	bne	ra,sp,10084 <_start+0x30>
+   10080:	f95ef06f          	j	14 <_good>
+   10084:	f8def06f          	j	10 <_bad>
+   10088:	f89ef06f          	j	10 <_bad>
+   1008c:	f85ef06f          	j	10 <_bad>
    10090:	f81ef06f          	j	10 <_bad>
-   10094:	00610463          	beq	sp,t1,1009c <_start+0x48>
-   10098:	f79ef06f          	j	10 <_bad>
-   1009c:	f79ef06f          	j	14 <_good>
+   10094:	f7def06f          	j	10 <_bad>
 
 Disassembly of section .riscv.attributes:
 
