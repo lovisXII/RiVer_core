@@ -17,14 +17,16 @@ logic data_v = 0;
 always_ff @(posedge clk) begin
   if (reset_n == 0) begin
     data_v <= 0;
-  end else begin
+  end 
+  else begin
     if (data_v == 0) begin
       if (PUSH == 1) begin
         data_v <= 1;
       end else begin
         data_v <= 0;
       end
-    end else begin
+    end 
+    else begin
       if (POP == 1) begin
         if (PUSH == 1) begin
           data_v <= 1;

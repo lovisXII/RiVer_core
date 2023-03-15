@@ -1,4 +1,4 @@
-// Verilated -*- C++ -*-
+// Verilated -*- SystemC -*-
 // DESCRIPTION: Verilator output: Symbol table internal header
 //
 // Internal details; most calling programs do not need this header,
@@ -7,6 +7,8 @@
 #ifndef _VCORE__SYMS_H_
 #define _VCORE__SYMS_H_  // guard
 
+#include "systemc.h"
+#include "verilated_sc.h"
 #include "verilated.h"
 
 // INCLUDE MODULE CLASSES
@@ -18,6 +20,8 @@ class Vcore__Syms : public VerilatedSyms {
     
     // LOCAL STATE
     const char* __Vm_namep;
+    bool __Vm_activity;  ///< Used by trace routines to determine change occurred
+    uint32_t __Vm_baseCode;  ///< Used by trace routines when tracing multiple models
     bool __Vm_didInit;
     
     // SUBCELL STATE

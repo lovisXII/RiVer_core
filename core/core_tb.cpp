@@ -6,12 +6,14 @@
 #include "elfio/elfio.hpp"
 #include "systemc.h"
 #include "include/colors.h"
+#include <sys/stat.h>  // mkdir
 
 // Include common routines
 #include <verilated.h>
 #if VM_TRACE
 #include <verilated_vcd_sc.h>
 #endif
+
 
 #include "Vcore.h"
 
@@ -20,6 +22,17 @@ using namespace ELFIO;
 
 
 int sc_main(int argc, char* argv[]) {
+
+    // Create logs/ directory in case we have traces to put under it
+    Verilated::mkdir("logs");
+    // const std::unique_ptr<VerilatedContext> contextp{new VerilatedContext};
+
+    // Before any evaluation, need to know to calculate those signals only used for tracing
+    Verilated::traceEverOn(true);
+    VerilatedVcdSc* tfp = nullptr;
+    tfp = new VerilatedVcdSc;
+    
+    
     unordered_map<int, int> ram;
     elfio                   reader;  // creation of an elfio object
 
@@ -234,7 +247,6 @@ int sc_main(int argc, char* argv[]) {
         }
     }
 
-    cout << "test2" << endl;
 /*
     ##############################################################
                     COMPONENT INSTANCIATION
@@ -243,20 +255,27 @@ int sc_main(int argc, char* argv[]) {
 
     Vcore core_inst("core_inst");
 
-
-    sc_signal<bool> clk;
+    core_inst.trace(tfp, 99);  // Trace 99 levels of hierarchy
+    Verilated::mkdir("logs");
+    tfp->open("logs/vlt_dump.vcd");
+    
+    sc_clock        clk("clk", 1, SC_NS);
     sc_signal<bool> reset_n;
-    sc_signal<bool> MCACHE_STALL_SM;
-    sc_signal<bool> MCACHE_ADR_VALID_SM;
-    sc_signal<bool> MCACHE_STORE_SM;
-    sc_signal<bool> MCACHE_LOAD_SM;
-    sc_signal<uint32_t> byt_sel;
-    sc_signal<bool> IC_STALL_SI;
-    sc_signal<bool> ADR_VALID_SI;
-    sc_signal<uint32_t> MCACHE_RESULT_SM;
-    sc_signal<uint32_t> MCACHE_DATA_SM;
-    sc_signal<uint32_t> MCACHE_ADR_SM;
-    sc_signal<uint32_t> IC_INST_SI;
+
+    sc_signal<bool> MCACHE_STALL_SM;        // mem need to stall
+    sc_signal<bool> MCACHE_ADR_VALID_SM;    // address send by mem is valid
+    sc_signal<bool> MCACHE_STORE_SM;        // access is a store
+    sc_signal<bool> MCACHE_LOAD_SM;         // access is a load
+    sc_signal<uint32_t> byt_sel;            // tells what part of the data to consider
+    
+    sc_signal<bool> IC_STALL_SI;            // Ifetch stall
+    sc_signal<bool> ADR_VALID_SI;           // send by ifetch is valid
+
+    sc_signal<uint32_t> MCACHE_RESULT_SM;   // data send by data cache
+    sc_signal<uint32_t> MCACHE_DATA_SM;     // data send by mem to be stored
+    sc_signal<uint32_t> MCACHE_ADR_SM;      // address for the access
+
+    sc_signal<uint32_t> IC_INST_SI;         // instruction
     sc_signal<uint32_t> ADR_SI;             // PC from ifetch
     sc_signal<uint32_t> PC_INIT;            // tells if pc if valid
     sc_signal<uint32_t> DEBUG_PC_READ;
@@ -283,8 +302,6 @@ int sc_main(int argc, char* argv[]) {
     core_inst.DEBUG_PC_READ(DEBUG_PC_READ);
 
 
-    sc_trace_file* tf;
-    tf = sc_create_vcd_trace_file("tf");
 
     cout << "Reseting...";
 
@@ -298,7 +315,7 @@ int sc_main(int argc, char* argv[]) {
 
     int NB_CYCLES = 0;
     int cycles = 0;
-    int countdown;
+    int countdown ;
 
     int if_adr;
     int if_result;
@@ -307,144 +324,197 @@ int sc_main(int argc, char* argv[]) {
 
     while (1) 
     {
-//         if (countdown) countdown--;
-//         cycles++;
-//         // mem interface
-//         mem_adr       = MCACHE_ADR_SM.read() & 0XfffffffC; // removing the least 2 significant bits
-//         mem_size      = byt_sel.read() ;
-//         bool         mem_adr_valid = MCACHE_ADR_VALID_SM.read();
-//         unsigned int mem_data      = MEM_DATA.read();
-//         bool         mem_store     = MCACHE_STORE_SM.read();
-//         bool         mem_load      = MCACHE_LOAD_SM.read();
-//         unsigned int mem_result;
-//         // Ifetch interface
-//         if_adr       = ADR_SI.read();
-//         bool         if_afr_valid = ADR_SI.read();
+        if (countdown) countdown--;
+        cycles++;
 
+        // mem interface
+        mem_adr       = MCACHE_ADR_SM.read() & 0XfffffffC; // removing the least 2 significant bits
+        mem_size      = byt_sel.read() ;
+        bool         mem_adr_valid = MCACHE_ADR_VALID_SM.read();
 
-// /*
-//     ##############################################################
-//                     END OF TEST GESTION
-//     ##############################################################
-// */
-
-//         unsigned int pc_adr = ADR_SI.read();
-//         NB_CYCLES = sc_time_stamp().to_double()/1000;
+        unsigned int mem_data      = MCACHE_DATA_SM.read();
+        bool         mem_store     = MCACHE_STORE_SM.read();
+        bool         mem_load      = MCACHE_LOAD_SM.read();
         
-//         if (signature_name == "" && pc_adr == bad_adr) {
-//             cout << FRED("Error ! ") << "Found bad at adr 0x" << std::hex << pc_adr << endl;
-//             sc_start(3, SC_NS);
-//             exit(1);
-//         } else if (signature_name == "" && pc_adr == good_adr) {
-//             if(stats)
-//             {
-//                 #ifdef BRANCH_PREDICTION || RET_BRANCH_PREDICTION
-//                     cout << "NB BRANCH TAKEN = "    <<  nb_jump_taken   <<  endl;
-//                 #endif
-//                 test_stats << test_filename << " " << NB_CYCLES  << " " << "SCALAR" << endl;
-//                 test_stats.close();
-//             }
+        unsigned int mem_result;
+        // Ifetch interface
+        if_adr       = ADR_SI.read();
+        bool         if_afr_valid = ADR_VALID_SI.read();
+
+
+/*
+    ##############################################################
+                    END OF TEST GESTION
+    ##############################################################
+*/
+
+        unsigned int pc_adr = ADR_SI.read();
+        NB_CYCLES = sc_time_stamp().to_double()/1000;
+        
+        if (signature_name == "" && pc_adr == bad_adr) {
+            cout << FRED("Error ! ") << "Found bad at adr 0x" << std::hex << pc_adr << endl;
+            sc_start(3, SC_NS);
+
+            // Final model cleanup
+            core_inst.final();
+            // Close trace if opened
+            if (tfp) {
+                tfp->close();
+                tfp = nullptr;
+            }
+
+            // Coverage analysis (calling write only after the test is known to pass)
+            #if VM_COVERAGE
+                Verilated::mkdir("logs");
+                VerilatedCov::write("logs/coverage.dat");
+            #endif
+
+            exit(1);
+        } else if (signature_name == "" && pc_adr == good_adr) {
+            if(stats)
+            {
+                #ifdef BRANCH_PREDICTION || RET_BRANCH_PREDICTION
+                    cout << "NB BRANCH TAKEN = "    <<  nb_jump_taken   <<  endl;
+                #endif
+                test_stats << test_filename << " " << NB_CYCLES  << " " << "SCALAR" << endl;
+                test_stats.close();
+            }
             
-//             cout << FGRN("Success ! ") << "Found good at adr 0x" << std::hex << pc_adr << endl;
-//             sc_start(3, SC_NS);
-//             exit(0);
-//         } 
-//         else if(signature_name == "" && pc_adr == exception_occur){
-//             cout << FYEL("Error ! ") << "Found exception_occur at adr 0x" << std::hex << pc_adr << endl;
-//             sc_start(3, SC_NS);
-//             exit(2);
-//         }
-//         else if (countdown == 0 && ((pc_adr == rvtest_code_end) || (pc_adr ==  rvtest_end) || (signature_name != "" && cycles > 2000000))) {
-//             countdown = 50;
-//         }
-//         if (countdown == 1) {
-//             cout << "Test ended at " << std::hex << pc_adr << endl;
-//             sc_start(3, SC_NS);
+            cout << FGRN("Success ! ") << "Found good at adr 0x" << std::hex << pc_adr << endl;
+            sc_start(3, SC_NS);
+            // Final model cleanup
+            core_inst.final();
+            // Close trace if opened
+            if (tfp) {
+                tfp->close();
+                tfp = nullptr;
+            }
+            // Coverage analysis (calling write only after the test is known to pass)
+            #if VM_COVERAGE
+                Verilated::mkdir("logs");
+                VerilatedCov::write("logs/coverage.dat");
+            #endif
+            exit(0);
+        } 
+        else if(signature_name == "" && pc_adr == exception_occur){
+            cout << FYEL("Error ! ") << "Found exception_occur at adr 0x" << std::hex << pc_adr << endl;
+            sc_start(3, SC_NS);
+            // Final model cleanup
+            core_inst.final();
+            // Close trace if opened
+            if (tfp) {
+                tfp->close();
+                tfp = nullptr;
+            }
+            // Coverage analysis (calling write only after the test is known to pass)
+            #if VM_COVERAGE
+                Verilated::mkdir("logs");
+                VerilatedCov::write("logs/coverage.dat");
+            #endif
+            exit(2);
+        }
+        else if (countdown == 0 && ((pc_adr == rvtest_code_end) || (pc_adr ==  rvtest_end) || (signature_name != "" && cycles > 2000000))) {
+            countdown = 50;
+        }
+        if (countdown == 1) {
+            cout << "Test ended at " << std::hex << pc_adr << endl;
+            sc_start(3, SC_NS);
+
+            // Stats Gestion riscof
+            test_stats << test_filename << " " << NB_CYCLES  << " " << "SCALAR" << endl;
+            test_stats.close();
             
-//             // Stats Gestion riscof
-//             test_stats << test_filename << " " << NB_CYCLES  << " " << "SCALAR" << endl;
-//             test_stats.close();
             
-            
-//             ofstream signature;
-//             signature.open(signature_name, ios::out | ios::trunc);
-//             cout << "signature_name :" << signature_name << endl ;
-//             cout << "begin_signature :" << begin_signature << endl ;
-//             cout << "end_signature :" << end_signature << endl ;
+            ofstream signature;
+            signature.open(signature_name, ios::out | ios::trunc);
+            cout << "signature_name :" << signature_name << endl ;
+            cout << "begin_signature :" << begin_signature << endl ;
+            cout << "end_signature :" << end_signature << endl ;
            
-//             for (int i = begin_signature; i < end_signature; i += 4) {
-//                 signature << setfill('0') << setw(8) << hex << ram[i] << endl;
-//             }
-//             exit(0);
-//         }
+            for (int i = begin_signature; i < end_signature; i += 4) {
+                signature << setfill('0') << setw(8) << hex << ram[i] << endl;
+            }
+            // Final model cleanup
+            core_inst.final();
+            // Close trace if opened
+            if (tfp) {
+                tfp->close();
+                tfp = nullptr;
+            }
+            // Coverage analysis (calling write only after the test is known to pass)
+            #if VM_COVERAGE
+                Verilated::mkdir("logs");
+                VerilatedCov::write("logs/coverage.dat");
+            #endif
+            exit(0);
+        }
 
-// /*
-//     ##############################################################
-//                     MEMORY ACCESS GESTION
-//     ##############################################################
-// */
+/*
+    ##############################################################
+                    MEMORY ACCESS GESTION
+    ##############################################################
+*/
 
-//         if (mem_store && mem_adr_valid) {
-//             int temporary_value = ram[mem_adr] ; 
-//             unsigned int temporary_store_value = mem_data;
-//             if(mem_size == 2){//access in byte
-//             // doing a mask on the least 2 significant bits
-//                 int mask_adr = MEM_ADR.read() & 0x00000003 ;
-//                 // The switch will allow to keep only the bits we want to store
-//                 switch (mask_adr)
-//                 {
-//                 case 0 :
-//                     temporary_store_value = temporary_store_value & 0x000000FF ;
-//                     temporary_value = 0xFFFFFF00 & temporary_value ;
-//                     ram[mem_adr] = temporary_value | temporary_store_value ;
-//                     break ;
-//                 case 1 :
-//                     temporary_store_value = temporary_store_value & 0x0000FF00 ;
-//                     temporary_value = 0xFFFF00FF & temporary_value ;
-//                     ram[mem_adr] = temporary_value | temporary_store_value ;
-//                     break ;
-//                 case 2 :
-//                     temporary_store_value = temporary_store_value & 0x00FF0000 ;
-//                     temporary_value = 0xFF00FFFF & temporary_value ;
-//                     ram[mem_adr] = temporary_value | temporary_store_value ;
-//                     break ;
-//                 case 3 :      
-//                     temporary_store_value = temporary_store_value & 0xFF000000 ;
-//                     temporary_value = 0x00FFFFFF & temporary_value ;
-//                     ram[mem_adr] = temporary_value | temporary_store_value ;
-//                     break ;
-//                 default:
-//                     break;
-//                 }
-//             }
-//             else if(mem_size == 1){//access in half word
-//                 int mask_adr = MEM_ADR.read() & 0x00000003 ;
-//                 switch (mask_adr)
-//                 {
-//                 case 0 :
-//                     temporary_store_value = temporary_store_value & 0x0000FFFF ;
-//                     temporary_value = 0xFFFF0000 & temporary_value ;
-//                     ram[mem_adr] = temporary_value | temporary_store_value ;
-//                     break ;
-//                 case 2 :          
-//                     temporary_store_value = temporary_store_value & 0xFFFF0000 ;
-//                     temporary_value = 0x00000FFFF & temporary_value ;
-//                     ram[mem_adr] = temporary_value | temporary_store_value ;
-//                     break ;      
-//                 default:
-//                     break;
-//                 }
-//             }
-//             else//access in word
-//             {
-//                 ram[mem_adr] = mem_data;}
-//         }
-//         mem_result = ram[mem_adr];
-//         MEM_RESULT.write(mem_result);
-//         MEM_STALL.write(false);
-//         if_result = ram[if_adr];
-//         INST_SIC.write(if_result);
-//         STALL_SIC.write(false);
+        if (mem_store && mem_adr_valid) {
+            int temporary_value = ram[mem_adr] ; 
+            unsigned int temporary_store_value = mem_data;
+            if(mem_size == 2){//access in byte
+            // doing a mask on the least 2 significant bits
+                int mask_adr = MCACHE_ADR_SM.read() & 0x00000003 ;
+                // The switch will allow to keep only the bits we want to store
+                switch (mask_adr)
+                {
+                case 0 :
+                    temporary_store_value = temporary_store_value & 0x000000FF ;
+                    temporary_value = 0xFFFFFF00 & temporary_value ;
+                    ram[mem_adr] = temporary_value | temporary_store_value ;
+                    break ;
+                case 1 :
+                    temporary_store_value = temporary_store_value & 0x0000FF00 ;
+                    temporary_value = 0xFFFF00FF & temporary_value ;
+                    ram[mem_adr] = temporary_value | temporary_store_value ;
+                    break ;
+                case 2 :
+                    temporary_store_value = temporary_store_value & 0x00FF0000 ;
+                    temporary_value = 0xFF00FFFF & temporary_value ;
+                    ram[mem_adr] = temporary_value | temporary_store_value ;
+                    break ;
+                case 3 :      
+                    temporary_store_value = temporary_store_value & 0xFF000000 ;
+                    temporary_value = 0x00FFFFFF & temporary_value ;
+                    ram[mem_adr] = temporary_value | temporary_store_value ;
+                    break ;
+                default:
+                    break;
+                }
+            }
+            else if(mem_size == 1){//access in half word
+                int mask_adr = MCACHE_ADR_SM.read() & 0x00000003 ;
+                switch (mask_adr)
+                {
+                case 0 :
+                    temporary_store_value = temporary_store_value & 0x0000FFFF ;
+                    temporary_value = 0xFFFF0000 & temporary_value ;
+                    ram[mem_adr] = temporary_value | temporary_store_value ;
+                    break ;
+                case 2 :          
+                    temporary_store_value = temporary_store_value & 0xFFFF0000 ;
+                    temporary_value = 0x00000FFFF & temporary_value ;
+                    ram[mem_adr] = temporary_value | temporary_store_value ;
+                    break ;      
+                default:
+                    break;
+                }
+            }
+            else//access in word
+            {
+                ram[mem_adr] = mem_data;}
+        }
+        mem_result = ram[mem_adr];
+        MCACHE_RESULT_SM.write(mem_result);
+        MCACHE_STALL_SM.write(false);
+        IC_INST_SI = ram[if_adr];
+        IC_STALL_SI.write(false);
 
         sc_start(500, SC_PS);
 }

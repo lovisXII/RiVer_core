@@ -15,6 +15,8 @@
 //==========
 
 class Vcore__Syms;
+class Vcore_VerilatedVcd;
+
 
 //----------
 
@@ -48,23 +50,32 @@ SC_MODULE(Vcore) {
         CData/*0:0*/ core__DOT__DEC2IF_POP_SI;
         CData/*0:0*/ core__DOT__IF2DEC_FLUSH_SD;
         CData/*0:0*/ core__DOT__DEC2EXE_POP_SE;
+        CData/*5:0*/ core__DOT__RADR1_RD;
+        CData/*5:0*/ core__DOT__RADR2_RD;
         CData/*3:0*/ core__DOT__SELECT_OPERATION_RD;
         CData/*0:0*/ core__DOT__WRITE_PC_ENABLE_SD;
-        CData/*0:0*/ core__DOT__EXE2MEM_POP_SM;
-        CData/*5:0*/ core__DOT__MEM_DEST_RM;
-        CData/*0:0*/ core__DOT__WB_RM;
-        CData/*0:0*/ core__DOT__MEM2WBK_EMPTY_SM;
+        CData/*1:0*/ core__DOT__MEM_SIZE_RM;
+        CData/*0:0*/ core__DOT__SIGN_EXTEND_RM;
+        CData/*0:0*/ core__DOT__LOAD_RM;
+        CData/*0:0*/ core__DOT__MEM2WBK_POP_SW;
+        CData/*5:0*/ core__DOT__BP_DEST_RE;
+        CData/*0:0*/ core__DOT__BP_MEM_LOAD_RE;
+        CData/*0:0*/ core__DOT__BP_EXE2MEM_EMPTY_SE;
+        CData/*5:0*/ core__DOT__BP_DEST_RM;
         CData/*0:0*/ core__DOT__CSR_ENABLE_SM;
-        CData/*0:0*/ core__DOT__CSR_WENABLE_RM;
+        CData/*0:0*/ core__DOT__EXCEPTION_SM;
         CData/*1:0*/ core__DOT__CURRENT_MODE_SM;
-        CData/*0:0*/ core__DOT__MULT_INST_RM;
+        CData/*0:0*/ core__DOT__MRET_SM;
         CData/*0:0*/ core__DOT__X0X1_POP_SX1;
         CData/*0:0*/ core__DOT__SELECT_MSB_RX1;
+        CData/*0:0*/ core__DOT__SIGNED_RES_RX1;
         CData/*0:0*/ core__DOT__X1X2_EMPTY_SX1;
         CData/*0:0*/ core__DOT__ifetch_i__DOT__if2dec_push_si;
         CData/*0:0*/ core__DOT__ifetch_i__DOT__stall_si;
+        CData/*1:0*/ core__DOT__ifetch_i__DOT__pred_state_t;
         CData/*1:0*/ core__DOT__ifetch_i__DOT__next_pred_state;
         CData/*3:0*/ core__DOT__ifetch_i__DOT__pred_valid_reg;
+        CData/*1:0*/ core__DOT__ifetch_i__DOT__pred_write_pointer_si;
         CData/*0:0*/ core__DOT__ifetch_i__DOT__pred_branch_taken;
         CData/*0:0*/ core__DOT__ifetch_i__DOT__unnamedblk2__DOT__found;
         CData/*1:0*/ core__DOT__ifetch_i__DOT__unnamedblk2__DOT__pred_write_pointer;
@@ -100,6 +111,8 @@ SC_MODULE(Vcore) {
         CData/*0:0*/ core__DOT__dec_i__DOT__lb_i_sd;
         CData/*0:0*/ core__DOT__dec_i__DOT__lbu_i_sd;
         CData/*0:0*/ core__DOT__dec_i__DOT__sw_i_sd;
+    };
+    struct {
         CData/*0:0*/ core__DOT__dec_i__DOT__sh_i_sd;
         CData/*0:0*/ core__DOT__dec_i__DOT__sb_i_sd;
         CData/*0:0*/ core__DOT__dec_i__DOT__beq_i_sd;
@@ -109,8 +122,6 @@ SC_MODULE(Vcore) {
         CData/*0:0*/ core__DOT__dec_i__DOT__bltu_i_sd;
         CData/*0:0*/ core__DOT__dec_i__DOT__bgeu_i_sd;
         CData/*0:0*/ core__DOT__dec_i__DOT__mul_i_sd;
-    };
-    struct {
         CData/*0:0*/ core__DOT__dec_i__DOT__mulh_i_sd;
         CData/*0:0*/ core__DOT__dec_i__DOT__mulhsu_i_sd;
         CData/*0:0*/ core__DOT__dec_i__DOT__mulhu_i_sd;
@@ -132,6 +143,8 @@ SC_MODULE(Vcore) {
         CData/*0:0*/ core__DOT__dec_i__DOT__illegal_inst;
         CData/*0:0*/ core__DOT__dec_i__DOT__illegal_inst_sd;
         CData/*0:0*/ core__DOT__dec_i__DOT__instruction_access_fault_sd;
+        CData/*0:0*/ core__DOT__dec_i__DOT__instruction_adress_misaligned_sd;
+        CData/*0:0*/ core__DOT__dec_i__DOT__instruction_adress_fault_sd;
         CData/*5:0*/ core__DOT__dec_i__DOT__radr1_sd;
         CData/*5:0*/ core__DOT__dec_i__DOT__radr2_sd;
         CData/*5:0*/ core__DOT__dec_i__DOT__rdest_sd;
@@ -154,6 +167,7 @@ SC_MODULE(Vcore) {
         CData/*0:0*/ core__DOT__exec_i__DOT__stall_se;
         CData/*0:0*/ core__DOT__exec_i__DOT__r1_valid_se;
         CData/*0:0*/ core__DOT__exec_i__DOT__r2_valid_se;
+        CData/*0:0*/ core__DOT__exec_i__DOT__bpc_disable1;
         CData/*0:0*/ core__DOT__exec_i__DOT__bpc_disable2;
         CData/*0:0*/ core__DOT__exec_i__DOT__adress_misaligned;
         CData/*0:0*/ core__DOT__exec_i__DOT__load_adress_misaligned_se;
@@ -163,6 +177,8 @@ SC_MODULE(Vcore) {
         CData/*0:0*/ core__DOT__exec_i__DOT__store_access_fault_se;
         CData/*0:0*/ core__DOT__exec_i__DOT__exception_se;
         CData/*0:0*/ core__DOT__exec_i__DOT__start_div;
+    };
+    struct {
         CData/*0:0*/ core__DOT__exec_i__DOT__done_div;
         CData/*0:0*/ core__DOT__exec_i__DOT__busy_div;
         CData/*0:0*/ core__DOT__exec_i__DOT__exe2mem__DOT__data_v;
@@ -175,12 +191,18 @@ SC_MODULE(Vcore) {
         CData/*0:0*/ core__DOT__exec_i__DOT__divider_i__DOT__reminder_sign_reg;
         CData/*0:0*/ core__DOT__exec_i__DOT__divider_i__DOT__signed_inst;
         CData/*0:0*/ core__DOT__exec_i__DOT__divider_i__DOT__division;
-    };
-    struct {
         CData/*0:0*/ core__DOT__exec_i__DOT__divider_i__DOT__setup_regs;
         CData/*0:0*/ core__DOT__exec_i__DOT__divider_i__DOT__same;
         CData/*0:0*/ core__DOT__exec_i__DOT__divider_i__DOT__zero_div;
         CData/*0:0*/ core__DOT__exec_i__DOT__divider_i__DOT__running;
+        CData/*0:0*/ core__DOT__mem_i__DOT__mem2wbk_push;
+        CData/*0:0*/ core__DOT__mem_i__DOT__stall_sm;
+        CData/*0:0*/ core__DOT__mem_i__DOT__wb;
+        CData/*3:0*/ core__DOT__mem_i__DOT__byt_sel_sm;
+        CData/*0:0*/ core__DOT__mem_i__DOT__machine_mode_condition;
+        CData/*1:0*/ core__DOT__mem_i__DOT__mode_sm;
+        CData/*1:0*/ core__DOT__mem_i__DOT__old_mode;
+        CData/*0:0*/ core__DOT__mem_i__DOT__mem2wbk__DOT__data_v;
         CData/*0:0*/ core__DOT__x0_mult__DOT__signed_type;
         CData/*0:0*/ core__DOT__x0_mult__DOT__stall_sx0;
         CData/*0:0*/ core__DOT__x0_mult__DOT__x0x1__DOT__data_v;
@@ -188,26 +210,41 @@ SC_MODULE(Vcore) {
         CData/*0:0*/ core__DOT__x1_mult__DOT__x1x2_push;
         CData/*0:0*/ core__DOT__x1_mult__DOT__x1x2_full;
         CData/*0:0*/ core__DOT__x1_mult__DOT__x1x2__DOT__data_v;
-        SData/*11:0*/ core__DOT__CSR_WADR_SM;
         SData/*11:0*/ core__DOT__dec_i__DOT__csr_radr;
-        IData/*31:0*/ core__DOT__MEM_RES_RM;
-        IData/*31:0*/ core__DOT__CSR_WDATA_SM;
+        IData/*31:0*/ core__DOT__BP_EXE_RES_RE;
+        IData/*31:0*/ core__DOT__BP_MEM_RES_RM;
+        IData/*31:0*/ core__DOT__MSTATUS_WDATA_SM;
+        IData/*31:0*/ core__DOT__MCAUSE_WDATA_SM;
+        IData/*31:0*/ core__DOT__MEPC_SC;
+        IData/*31:0*/ core__DOT__MSTATUS_RC;
+        IData/*31:0*/ core__DOT__MTVEC_VALUE_RC;
+        IData/*31:0*/ core__DOT__MIP_VALUE_RC;
+        IData/*31:0*/ core__DOT__MIE_VALUE_RC;
+        IData/*31:0*/ core__DOT__MCAUSE_SC;
         IData/*31:0*/ core__DOT__CSR_RDATA_SC;
-        IData/*31:0*/ core__DOT__CSR_RDATA_RM;
+        IData/*31:0*/ core__DOT__RETURN_ADRESS_SM;
+        IData/*31:0*/ core__DOT__PC_MEM2WBK_RM;
         WData/*127:0*/ core__DOT__RES_RX1[4];
         WData/*96:0*/ core__DOT__ifetch_i__DOT__if2dec_din[4];
         IData/*31:0*/ core__DOT__ifetch_i__DOT__pred_branch_next_adr;
+        IData/*31:0*/ core__DOT__ifetch_i__DOT__unnamedblk1__DOT__i;
         IData/*31:0*/ core__DOT__ifetch_i__DOT__unnamedblk2__DOT__index;
         IData/*31:0*/ core__DOT__ifetch_i__DOT__unnamedblk2__DOT__unnamedblk3__DOT__i;
         WData/*96:0*/ core__DOT__ifetch_i__DOT__if2dec__DOT__data[4];
         WData/*133:0*/ core__DOT__dec_i__DOT__dec2if_din[5];
+        WData/*251:0*/ core__DOT__dec_i__DOT__dec2exe_din[8];
         WData/*251:0*/ core__DOT__dec_i__DOT__dec2exe_data[8];
+        WData/*251:0*/ core__DOT__dec_i__DOT__dec2exe_x[8];
         IData/*31:0*/ core__DOT__dec_i__DOT__op1_csri_type_sd;
+        IData/*31:0*/ core__DOT__dec_i__DOT__mtvec_value;
+        IData/*31:0*/ core__DOT__dec_i__DOT__mcause_val;
         IData/*31:0*/ core__DOT__dec_i__DOT__dec2exe_op1_sd;
         IData/*31:0*/ core__DOT__dec_i__DOT__dec2exe_op2_sd;
         IData/*31:0*/ core__DOT__dec_i__DOT__op1_u_type_sd;
         IData/*31:0*/ core__DOT__dec_i__DOT__op2_i_type_sd;
         IData/*31:0*/ core__DOT__dec_i__DOT__op2_s_type_sd;
+    };
+    struct {
         IData/*31:0*/ core__DOT__dec_i__DOT__rdata1_sd;
         IData/*31:0*/ core__DOT__dec_i__DOT__rdata2_sd;
         IData/*31:0*/ core__DOT__dec_i__DOT__offset_branch_sd;
@@ -218,10 +255,14 @@ SC_MODULE(Vcore) {
         IData/*31:0*/ core__DOT__dec_i__DOT__res;
         IData/*31:0*/ core__DOT__dec_i__DOT__res_compare;
         IData/*31:0*/ core__DOT__dec_i__DOT__pc;
+        IData/*31:0*/ core__DOT__dec_i__DOT__init_pc;
+        IData/*31:0*/ core__DOT__dec_i__DOT__new_pc;
         IData/*31:0*/ core__DOT__dec_i__DOT__branch_adr_sd;
         WData/*133:0*/ core__DOT__dec_i__DOT__dec2if__DOT__data[5];
         WData/*251:0*/ core__DOT__dec_i__DOT__dec2exe__DOT__data[8];
         WData/*199:0*/ core__DOT__exec_i__DOT__exe2mem_data[7];
+        WData/*199:0*/ core__DOT__exec_i__DOT__exe2mem_x[7];
+        WData/*199:0*/ core__DOT__exec_i__DOT__exe2mem_din[7];
         IData/*31:0*/ core__DOT__exec_i__DOT__op1;
         IData/*31:0*/ core__DOT__exec_i__DOT__op2;
         IData/*31:0*/ core__DOT__exec_i__DOT__alu_op2;
@@ -241,8 +282,16 @@ SC_MODULE(Vcore) {
         IData/*31:0*/ core__DOT__exec_i__DOT__divider_i__DOT__quotient_se;
         IData/*31:0*/ core__DOT__exec_i__DOT__divider_i__DOT__quotient_reg;
         IData/*31:0*/ core__DOT__exec_i__DOT__divider_i__DOT__quotient;
-    };
-    struct {
+        IData/*31:0*/ core__DOT__exec_i__DOT__divider_i__DOT__op1_setup;
+        IData/*31:0*/ core__DOT__exec_i__DOT__divider_i__DOT__op2_setup;
+        WData/*72:0*/ core__DOT__mem_i__DOT__mem2wbk_din[3];
+        IData/*31:0*/ core__DOT__mem_i__DOT__load_byte;
+        IData/*31:0*/ core__DOT__mem_i__DOT__load_halfword;
+        IData/*31:0*/ core__DOT__mem_i__DOT__data_byte_store_sm;
+        IData/*31:0*/ core__DOT__mem_i__DOT__data_half_store_sm;
+        IData/*31:0*/ core__DOT__mem_i__DOT__mstatus_x;
+        WData/*72:0*/ core__DOT__mem_i__DOT__mem2wbk__DOT__data[3];
+        IData/*31:0*/ core__DOT__reg_i__DOT__unnamedblk1__DOT__i;
         IData/*31:0*/ core__DOT__csr_i__DOT__reg_mvendorid;
         IData/*31:0*/ core__DOT__csr_i__DOT__reg_marchid;
         IData/*31:0*/ core__DOT__csr_i__DOT__reg_mimpid;
@@ -259,6 +308,11 @@ SC_MODULE(Vcore) {
         IData/*31:0*/ core__DOT__x0_mult__DOT__op1;
         IData/*31:0*/ core__DOT__x0_mult__DOT__op2;
         WData/*321:0*/ core__DOT__x0_mult__DOT__x0x1_din[11];
+        IData/*31:0*/ core__DOT__x0_mult__DOT__unnamedblk1__DOT__i;
+    };
+    struct {
+        IData/*31:0*/ core__DOT__x0_mult__DOT__unnamedblk1__DOT__unnamedblk2__DOT__unnamedblk3__DOT__j;
+        IData/*31:0*/ core__DOT__x0_mult__DOT__unnamedblk1__DOT__unnamedblk2__DOT__unnamedblk4__DOT__k;
         WData/*321:0*/ core__DOT__x0_mult__DOT__x0x1__DOT__data[11];
         WData/*129:0*/ core__DOT__x1_mult__DOT__x1x2_din[5];
         WData/*129:0*/ core__DOT__x1_mult__DOT__x1x2__DOT__data[5];
@@ -267,6 +321,7 @@ SC_MODULE(Vcore) {
         QData/*63:0*/ core__DOT__exec_i__DOT__divider_i__DOT__divisor_reg;
         QData/*63:0*/ core__DOT__exec_i__DOT__divider_i__DOT__reminder_reg;
         QData/*63:0*/ core__DOT__exec_i__DOT__divider_i__DOT__divisor_setup;
+        QData/*63:0*/ core__DOT__x0_mult__DOT__prod;
         QData/*63:0*/ core__DOT__x0_mult__DOT__unnamedblk1__DOT__unnamedblk2__DOT__prod;
         QData/*63:0*/ core__DOT__x0_mult__DOT__csa2_6__DOT__AxB;
         QData/*63:0*/ core__DOT__x0_mult__DOT__csa2_6__DOT__shf;
@@ -307,8 +362,6 @@ SC_MODULE(Vcore) {
         QData/*63:0*/ core__DOT__x0_mult__DOT__csa_instance__BRA__0__KET____DOT__csa3__DOT__AxB;
         QData/*63:0*/ core__DOT__x0_mult__DOT__csa_instance__BRA__0__KET____DOT__csa3__DOT__shf;
         QData/*63:0*/ core__DOT__x0_mult__DOT__csa_instance__BRA__1__KET____DOT__csa3__DOT__AxB;
-    };
-    struct {
         QData/*63:0*/ core__DOT__x0_mult__DOT__csa_instance__BRA__1__KET____DOT__csa3__DOT__shf;
         QData/*63:0*/ core__DOT__x0_mult__DOT__csa_instance__BRA__2__KET____DOT__csa3__DOT__AxB;
         QData/*63:0*/ core__DOT__x0_mult__DOT__csa_instance__BRA__2__KET____DOT__csa3__DOT__shf;
@@ -322,6 +375,8 @@ SC_MODULE(Vcore) {
         QData/*63:0*/ core__DOT__x0_mult__DOT__stage4__BRA__2__KET____DOT__csa4__DOT__shf;
         QData/*63:0*/ core__DOT__x0_mult__DOT__stage5__BRA__0__KET____DOT__csa5__DOT__AxB;
         QData/*63:0*/ core__DOT__x0_mult__DOT__stage5__BRA__0__KET____DOT__csa5__DOT__shf;
+    };
+    struct {
         QData/*63:0*/ core__DOT__x0_mult__DOT__stage5__BRA__1__KET____DOT__csa5__DOT__AxB;
         QData/*63:0*/ core__DOT__x0_mult__DOT__stage5__BRA__1__KET____DOT__csa5__DOT__shf;
         QData/*63:0*/ core__DOT__x1_mult__DOT__csa6__DOT__AxB;
@@ -352,23 +407,24 @@ SC_MODULE(Vcore) {
     CData/*0:0*/ __Vcellinp__core__reset_n;
     CData/*0:0*/ __Vcellinp__core__clk;
     CData/*0:0*/ __Vcellinp__core__IC_STALL_SI;
-    CData/*3:0*/ __Vcellout__core__byt_sel;
-    CData/*0:0*/ __Vcellout__core__MCACHE_LOAD_SM;
-    CData/*0:0*/ __Vcellout__core__MCACHE_STORE_SM;
-    CData/*0:0*/ __Vcellout__core__MCACHE_ADR_VALID_SM;
+    CData/*0:0*/ __Vcellinp__core__MCACHE_STALL_SM;
     CData/*2:0*/ __Vtableidx1;
     CData/*0:0*/ __Vdly__core__DOT__ifetch_i__DOT__if2dec__DOT__data_v;
     CData/*0:0*/ __Vdly__core__DOT__dec_i__DOT__dec2if__DOT__data_v;
     CData/*0:0*/ __Vdly__core__DOT__dec_i__DOT__dec2exe__DOT__data_v;
+    CData/*0:0*/ __Vdly__core__DOT__exec_i__DOT__exe2mem__DOT__data_v;
+    CData/*0:0*/ __Vdly__core__DOT__mem_i__DOT__mem2wbk__DOT__data_v;
+    CData/*0:0*/ __Vdly__core__DOT__x0_mult__DOT__x0x1__DOT__data_v;
+    CData/*0:0*/ __Vdly__core__DOT__x1_mult__DOT__x1x2__DOT__data_v;
     CData/*0:0*/ __VinpClk__TOP____Vcellinp__core__reset_n;
     CData/*0:0*/ __Vclklast__TOP____Vcellinp__core__clk;
     CData/*0:0*/ __Vclklast__TOP____VinpClk__TOP____Vcellinp__core__reset_n;
     CData/*0:0*/ __Vchglast__TOP____Vcellinp__core__reset_n;
     IData/*31:0*/ __Vcellinp__core__PC_INIT;
     IData/*31:0*/ __Vcellinp__core__IC_INST_SI;
-    IData/*31:0*/ __Vcellout__core__MCACHE_ADR_SM;
-    IData/*31:0*/ __Vcellout__core__MCACHE_DATA_SM;
+    IData/*31:0*/ __Vcellinp__core__MCACHE_RESULT_SM;
     IData/*31:0*/ core__DOT__reg_i__DOT____Vlvbound1;
+    CData/*0:0*/ __Vm_traceActivity[6];
     static CData/*0:0*/ __Vtable1_core__DOT__exec_i__DOT__divider_i__DOT__setup_regs[8];
     static CData/*0:0*/ __Vtable1_core__DOT__exec_i__DOT__divider_i__DOT__same[8];
     static CData/*0:0*/ __Vtable1_core__DOT__exec_i__DOT__divider_i__DOT__zero_div[8];
@@ -386,10 +442,15 @@ SC_MODULE(Vcore) {
   public:
     SC_CTOR(Vcore);
     virtual ~Vcore();
+    /// Trace signals in the model; called by application code
+    void trace(VerilatedVcdC* tfp, int levels, int options = 0);
+    /// SC tracing; avoid overloaded virtual function lint warning
+    virtual void trace(sc_trace_file* tfp) const { ::sc_core::sc_module::trace(tfp); }
     
     // API METHODS
   private:
-    void eval();
+    void eval() { eval_step(); }
+    void eval_step();
   public:
     void final();
     
@@ -400,10 +461,11 @@ SC_MODULE(Vcore) {
     void __Vconfigure(Vcore__Syms* symsp, bool first);
   private:
     static QData _change_request(Vcore__Syms* __restrict vlSymsp);
+    static QData _change_request_1(Vcore__Syms* __restrict vlSymsp);
   public:
     static void _combo__TOP__10(Vcore__Syms* __restrict vlSymsp);
+    static void _combo__TOP__12(Vcore__Syms* __restrict vlSymsp);
     static void _combo__TOP__3(Vcore__Syms* __restrict vlSymsp);
-    static void _combo__TOP__7(Vcore__Syms* __restrict vlSymsp);
   private:
     void _ctor_var_reset() VL_ATTR_COLD;
   public:
@@ -416,12 +478,24 @@ SC_MODULE(Vcore) {
     static void _eval_initial(Vcore__Syms* __restrict vlSymsp) VL_ATTR_COLD;
     static void _eval_settle(Vcore__Syms* __restrict vlSymsp) VL_ATTR_COLD;
     static void _initial__TOP__2(Vcore__Syms* __restrict vlSymsp) VL_ATTR_COLD;
+    static void _sequent__TOP__11(Vcore__Syms* __restrict vlSymsp);
     static void _sequent__TOP__5(Vcore__Syms* __restrict vlSymsp);
     static void _sequent__TOP__6(Vcore__Syms* __restrict vlSymsp);
+    static void _sequent__TOP__7(Vcore__Syms* __restrict vlSymsp);
     static void _sequent__TOP__8(Vcore__Syms* __restrict vlSymsp);
     static void _sequent__TOP__9(Vcore__Syms* __restrict vlSymsp);
     static void _settle__TOP__1(Vcore__Syms* __restrict vlSymsp) VL_ATTR_COLD;
     static void _settle__TOP__4(Vcore__Syms* __restrict vlSymsp) VL_ATTR_COLD;
+  private:
+    static void traceChgSub0(void* userp, VerilatedVcd* tracep);
+    static void traceChgTop0(void* userp, VerilatedVcd* tracep);
+    static void traceCleanup(void* userp, VerilatedVcd* /*unused*/);
+    static void traceFullSub0(void* userp, VerilatedVcd* tracep) VL_ATTR_COLD;
+    static void traceFullTop0(void* userp, VerilatedVcd* tracep) VL_ATTR_COLD;
+    static void traceInitSub0(void* userp, VerilatedVcd* tracep) VL_ATTR_COLD;
+    static void traceInitTop(void* userp, VerilatedVcd* tracep) VL_ATTR_COLD;
+    void traceRegister(VerilatedVcd* tracep) VL_ATTR_COLD;
+    static void traceInit(void* userp, VerilatedVcd* tracep, uint32_t code) VL_ATTR_COLD;
 } VL_ATTR_ALIGNED(VL_CACHE_LINE_BYTES);
 
 //----------
