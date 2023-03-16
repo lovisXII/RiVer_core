@@ -456,59 +456,34 @@ int sc_main(int argc, char* argv[]) {
 */
 
         if (mem_store && mem_adr_valid) {
-            int temporary_value = ram[mem_adr] ; 
-            unsigned int temporary_store_value = mem_data;
-            if(mem_size == 2){//access in byte
-            // doing a mask on the least 2 significant bits
-                int mask_adr = MCACHE_ADR_SM.read() & 0x00000003 ;
-                // The switch will allow to keep only the bits we want to store
-                switch (mask_adr)
-                {
-                case 0 :
-                    temporary_store_value = temporary_store_value & 0x000000FF ;
-                    temporary_value = 0xFFFFFF00 & temporary_value ;
-                    ram[mem_adr] = temporary_value | temporary_store_value ;
-                    break ;
-                case 1 :
-                    temporary_store_value = temporary_store_value & 0x0000FF00 ;
-                    temporary_value = 0xFFFF00FF & temporary_value ;
-                    ram[mem_adr] = temporary_value | temporary_store_value ;
-                    break ;
-                case 2 :
-                    temporary_store_value = temporary_store_value & 0x00FF0000 ;
-                    temporary_value = 0xFF00FFFF & temporary_value ;
-                    ram[mem_adr] = temporary_value | temporary_store_value ;
-                    break ;
-                case 3 :      
-                    temporary_store_value = temporary_store_value & 0xFF000000 ;
-                    temporary_value = 0x00FFFFFF & temporary_value ;
-                    ram[mem_adr] = temporary_value | temporary_store_value ;
-                    break ;
-                default:
-                    break;
-                }
-            }
-            else if(mem_size == 1){//access in half word
-                int mask_adr = MCACHE_ADR_SM.read() & 0x00000003 ;
-                switch (mask_adr)
-                {
-                case 0 :
-                    temporary_store_value = temporary_store_value & 0x0000FFFF ;
-                    temporary_value = 0xFFFF0000 & temporary_value ;
-                    ram[mem_adr] = temporary_value | temporary_store_value ;
-                    break ;
-                case 2 :          
-                    temporary_store_value = temporary_store_value & 0xFFFF0000 ;
-                    temporary_value = 0x00000FFFF & temporary_value ;
-                    ram[mem_adr] = temporary_value | temporary_store_value ;
-                    break ;      
-                default:
-                    break;
-                }
-            }
-            else//access in word
+            switch (mem_size)
             {
-                ram[mem_adr] = mem_data;}
+            case 1 :
+                ram[mem_adr] = (ram[mem_adr] & 0xFFFFFF00) | (MCACHE_DATA_SM.read() & ~(0xFFFFFF00));
+                break;
+            case 2:
+                ram[mem_adr] = (ram[mem_adr] & 0xFFFF00FF) | ((MCACHE_DATA_SM.read() << 8) & ~(0xFFFF00FF));
+                break;
+            case 4:
+                ram[mem_adr] = (ram[mem_adr] & 0xFF00FFFF) | ((MCACHE_DATA_SM.read() << 16) & ~(0xFF00FFFF));   
+                break;
+            case 8:
+                ram[mem_adr] = (ram[mem_adr] & 0x00FFFFFF) | ((MCACHE_DATA_SM.read() << 24) & ~(0x00FFFFFF));  
+                break;
+            // store half word 
+            case 3:
+                ram[mem_adr] = (ram[mem_adr] & 0xFFFF0000) | (MCACHE_DATA_SM.read() & ~(0xFFFF0000));   
+                break;
+            case 12:
+                ram[mem_adr] = (ram[mem_adr] & 0x0000FFFF) | ((MCACHE_DATA_SM.read() << 16) & ~(0x0000FFFF));
+                break;
+            // store word
+            case 15:  
+                ram[mem_adr] = MCACHE_DATA_SM.read();
+                break;
+            default:
+                break;
+            }
         }
         mem_result = ram[mem_adr];
         MCACHE_RESULT_SM.write(mem_result);
