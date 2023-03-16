@@ -25,6 +25,7 @@ _label2 :
     bge x2,x1,_branch3
 _label3 :
     j _good
+    j _bad
 _branch1 :
     j _label1
 _branch2 :  

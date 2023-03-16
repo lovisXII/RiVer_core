@@ -16,7 +16,6 @@ _start :
     li x5,362
 
     add x1,x2,x3 # x1 = 48
-    #nop
 
     sw x5,0(x1) # 0(x1) = 362 
     lw x6,0(x1) # x6 = 362

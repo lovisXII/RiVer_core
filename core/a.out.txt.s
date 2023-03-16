@@ -2,16 +2,6 @@
 a.out:     file format elf32-littleriscv
 
 
-Disassembly of section seg_text:
-
-00010054 <_start>:
-   10054:	01234097          	auipc	ra,0x1234
-   10058:	12341137          	lui	sp,0x12341
-   1005c:	05410113          	addi	sp,sp,84 # 12341054 <_start+0x12331000>
-   10060:	00209463          	bne	ra,sp,10068 <_start+0x14>
-   10064:	fb1ef06f          	j	14 <_good>
-   10068:	fa9ef06f          	j	10 <_bad>
-
 Disassembly of section .riscv.attributes:
 
 00000000 <.riscv.attributes>:
@@ -52,7 +42,7 @@ Disassembly of section seg_reset:
 
 80000000 <_reset>:
 80000000:	00010e37          	lui	t3,0x10
-80000004:	054e0e13          	addi	t3,t3,84 # 10054 <_start>
+80000004:	054e0e13          	addi	t3,t3,84 # 10054 <_exception_occur+0x1003c>
 80000008:	01000e97          	auipc	t4,0x1000
 8000000c:	ff8e8e93          	addi	t4,t4,-8 # 81000000 <_exception>
 80000010:	90000f37          	lui	t5,0x90000

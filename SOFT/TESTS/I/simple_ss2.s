@@ -6,10 +6,6 @@ _start:
     ori x2,x0,12
     ori x3,x0,12
     ori x4,x0,52
-    nop
-    nop
-    nop
-    nop
     beq x3,x2,_label_test_1
     addi x7,x0,120
     beq x3,x2, _label_test_2 
@@ -26,4 +22,5 @@ _label_test_2 :
 _label_test_1 :
     addi x5,x0,12
     j _good
+    j _bad
     

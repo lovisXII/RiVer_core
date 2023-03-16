@@ -14,7 +14,3 @@ _start:
 _func :
     addi x2,x2,1 
     ret
-
-    nop
-    nop
-    nop

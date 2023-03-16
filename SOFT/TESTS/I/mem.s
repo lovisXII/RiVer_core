@@ -21,11 +21,6 @@ _start:
     sll x6,x6,11 # sll = 124928
 
     bne x5,x6, _bad
-    nop
-
     jal x6, _good
-    nop
-
-    nop
 
 

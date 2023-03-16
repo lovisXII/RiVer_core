@@ -3,9 +3,7 @@
 
 _start :
 
-    li x5,47
-    nop
-    
+    li x5,47    
     addi x1,x0,12
     addi x2,x0,23
     

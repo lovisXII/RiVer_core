@@ -370,7 +370,25 @@ int sc_main(int argc, char* argv[]) {
             #endif
 
             exit(1);
-        } else if (signature_name == "" && pc_adr == good_adr) {
+        } 
+        else if(signature_name == "" && pc_adr == exception_occur){
+            cout << FYEL("Error ! ") << "Found exception_occur at adr 0x" << std::hex << pc_adr << endl;
+            sc_start(3, SC_NS);
+            // Final model cleanup
+            core_inst.final();
+            // Close trace if opened
+            if (tfp) {
+                tfp->close();
+                tfp = nullptr;
+            }
+            // Coverage analysis (calling write only after the test is known to pass)
+            #if VM_COVERAGE
+                Verilated::mkdir("logs");
+                VerilatedCov::write("logs/coverage.dat");
+            #endif
+            exit(2);
+        }
+        else if (signature_name == "" && pc_adr == good_adr) {
             if(stats)
             {
                 #ifdef BRANCH_PREDICTION || RET_BRANCH_PREDICTION
@@ -396,23 +414,6 @@ int sc_main(int argc, char* argv[]) {
             #endif
             exit(0);
         } 
-        else if(signature_name == "" && pc_adr == exception_occur){
-            cout << FYEL("Error ! ") << "Found exception_occur at adr 0x" << std::hex << pc_adr << endl;
-            sc_start(3, SC_NS);
-            // Final model cleanup
-            core_inst.final();
-            // Close trace if opened
-            if (tfp) {
-                tfp->close();
-                tfp = nullptr;
-            }
-            // Coverage analysis (calling write only after the test is known to pass)
-            #if VM_COVERAGE
-                Verilated::mkdir("logs");
-                VerilatedCov::write("logs/coverage.dat");
-            #endif
-            exit(2);
-        }
         else if (countdown == 0 && ((pc_adr == rvtest_code_end) || (pc_adr ==  rvtest_end) || (signature_name != "" && cycles > 2000000))) {
             countdown = 50;
         }
