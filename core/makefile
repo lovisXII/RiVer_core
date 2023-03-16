@@ -19,7 +19,7 @@ C_ARGS=$(INCLUDE_PATH) -Wl, $(LIBS) -g
 
 # RISCV
 
-SW_DIR=../SOFT/
+SW_DIR=../sw/
 LD_SCRIPT= -T $(SW_DIR)/kernel.ld
 RISC_FLAGS= -nostdlib $(LD_SCRIPT)
 
