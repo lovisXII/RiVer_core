@@ -8,9 +8,9 @@ core_tb.o: ../core_tb.cpp ../../ELFIO/elfio/elfio.hpp \
  ../../ELFIO/elfio/elfio_modinfo.hpp ../../ELFIO/elfio/elfio_versym.hpp \
  ../include/colors.h /usr/share/verilator/include/verilated.h \
  /usr/share/verilator/include/verilatedos.h \
+ /usr/share/verilator/include/verilated_sc.h Vcore.h \
  /usr/share/verilator/include/verilated_sc.h \
  /usr/share/verilator/include/verilated_vcd_sc.h \
  /usr/share/verilator/include/verilated_vcd_c.h \
  /usr/share/verilator/include/verilated.h \
- /usr/share/verilator/include/verilated_trace.h Vcore.h \
- /usr/share/verilator/include/verilated_sc.h
+ /usr/share/verilator/include/verilated_trace.h

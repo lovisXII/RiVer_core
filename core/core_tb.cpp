@@ -7,41 +7,72 @@
 #include "systemc.h"
 #include "include/colors.h"
 #include <sys/stat.h>  // mkdir
-
-// Include common routines
 #include <verilated.h>
+#include "Vcore.h"
 #if VM_TRACE
 #include <verilated_vcd_sc.h>
 #endif
 
-
-#include "Vcore.h"
-
 using namespace std;
 using namespace ELFIO;
 
+enum error_type {HELP = 0, FILE_TYPE = 1};
+
+
+void helper(int error){
+    cout << endl << endl;
+    if(error == FILE_TYPE){
+        cerr << "[Error] Fileformat unknown, supported files are .S, .s, .c" << endl;
+        cerr << "[info] run --help to see the options" << endl ;
+    }
+    else if(error == HELP){
+        cerr << "Usage: ./core_tb test_filename [options] ..." << endl;
+        cerr << "Options:" << endl << endl;
+        cerr << "-O                          \t Optimise the .c file" << endl;
+        cerr << "--riscof signature_filename \t Allow to enable the riscof gestion and store the signature in the file named signature_filename" << endl ;
+        cerr << "--stats                     \t Allow to use the statistic such as the number of cycle needed to end the program" << endl;
+    }
+    exit(1);
+}
+
+void cleanup(Vcore &core, VerilatedVcdSc *tf){
+     // Final model cleanup
+    core.final();
+    // Close trace if opened
+    if (tf) {
+        tf->close();
+        tf = nullptr;
+    }
+    // Coverage analysis (calling write only after the test is known to pass)
+    #if VM_COVERAGE
+        Verilated::mkdir("logs");
+        VerilatedCov::write("logs/coverage.dat");
+    #endif
+    exit(1);
+}
 
 int sc_main(int argc, char* argv[]) {
 
-    // Create logs/ directory in case we have traces to put under it
-    Verilated::mkdir("logs");
-    // const std::unique_ptr<VerilatedContext> contextp{new VerilatedContext};
 
-    // Before any evaluation, need to know to calculate those signals only used for tracing
-    Verilated::traceEverOn(true);
-    VerilatedVcdSc* tfp = nullptr;
-    tfp = new VerilatedVcdSc;
-    
-    
-    unordered_map<int, int> ram;
-    elfio                   reader;  // creation of an elfio object
-
+    /*
+    ##############################################################
+                    Checking main arguments 
+    ##############################################################
+    */
     if(argc < 2){
-        cerr << "First argument must be a .S, .s or .c file, please use --help" << endl;
-        exit(0);
+        helper(FILE_TYPE);
     }
-    string                  test_filename(argv[1]);
-    string                  path(argv[1]);
+    if(argc == 2 && std::string(argv[1]) == "--help"){
+        helper(HELP);
+    }
+
+
+    /*
+    ##############################################################
+                    Affecting main arguments 
+    ##############################################################
+    */
+
     int                     reset_adr;
     int                     start_adr;
     int                     good_adr;
@@ -52,58 +83,44 @@ int sc_main(int argc, char* argv[]) {
     int                     begin_signature;
     int                     end_signature;
     int                     rvtest_end;
+    fstream                 test_stats;
+    string                  filename_stats;
 
-    fstream test_stats;
-    string filename_stats;
+    char                    test[512] = "> a.out.txt.s";
+    string                  opt;
+    string                  signature_name;
+    bool                    riscof;
+    bool                    stats;
+    string                  test_filename(argv[1]);
+    unordered_map<int, int> ram;
+    elfio                   reader;  // creation of an elfio object
+    string                  path(argv[1]);
 
-    char   test[512] = "> a.out.txt.s";
-    string opt;
-    string signature_name;
-    bool   riscof;
-    bool   stats;
-/*
-    ##############################################################
-                    PARSING ELF/.s/.c file 
-    ##############################################################
-*/
-    if(argc == 2 && std::string(argv[1]) == "--help"){
-        cout << endl << endl;
-        cout << "Usage: ./core_tb test_filename [options] ..." << endl;
-        cout << "Options:" << endl << endl;
-        cout << "-O                          \t Optimise the .c file" << endl;
-        cout << "--riscof signature_filename \t Allow to enable the riscof gestion and store the signature in the file named signature_filename" << endl ;
-        cout << "--stats                     \t Allow to use the statistic such as the number of cycle needed to end the program" << endl;
-        exit(0);
-    }
-    else if (argc >= 3 && std::string(argv[2]) == "-O") {
+    // trace file settings
+    Verilated::mkdir("logs");
+    Verilated::traceEverOn(true);
+    VerilatedVcdSc* tfp     = nullptr;
+    tfp                     = new VerilatedVcdSc;
+    
+    if (argc >= 3 && std::string(argv[2]) == "-O") {
         opt = "-O2";
     } 
     else if (argc >= 3 && std::string(argv[2]) == "--riscof") {
-        signature_name = string(argv[3]);
-        riscof         = true;
-        stats          = true;
+        signature_name          = string(argv[3]);
+        riscof                  = true;
+        stats                   = true;
 
-        int tmp = test_filename.find("src/");
-        int tmp2 = test_filename.find("dut/");
+        int tmp                 = test_filename.find("src/");
+        int tmp2                = test_filename.find("dut/");
 
-        string tempo_string = test_filename.substr(0,tmp);
-        string tempo_string2 = test_filename.substr(0,tmp2);
-        int tmp3 = tempo_string2.size() - (tempo_string.size() + 4);
+        string tempo_string     = test_filename.substr(0,tmp);
+        string tempo_string2    = test_filename.substr(0,tmp2);
+        int tmp3                = tempo_string2.size() - (tempo_string.size() + 4);
 
-        test_filename = test_filename.substr(tmp+4, tmp3);
-        
-        #ifdef BRANCH_PREDICTION 
-        filename_stats = "stats_branch_SS1.txt";        
-        #elif  RET_BRANCH_PREDICTION
-        filename_stats = "stats_stack_branch_SS1.txt";        
-        #elif BRANCH_PREDICTION & RET_BRANCH_PREDICTION
-        filename_stats = "stat_all_branch_SS1.txt";
-        #elif ICACHE_ON & DCACHE_ON
-        filename_stats = "stats_caches_SS1.txt";
-        #else
-        filename_stats = "test_stats_SS1.txt";
-        #endif
+        test_filename           = test_filename.substr(tmp+4, tmp3); 
+        filename_stats          = "stats.txt";
         test_stats.open(filename_stats, fstream::app);
+        
         if(!test_stats.is_open())
         {
             cout << "Impossible to open " << filename_stats << endl ;
@@ -112,45 +129,36 @@ int sc_main(int argc, char* argv[]) {
     } 
     else if(argc >= 3 && std::string(argv[2]) == "--stats")
     {
-        stats          = true;
-        int tmp = test_filename.rfind("/");
-        test_filename = test_filename.substr(tmp+1, test_filename.size());
-        
-        #ifdef BRANCH_PREDICTION 
-        filename_stats = "stats_branch_SS1.txt";        
-        #elif  RET_BRANCH_PREDICTION
-        filename_stats = "stats_stack_branch_SS1.txt";        
-        #elif BRANCH_PREDICTION & RET_BRANCH_PREDICTION
-        filename_stats = "stat_all_branch_SS1.txt";
-        #elif ICACHE_ON & DCACHE_ON
-        filename_stats = "stats_caches_SS1.txt";
-        #else
-        filename_stats = "test_stats_SS1.txt";
-        #endif
+        stats                   = true;
+        int tmp                 = test_filename.rfind("/");
+        test_filename           = test_filename.substr(tmp+1, test_filename.size());
+        filename_stats          = "test_stats.txt";
         test_stats.open(filename_stats, fstream::app);
+
         if(!test_stats.is_open())
         {
             cout << "Impossible to open " << filename_stats << endl ;
             exit(1);
         }
     }
-
+/*
+    ##############################################################
+                    PARSING ELF/.s/.c file 
+    ##############################################################
+*/
     char temp_text[512];
-    if (path.substr(path.find_last_of(".") + 1) == "s" || path.substr(path.find_last_of(".") + 1) == "S" 
-    || path.substr(path.find_last_of(".") + 1) == "c") {  
+    string extension           = path.substr(path.find_last_of(".") + 1) ; 
+    
+    if (extension == "s" || extension == "S" || extension == "c") {  
         char temp[512];
-
         sprintf(temp,
                 "riscv32-unknown-elf-gcc -nostdlib -march=rv32im -T ../sw/app.ld %s %s",
                 opt.c_str(),
-                path.c_str());  
-                                
+                path.c_str());          
         system((char*)temp);    
         path = "a.out";         
     }else{
-        cerr << "Please use a supported file format, file format are .S, .s or .c";
-        exit(1);
-
+        helper(FILE_TYPE);
     }
     if (!reader.load(path)) {  
         std::cout << "Can't find or process ELF file " << argv[1] << std::endl;
@@ -159,8 +167,8 @@ int sc_main(int argc, char* argv[]) {
     sprintf(temp_text, "riscv32-unknown-elf-objdump -D %s", path.c_str());
     strcat(temp_text, test);
     system((char*)temp_text);
+
     cout << "Loading ELF file..." << endl;
- 
     int n_sec = reader.sections.size();  // get the total amount of sections
 
 /*
@@ -193,6 +201,7 @@ int sc_main(int argc, char* argv[]) {
         if (sec->get_type() == SHT_SYMTAB) {
             cout << "Reading symbols table..." << endl;
             const symbol_section_accessor symbols(reader, sec);
+
             for (unsigned int j = 0; j < symbols.get_symbols_num(); ++j) {
                 std::string   name;
                 Elf64_Addr    value;
@@ -203,45 +212,46 @@ int sc_main(int argc, char* argv[]) {
                 unsigned char other;
 
                 symbols.get_symbol(j, name, value, size, bind, type, section_index, other);
+
                 if (name == "_reset") {
-                    cout << "Found reset" << endl;
-                    reset_adr = value ;  // minus 4 to acount for init inc_pc
+                    reset_adr = value ;  
+                    cout << "Found reset at address 0x" << std::hex << reset_adr << endl;
                 }
                 if (name == "_start") {
-                    cout << "Found start" << endl;
-                    start_adr = value - 4;  // minus 4 to acount for init inc_pc
+                    start_adr = value - 4;  
+                    cout << "Found start at address 0x" << std::hex << start_adr << endl;
                 }
                 if (name == "_bad") {
-                    cout << "Found bad" << endl;
                     bad_adr = value;
+                    cout << "Found bad at address 0x" << std::hex << bad_adr << endl;
                 }
                 if (name == "_good") {
-                    cout << "Found good" << endl;
                     good_adr = value;
+                    cout << "Found good at address 0x" << std::hex << good_adr  << endl;
                 }
                 if (name == "_exception_occur") {
-                    cout << "Found exception_occur" << endl;
                     exception_occur = value;
+                    cout << "Found exception_occur at address 0x" << std::hex << exception_occur << endl;
                 }
                 if (name == "rvtest_code_end") {
-                    cout << "Found rvtest_code_end" << endl;
                     rvtest_code_end = value;
+                    cout << "Found rvtest_code_end at address 0x" << std::hex << rvtest_code_end << endl;
                 }
                 if (name == "rvtest_entry_point") {
-                    cout << "Found rvtest_entry_point" << endl;
                     reset_adr = value ;
+                    cout << "Found rvtest_entry_point at address 0x" << std::hex << reset_adr << endl;
                 }
                 if (name == "begin_signature") {
-                    cout << "Found begin_signature" << endl;
                     begin_signature = value;
+                    cout << "Found begin_signature at address 0x" << std::hex << begin_signature << endl;
                 }
                 if (name == "end_signature") {
-                    cout << "Found end_signature" << endl;
                     end_signature = value;
+                    cout << "Found end_signature at address 0x" << std::hex << end_signature << endl;
                 }
                 if (name == "rvtest_end") {
                     rvtest_end = value;
-                    cout << "Found rvtest_end at adr " << std::hex << rvtest_end << endl;
+                    cout << "Found rvtest_end at address 0x " << std::hex << rvtest_end << endl;
                 }
             }
         }
@@ -354,39 +364,12 @@ int sc_main(int argc, char* argv[]) {
         if (signature_name == "" && pc_adr == bad_adr) {
             cout << FRED("Error ! ") << "Found bad at adr 0x" << std::hex << pc_adr << endl;
             sc_start(3, SC_NS);
-
-            // Final model cleanup
-            core_inst.final();
-            // Close trace if opened
-            if (tfp) {
-                tfp->close();
-                tfp = nullptr;
-            }
-
-            // Coverage analysis (calling write only after the test is known to pass)
-            #if VM_COVERAGE
-                Verilated::mkdir("logs");
-                VerilatedCov::write("logs/coverage.dat");
-            #endif
-
-            exit(1);
+            cleanup(core_inst, tfp);
         } 
         else if(signature_name == "" && pc_adr == exception_occur){
             cout << FYEL("Error ! ") << "Found exception_occur at adr 0x" << std::hex << pc_adr << endl;
             sc_start(3, SC_NS);
-            // Final model cleanup
-            core_inst.final();
-            // Close trace if opened
-            if (tfp) {
-                tfp->close();
-                tfp = nullptr;
-            }
-            // Coverage analysis (calling write only after the test is known to pass)
-            #if VM_COVERAGE
-                Verilated::mkdir("logs");
-                VerilatedCov::write("logs/coverage.dat");
-            #endif
-            exit(2);
+            cleanup(core_inst, tfp);
         }
         else if (signature_name == "" && pc_adr == good_adr) {
             if(stats)
@@ -400,19 +383,7 @@ int sc_main(int argc, char* argv[]) {
             
             cout << FGRN("Success ! ") << "Found good at adr 0x" << std::hex << pc_adr << endl;
             sc_start(3, SC_NS);
-            // Final model cleanup
-            core_inst.final();
-            // Close trace if opened
-            if (tfp) {
-                tfp->close();
-                tfp = nullptr;
-            }
-            // Coverage analysis (calling write only after the test is known to pass)
-            #if VM_COVERAGE
-                Verilated::mkdir("logs");
-                VerilatedCov::write("logs/coverage.dat");
-            #endif
-            exit(0);
+            cleanup(core_inst, tfp);
         } 
         else if (countdown == 0 && ((pc_adr == rvtest_code_end) || (pc_adr ==  rvtest_end) || (signature_name != "" && cycles > 2000000))) {
             countdown = 50;
@@ -435,19 +406,7 @@ int sc_main(int argc, char* argv[]) {
             for (int i = begin_signature; i < end_signature; i += 4) {
                 signature << setfill('0') << setw(8) << hex << ram[i] << endl;
             }
-            // Final model cleanup
-            core_inst.final();
-            // Close trace if opened
-            if (tfp) {
-                tfp->close();
-                tfp = nullptr;
-            }
-            // Coverage analysis (calling write only after the test is known to pass)
-            #if VM_COVERAGE
-                Verilated::mkdir("logs");
-                VerilatedCov::write("logs/coverage.dat");
-            #endif
-            exit(0);
+            cleanup(core_inst, tfp);
         }
 
 /*

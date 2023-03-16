@@ -25,7 +25,7 @@ RISC_FLAGS= -nostdlib $(LD_SCRIPT)
 
 all: core_tb
 
-core_tb: kernel
+core_tb: clean kernel
 	export SYSTEMC_INCLUDE=/usr/local/systemc-2.3.3/include/
 	export SYSTEMC_LIBDIR=/usr/local/systemc-2.3.3/lib-linux64/
 	$(VERILATOR) -CFLAGS "$(C_ARGS)" $(VERILATOR_FLAGS) $(SRC) --top-module $(TOP)  --exe $(TB)
