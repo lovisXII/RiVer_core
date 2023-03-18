@@ -54,7 +54,7 @@ class projet(pluginTemplate):
         #We capture if the user would like the run the tests on the target or
         #not. If you are interested in just compiling the tests and not running
         #them on the target, then following variable should be set to False
-        if 'target_run' in config and config['target_run']==1'b0:
+        if 'target_run' in config and config['target_run']=='0':
             self.target_run = False
         else:
             self.target_run = True

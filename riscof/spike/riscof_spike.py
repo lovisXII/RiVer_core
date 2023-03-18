@@ -22,7 +22,7 @@ class spike(pluginTemplate):
     __version__ = "XXX"
 
     def __init__(self, *args, **kwargs):
-        sclass = super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         config = kwargs.get('config')
 
@@ -54,13 +54,10 @@ class spike(pluginTemplate):
         #We capture if the user would like the run the tests on the target or
         #not. If you are interested in just compiling the tests and not running
         #them on the target, then following variable should be set to False
-        if 'target_run' in config and config['target_run']==1'b0:
+        if 'target_run' in config and config['target_run']=='0':
             self.target_run = False
         else:
             self.target_run = True
-
-        # Return the parameters set above back to RISCOF for further processing.
-        return sclass
 
     def initialise(self, suite, work_dir, archtest_env):
 
@@ -120,7 +117,7 @@ class spike(pluginTemplate):
 
       # set the make command that will be used. The num_jobs parameter was set in the __init__
       # function earlier
-      make.makeCommand = 'make -j' + self.num_jobs
+      make.makeCommand = 'make -k -j' + self.num_jobs
 
       # we will iterate over each entry in the testList. Each entry node will be refered to by the
       # variable testname.
