@@ -15,3 +15,4 @@ cd Python-3.6.15
 ./configure --enable-optimizations  -with-lto  --with-pydebug
 make altinstall
 python3.6 -m pip install git+https://github.com/riscv/riscof.git
+sudo rm -rf Python-3.6.15
