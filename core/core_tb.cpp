@@ -109,6 +109,8 @@ int sc_main(int argc, char* argv[]) {
         opt = "-O2";
     } 
     else if (argc >= 4 && std::string(argv[2]) == "--riscof") {
+        if(argv[3] == "")
+            helper(ARG_MISS );
         signature_name          = string(argv[3]);
         riscof                  = true;
         stats                   = true;
@@ -143,10 +145,6 @@ int sc_main(int argc, char* argv[]) {
             cout << "Impossible to open " << filename_stats << endl ;
             exit(1);
         }
-    }
-    else{
-        helper(ARG_MISS);
-        cleanup(core_inst, tfp, 1); 
     }
 /*
     ##############################################################
@@ -378,9 +376,6 @@ int sc_main(int argc, char* argv[]) {
         else if (signature_name == "" && pc_adr == good_adr) {
             if(stats)
             {
-                #ifdef BRANCH_PREDICTION || RET_BRANCH_PREDICTION
-                    cout << "NB BRANCH TAKEN = "    <<  nb_jump_taken   <<  endl;
-                #endif
                 test_stats << test_filename << " " << NB_CYCLES  << " " << "SCALAR" << endl;
                 test_stats.close();
             }
