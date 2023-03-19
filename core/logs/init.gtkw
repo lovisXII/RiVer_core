@@ -1,0 +1,50 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Thu Mar 16 20:49:48 2023
+[*]
+[dumpfile] "/home/lovis/Desktop/RiVer_core/core/logs/vlt_dump.vcd"
+[dumpfile_mtime] "Thu Mar 16 20:48:55 2023"
+[dumpfile_size] 775940
+[savefile] "/home/lovis/Desktop/RiVer_core/core/logs/init.gtkw"
+[timestart] 4960
+[size] 2486 1403
+[pos] -2561 -28
+*-11.000000 14330 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] core_inst.
+[treeopen] core_inst.core.
+[sst_width] 287
+[signals_width] 389
+[sst_expanded] 1
+[sst_vpaned_height] 432
+@28
+core_inst.core.dec_i.clk
+core_inst.core.dec_i.reset_n
+@200
+-
+@28
+core_inst.core.dec_i.EXCEPTION_SM
+@200
+-
+-DECOD
+-
+@22
+core_inst.core.dec_i.INSTR_RI[31:0]
+core_inst.core.dec_i.PC_RD[31:0]
+@200
+-
+-ifetch
+-
+-
+-EXE
+-
+-
+-MEM
+@22
+core_inst.core.mem_i.PC_EXE2MEM_RE[31:0]
+@23
+core_inst.core.mem_i.MCACHE_RESULT_SM[31:0]
+@200
+-
+-CSR
+[pattern_trace] 1
+[pattern_trace] 0
