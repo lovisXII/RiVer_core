@@ -76,11 +76,12 @@ int sc_main(int argc, char* argv[]) {
     int                     good_adr;
     int                     exception_occur ;
     int                     bad_adr;
-    int                     rvtest_code_end;
-    int                     rvtest_entry_point;
+
+    int                     rvtest_code_end     = 0xFFFFFFFF;
+    int                     rvtest_entry_point  = 0xFFFFFFFF;
     int                     begin_signature;
     int                     end_signature;
-    int                     rvtest_end;
+    int                     rvtest_end          = 0xFFFFFFFF;
     fstream                 test_stats;
     string                  filename_stats;
 
@@ -325,18 +326,23 @@ int sc_main(int argc, char* argv[]) {
     cerr << "done." << endl;
 
     int NB_CYCLES = 0;
-    int cycles = 0;
-    int countdown = 5000;
 
     int if_adr;
     int if_result;
     int mem_adr;
     int mem_size;
 
+    // Use to let the time to riscof to execute the last instruction
+    // When it arrives to the end of the code it will start the countdown before exiting
+
+    int countdown = 50;
+    bool start_countdown = false;
+
     while (1) 
     {
-        if (countdown) countdown--;
-        cycles++;
+
+        if(start_countdown)
+            countdown --;
 
         // mem interface
         mem_adr       = MCACHE_ADR_SM.read() & 0XfffffffC; // removing the least 2 significant bits
@@ -383,10 +389,10 @@ int sc_main(int argc, char* argv[]) {
             sc_start(3, SC_NS);
             cleanup(core_inst, tfp, 0);
         } 
-        else if (countdown == 0 && ((pc_adr == rvtest_code_end) || (pc_adr ==  rvtest_end) || (signature_name != "" && cycles > 2000000))) {
-            countdown = 50;
+        else if((pc_adr == rvtest_code_end) || (pc_adr ==  rvtest_end)){
+            start_countdown = true;
         }
-        if (countdown == 1) {
+        else if (countdown == 0 || (signature_name != "" && NB_CYCLES > 2000000)) {
             cout << "Test ended at " << std::hex << pc_adr << endl;
             sc_start(3, SC_NS);
 
