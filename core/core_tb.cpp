@@ -58,6 +58,7 @@ int sc_main(int argc, char* argv[]) {
                     Checking main arguments 
     ##############################################################
     */
+   cout << argc << endl;
     if(argc < 2){
         helper(ARG_MISS);
     }
@@ -108,8 +109,8 @@ int sc_main(int argc, char* argv[]) {
     if (argc >= 3 && std::string(argv[2]) == "-O") {
         opt = "-O2";
     } 
-    else if (argc >= 4 && std::string(argv[2]) == "--riscof") {
-        if(argv[3] == "")
+    else if (std::string(argv[2]) == "--riscof") {
+        if(argc < 4)
             helper(ARG_MISS );
         signature_name          = string(argv[3]);
         riscof                  = true;
