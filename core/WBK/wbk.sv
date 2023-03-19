@@ -23,8 +23,8 @@ assign WB_SW = (WB_RM && !MEM2WBK_EMPTY_SM) ? 1'b1 : 1'b0;
 
 assign MEM2WBK_POP_SW = !MEM2WBK_EMPTY_SM;
 
-assign DATA_SW = CSR_WENABLE_RM ? CSR_RDATA_RM :
-                 MULT_INST_RM ? RES_RX2 :
-                 MEM_RES_RM;
+assign DATA_SW  = {32{CSR_WENABLE_RM}} & CSR_RDATA_RM
+                | {32{MULT_INST_RM}} & RES_RX2
+                | {32{~(MULT_INST_RM | CSR_WENABLE_RM)}} & MEM_RES_RM;   
 
 endmodule
