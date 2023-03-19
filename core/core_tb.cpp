@@ -16,12 +16,12 @@
 using namespace std;
 using namespace ELFIO;
 
-enum error_type {HELP = 0, FILE_TYPE = 1};
+enum error_type {HELP = 0, ARG_MISS = 1};
 
 void helper(int error){
     cout << endl << endl;
-    if(error == FILE_TYPE){
-        cerr << "[Error] Fileformat unknown, supported files are .S, .s, .c" << endl;
+    if(error == ARG_MISS){
+        cerr << "[Error] Missing argument" << endl;
         cerr << "[info] run --help to see the options" << endl ;
     }
     else if(error == HELP){
@@ -59,7 +59,7 @@ int sc_main(int argc, char* argv[]) {
     ##############################################################
     */
     if(argc < 2){
-        helper(FILE_TYPE);
+        helper(ARG_MISS);
     }
     if(argc == 2 && std::string(argv[1]) == "--help"){
         helper(HELP);
@@ -101,10 +101,14 @@ int sc_main(int argc, char* argv[]) {
     VerilatedVcdSc* tfp     = nullptr;
     tfp                     = new VerilatedVcdSc;
     
+    // Core instanciation
+
+    Vcore core_inst("core_inst");
+
     if (argc >= 3 && std::string(argv[2]) == "-O") {
         opt = "-O2";
     } 
-    else if (argc >= 3 && std::string(argv[2]) == "--riscof") {
+    else if (argc >= 4 && std::string(argv[2]) == "--riscof") {
         signature_name          = string(argv[3]);
         riscof                  = true;
         stats                   = true;
@@ -139,6 +143,10 @@ int sc_main(int argc, char* argv[]) {
             cout << "Impossible to open " << filename_stats << endl ;
             exit(1);
         }
+    }
+    else{
+        helper(ARG_MISS);
+        cleanup(core_inst, tfp, 1); 
     }
 /*
     ##############################################################
@@ -260,7 +268,6 @@ int sc_main(int argc, char* argv[]) {
     ##############################################################
 */
 
-    Vcore core_inst("core_inst");
 
     core_inst.trace(tfp, 99);  // Trace 99 levels of hierarchy
     Verilated::mkdir("logs");
