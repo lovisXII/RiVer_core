@@ -4,9 +4,9 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NOC='\033[0m'
 make
-for file in $(ls ../sw/tests//I/); do 
+for file in $(ls ../sw/tests/I/); do 
     printf "Test ${file} non opt..." 
-    timeout 30s obj_dir/Vcore ../sw/tests//I/$file >/dev/null 2>&1;
+    timeout 30s obj_dir/Vcore ../sw/tests/I/$file >/dev/null 2>&1;
     RES=$?;
     if (($RES == 0)) 
     then
@@ -18,7 +18,7 @@ for file in $(ls ../sw/tests//I/); do
         printf "${RED} failed\n${NOC}"    
     fi
     printf "Test ${file} opt..." 
-    timeout 30s obj_dir/Vcore ../sw/tests//I/$file -O >/dev/null 2>&1;
+    timeout 30s obj_dir/Vcore ../sw/tests/I/$file -O >/dev/null 2>&1;
     RES=$?;
     if (($RES == 0)) 
     then
@@ -31,9 +31,9 @@ for file in $(ls ../sw/tests//I/); do
     fi
 
 done
-for file in $(ls ../sw/tests//M/); do 
+for file in $(ls ../sw/tests/M/); do 
     printf "Test ${file} non opt..." 
-    timeout 30s obj_dir/Vcore ../sw/tests//M/$file >/dev/null 2>&1;
+    timeout 30s obj_dir/Vcore ../sw/tests/M/$file >/dev/null 2>&1;
     RES=$?;
     if (($RES == 0)) 
     then
@@ -45,7 +45,7 @@ for file in $(ls ../sw/tests//M/); do
         printf "${RED} failed\n${NOC}"    
     fi
     printf "Test ${file} opt..." 
-    timeout 30s obj_dir/Vcore ../sw/tests//M/$file -O >/dev/null 2>&1;
+    timeout 30s obj_dir/Vcore ../sw/tests/M/$file -O >/dev/null 2>&1;
     RES=$?;
     if (($RES == 0)) 
     then

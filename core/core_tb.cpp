@@ -17,7 +17,7 @@ using namespace std;
 using namespace ELFIO;
 
 enum error_type {HELP = 0, FILE_TYPE = 1};
-
+int retval = 0;
 
 void helper(int error){
     cout << endl << endl;
@@ -48,7 +48,7 @@ void cleanup(Vcore &core, VerilatedVcdSc *tf){
         Verilated::mkdir("logs");
         VerilatedCov::write("logs/coverage.dat");
     #endif
-    exit(1);
+    exit(retval);
 }
 
 int sc_main(int argc, char* argv[]) {
@@ -363,11 +363,13 @@ int sc_main(int argc, char* argv[]) {
         
         if (signature_name == "" && pc_adr == bad_adr) {
             cout << FRED("Error ! ") << "Found bad at adr 0x" << std::hex << pc_adr << endl;
+            retval = 1;
             sc_start(3, SC_NS);
             cleanup(core_inst, tfp);
         } 
         else if(signature_name == "" && pc_adr == exception_occur){
             cout << FYEL("Error ! ") << "Found exception_occur at adr 0x" << std::hex << pc_adr << endl;
+            retval = 2;
             sc_start(3, SC_NS);
             cleanup(core_inst, tfp);
         }
@@ -382,6 +384,7 @@ int sc_main(int argc, char* argv[]) {
             }
             
             cout << FGRN("Success ! ") << "Found good at adr 0x" << std::hex << pc_adr << endl;
+            retval = 0;
             sc_start(3, SC_NS);
             cleanup(core_inst, tfp);
         } 
@@ -416,35 +419,42 @@ int sc_main(int argc, char* argv[]) {
 */
 
         if (mem_store && mem_adr_valid) {
-            switch (mem_size)
-            {
-            case 1 :
-                ram[mem_adr] = (ram[mem_adr] & 0xFFFFFF00) | (MCACHE_DATA_SM.read() & ~(0xFFFFFF00));
-                break;
-            case 2:
-                ram[mem_adr] = (ram[mem_adr] & 0xFFFF00FF) | ((MCACHE_DATA_SM.read() << 8) & ~(0xFFFF00FF));
-                break;
-            case 4:
-                ram[mem_adr] = (ram[mem_adr] & 0xFF00FFFF) | ((MCACHE_DATA_SM.read() << 16) & ~(0xFF00FFFF));   
-                break;
-            case 8:
-                ram[mem_adr] = (ram[mem_adr] & 0x00FFFFFF) | ((MCACHE_DATA_SM.read() << 24) & ~(0x00FFFFFF));  
-                break;
-            // store half word 
-            case 3:
-                ram[mem_adr] = (ram[mem_adr] & 0xFFFF0000) | (MCACHE_DATA_SM.read() & ~(0xFFFF0000));   
-                break;
-            case 12:
-                ram[mem_adr] = (ram[mem_adr] & 0x0000FFFF) | ((MCACHE_DATA_SM.read() << 16) & ~(0x0000FFFF));
-                break;
-            // store word
-            case 15:  
-                ram[mem_adr] = MCACHE_DATA_SM.read();
-                break;
-            default:
-                break;
+
+            int tmp = 0; 
+            int mask = 0;
+            int dataw; 
+            int data = MCACHE_DATA_SM.read();
+
+            switch(mem_size) {
+                // store byte
+                case 1:     dataw = data            & ~(0xFFFFFF00);    break;
+                case 2:     dataw = (data << 8)     & ~(0xFFFF00FF);    break;
+                case 4:     dataw = (data << 16)    & ~(0xFF00FFFF);    break;
+                case 8:     dataw = (data << 24)    & ~(0x00FFFFFF);    break;
+                // store half word 
+                case 3:     dataw = data            & ~(0xFFFF0000);    break;
+                case 12:    dataw = (data << 16)    & ~(0x0000FFFF);    break;
+                // store word
+                case 15:    dataw = data;                               break;
+
+                default:    dataw = 0;                                  break; 
             }
-        }
+
+            if(mem_size & 0x1) 
+                mask |= 0xFF; 
+            if(mem_size & 0x2)
+                mask |= 0xFF00;
+            if(mem_size & 0x4)
+                mask |= 0xFF0000;
+            if(mem_size & 0x8)
+                mask |= 0xFF000000;
+
+            tmp = ram[mem_adr];
+            tmp &= ~mask; 
+            tmp |= dataw; 
+            ram[mem_adr] = tmp;
+            }
+            
         mem_result = ram[mem_adr];
         MCACHE_RESULT_SM.write(mem_result);
         MCACHE_STALL_SM.write(false);
