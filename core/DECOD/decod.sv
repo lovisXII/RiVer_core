@@ -417,9 +417,7 @@ assign alu_cmd =  (and_i_sd || andi_i_sd || srl_i_sd || srli_i_sd || csrrc_i_sd 
                   (or_i_sd || ori_i_sd || sra_i_sd || srai_i_sd || csrrs_i_sd || csrrsi_i_sd) ? 2'b10 :
                   (xor_i_sd || xori_i_sd) ? 2'b11 : 2'b00;
 
-assign mult_cmd = (mul_i_sd) ? 2'b01 :
-                  (mulh_i_sd) ? 2'b10 :
-                  (mulhu_i_sd) ? 2'b11 : 2'b00;
+assign mult_cmd = {2{mulhu_i_sd}} | {mulh_i_sd, 1'b0} | {1'b0, mul_i_sd};
 
 assign div_cmd =  (div_i_sd) ? 2'b01 :
                   (divu_i_sd) ? 2'b10 :
