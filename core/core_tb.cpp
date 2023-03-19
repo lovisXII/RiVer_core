@@ -52,7 +52,6 @@ void cleanup(Vcore &core, VerilatedVcdSc *tf, int retval){
 
 int sc_main(int argc, char* argv[]) {
 
-
     /*
     ##############################################################
                     Checking main arguments 
@@ -108,8 +107,8 @@ int sc_main(int argc, char* argv[]) {
     if (argc >= 3 && std::string(argv[2]) == "-O") {
         opt = "-O2";
     } 
-    else if (argc > 3 && std::string(argv[2]) == "--riscof") {
-        if(argc < 4)
+    else if (argc >= 3 && std::string(argv[2]) == "--riscof") {
+        if(argc != 4)
             helper(ARG_MISS );
         signature_name          = string(argv[3]);
         riscof                  = true;
