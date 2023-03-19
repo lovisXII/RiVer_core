@@ -35,4 +35,4 @@ kernel:$(SW_DIR)/exception.s $(SW_DIR)/reset.s
 	$(RISC) $(RISC_FLAGS) $^ -o $@
 
 clean:
-	rm -rf obj_dir/ *.vcd *.out.txt.s *.out kernel
+	rm -rf obj_dir/ *.vcd *.out.txt.s *.out kernel *.txt

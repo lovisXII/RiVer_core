@@ -25,7 +25,7 @@ void helper(int error){
         cerr << "[info] run --help to see the options" << endl ;
     }
     else if(error == HELP){
-        cerr << "Usage: ./core_tb test_filename [options] ..." << endl;
+        cerr << "Usage: obj_dir/Vcore test_filename [options] ..." << endl;
         cerr << "Options:" << endl << endl;
         cerr << "-O                          \t Optimise the .c file" << endl;
         cerr << "--riscof signature_filename \t Allow to enable the riscof gestion and store the signature in the file named signature_filename" << endl ;
@@ -156,8 +156,6 @@ int sc_main(int argc, char* argv[]) {
                 path.c_str());          
         system((char*)temp);    
         path = "a.out";         
-    }else{
-        helper(FILE_TYPE);
     }
     if (!reader.load(path)) {  
         std::cout << "Can't find or process ELF file " << argv[1] << std::endl;
@@ -414,42 +412,36 @@ int sc_main(int argc, char* argv[]) {
     ##############################################################
 */
 
-        if (mem_store && mem_adr_valid) {
-
-            int tmp = 0; 
-            int mask = 0;
-            int dataw; 
-            int data = MCACHE_DATA_SM.read();
-
-            switch(mem_size) {
-                // store byte
-                case 1:     dataw = data            & ~(0xFFFFFF00);    break;
-                case 2:     dataw = (data << 8)     & ~(0xFFFF00FF);    break;
-                case 4:     dataw = (data << 16)    & ~(0xFF00FFFF);    break;
-                case 8:     dataw = (data << 24)    & ~(0x00FFFFFF);    break;
-                // store half word 
-                case 3:     dataw = data            & ~(0xFFFF0000);    break;
-                case 12:    dataw = (data << 16)    & ~(0x0000FFFF);    break;
-                // store word
-                case 15:    dataw = data;                               break;
-
-                default:    dataw = 0;                                  break; 
+  if (mem_store && mem_adr_valid) {
+            switch (mem_size)
+            {
+            case 1 :
+                ram[mem_adr] = (ram[mem_adr] & 0xFFFFFF00) | (MCACHE_DATA_SM.read() & ~(0xFFFFFF00));
+                break;
+            case 2:
+                ram[mem_adr] = (ram[mem_adr] & 0xFFFF00FF) | ((MCACHE_DATA_SM.read() << 8) & ~(0xFFFF00FF));
+                break;
+            case 4:
+                ram[mem_adr] = (ram[mem_adr] & 0xFF00FFFF) | ((MCACHE_DATA_SM.read() << 16) & ~(0xFF00FFFF));   
+                break;
+            case 8:
+                ram[mem_adr] = (ram[mem_adr] & 0x00FFFFFF) | ((MCACHE_DATA_SM.read() << 24) & ~(0x00FFFFFF));  
+                break;
+            // store half word 
+            case 3:
+                ram[mem_adr] = (ram[mem_adr] & 0xFFFF0000) | (MCACHE_DATA_SM.read() & ~(0xFFFF0000));   
+                break;
+            case 12:
+                ram[mem_adr] = (ram[mem_adr] & 0x0000FFFF) | ((MCACHE_DATA_SM.read() << 16) & ~(0x0000FFFF));
+                break;
+            // store word
+            case 15:  
+                ram[mem_adr] = MCACHE_DATA_SM.read();
+                break;
+            default:
+                break;
             }
-
-            if(mem_size & 0x1) 
-                mask |= 0xFF; 
-            if(mem_size & 0x2)
-                mask |= 0xFF00;
-            if(mem_size & 0x4)
-                mask |= 0xFF0000;
-            if(mem_size & 0x8)
-                mask |= 0xFF000000;
-
-            tmp = ram[mem_adr];
-            tmp &= ~mask; 
-            tmp |= dataw; 
-            ram[mem_adr] = tmp;
-            }
+        }
             
         mem_result = ram[mem_adr];
         MCACHE_RESULT_SM.write(mem_result);
