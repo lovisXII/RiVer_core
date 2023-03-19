@@ -17,7 +17,6 @@ using namespace std;
 using namespace ELFIO;
 
 enum error_type {HELP = 0, FILE_TYPE = 1};
-int retval = 0;
 
 void helper(int error){
     cout << endl << endl;
@@ -35,7 +34,7 @@ void helper(int error){
     exit(1);
 }
 
-void cleanup(Vcore &core, VerilatedVcdSc *tf){
+void cleanup(Vcore &core, VerilatedVcdSc *tf, int retval){
      // Final model cleanup
     core.final();
     // Close trace if opened
@@ -363,15 +362,13 @@ int sc_main(int argc, char* argv[]) {
         
         if (signature_name == "" && pc_adr == bad_adr) {
             cout << FRED("Error ! ") << "Found bad at adr 0x" << std::hex << pc_adr << endl;
-            retval = 1;
             sc_start(3, SC_NS);
-            cleanup(core_inst, tfp);
+            cleanup(core_inst, tfp,1);
         } 
         else if(signature_name == "" && pc_adr == exception_occur){
             cout << FYEL("Error ! ") << "Found exception_occur at adr 0x" << std::hex << pc_adr << endl;
-            retval = 2;
             sc_start(3, SC_NS);
-            cleanup(core_inst, tfp);
+            cleanup(core_inst, tfp, 2);
         }
         else if (signature_name == "" && pc_adr == good_adr) {
             if(stats)
@@ -384,9 +381,8 @@ int sc_main(int argc, char* argv[]) {
             }
             
             cout << FGRN("Success ! ") << "Found good at adr 0x" << std::hex << pc_adr << endl;
-            retval = 0;
             sc_start(3, SC_NS);
-            cleanup(core_inst, tfp);
+            cleanup(core_inst, tfp, 0);
         } 
         else if (countdown == 0 && ((pc_adr == rvtest_code_end) || (pc_adr ==  rvtest_end) || (signature_name != "" && cycles > 2000000))) {
             countdown = 50;
@@ -409,7 +405,7 @@ int sc_main(int argc, char* argv[]) {
             for (int i = begin_signature; i < end_signature; i += 4) {
                 signature << setfill('0') << setw(8) << hex << ram[i] << endl;
             }
-            cleanup(core_inst, tfp);
+            cleanup(core_inst, tfp, 0);
         }
 
 /*
