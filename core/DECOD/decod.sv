@@ -304,7 +304,7 @@ assign bgeu_i_sd = (b_type_sd == 1 && INSTR_RI[14:12] == 3'b111) ? 1'b1 : 1'b0;
 
 // U type
 assign lui_i_sd = u_type_sd;
-assign auipc_i_sd = (INSTR_RI[6:0] == 7'h1B) ? 1'b1 : 1'b0;
+assign auipc_i_sd = (INSTR_RI[6:0] == 7'b0010111) ? 1'b1 : 1'b0;
 
 // J type
 assign jal_i_sd = j_type_sd;
