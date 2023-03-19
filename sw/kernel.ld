@@ -10,6 +10,11 @@
 
 SECTIONS
 {
+    . = 0x01800 ;
+    seg_exit :
+    {
+        *(.exit)
+    }
     . = 0x10054 ;
     seg_text :
     {

@@ -9,6 +9,7 @@
 #include <sys/stat.h>  // mkdir
 #include <verilated.h>
 #include "Vcore.h"
+#define MAX_CYCLES 2000000
 #if VM_TRACE
 #include <verilated_vcd_sc.h>
 #endif
@@ -16,13 +17,17 @@
 using namespace std;
 using namespace ELFIO;
 
-enum error_type {HELP = 0, ARG_MISS = 1};
+enum error_type {HELP = 0, ARG_MISS = 1, OV_CYCLES};
 
 void helper(int error){
     cout << endl << endl;
     if(error == ARG_MISS){
         cerr << "[Error] Missing argument" << endl;
         cerr << "[info] run --help to see the options" << endl ;
+    }
+    else if (error == OV_CYCLES){
+        cerr << "[Error] Number of cycles for simulation exceed, maximum is";
+        cerr << MAX_CYCLES << endl;
     }
     else if(error == HELP){
         cerr << "Usage: obj_dir/Vcore test_filename [options] ..." << endl;
@@ -88,7 +93,7 @@ int sc_main(int argc, char* argv[]) {
     char                    test[512] = "> a.out.txt.s";
     string                  opt;
     string                  signature_name;
-    bool                    riscof;
+    bool                    riscof = false;
     bool                    stats;
     string                  test_filename(argv[1]);
     unordered_map<int, int> ram;
@@ -146,6 +151,7 @@ int sc_main(int argc, char* argv[]) {
             exit(1);
         }
     }
+    (riscof) ? cout << "[info] riscof enable" << endl : cout << "[info] riscof disable" << endl; 
 /*
     ##############################################################
                     PARSING ELF/.s/.c file 
@@ -335,7 +341,7 @@ int sc_main(int argc, char* argv[]) {
     // Use to let the time to riscof to execute the last instruction
     // When it arrives to the end of the code it will start the countdown before exiting
 
-    int countdown = 50;
+    int countdown = 50 ;
     bool start_countdown = false;
 
     while (1) 
@@ -368,31 +374,61 @@ int sc_main(int argc, char* argv[]) {
         unsigned int pc_adr = ADR_SI.read();
         NB_CYCLES = sc_time_stamp().to_double()/1000;
         
-        if (signature_name == "" && pc_adr == bad_adr) {
-            cout << FRED("Error ! ") << "Found bad at adr 0x" << std::hex << pc_adr << endl;
-            sc_start(3, SC_NS);
-            cleanup(core_inst, tfp,1);
-        } 
-        else if(signature_name == "" && pc_adr == exception_occur){
-            cout << FYEL("Error ! ") << "Found exception_occur at adr 0x" << std::hex << pc_adr << endl;
-            sc_start(3, SC_NS);
-            cleanup(core_inst, tfp, 2);
-        }
-        else if (signature_name == "" && pc_adr == good_adr) {
-            if(stats)
-            {
-                test_stats << test_filename << " " << NB_CYCLES  << " " << "SCALAR" << endl;
-                test_stats.close();
+        if(NB_CYCLES > MAX_CYCLES){
+            // Final model cleanup
+            core_inst.final();
+            // Close trace if opened
+            if (tfp) {
+                tfp->close();
+                tfp = nullptr;
             }
-            
-            cout << FGRN("Success ! ") << "Found good at adr 0x" << std::hex << pc_adr << endl;
-            sc_start(3, SC_NS);
-            cleanup(core_inst, tfp, 0);
-        } 
-        else if((pc_adr == rvtest_code_end) || (pc_adr ==  rvtest_end)){
+            // Coverage analysis (calling write only after the test is known to pass)
+            #if VM_COVERAGE
+                Verilated::mkdir("logs");
+                VerilatedCov::write("logs/coverage.dat");
+            #endif
+            helper(OV_CYCLES);
+        }
+
+        // starting the countdown
+        if(!riscof && !start_countdown && signature_name == "" && (pc_adr == bad_adr || pc_adr == good_adr 
+        || pc_adr == exception_occur)){
+            cout << "Reaching ending point, starting countdown" << endl;
+            start_countdown = true;
+        }    
+        // riscof :   
+        else if((riscof && !start_countdown && pc_adr == rvtest_code_end) || (pc_adr ==  rvtest_end)){
+            cout << "Reaching ending point, starting countdown" << endl;
             start_countdown = true;
         }
-        else if (countdown == 0 || (signature_name != "" && NB_CYCLES > 2000000)) {
+
+        // Exciting when countdown reach 0 
+        if(!riscof && countdown == 0){
+            cout << "countdown reach 0"<<endl;
+            if (signature_name == "" && (pc_adr == bad_adr || pc_adr == bad_adr +4)) {
+                cout << FRED("Error ! ") << "Found bad at adr 0x" << std::hex << pc_adr << endl;
+                sc_start(3, SC_NS);
+                cleanup(core_inst, tfp,1);
+            } 
+            else if(signature_name == "" && (pc_adr == exception_occur || pc_adr == exception_occur +4)){
+                cout << FYEL("Error ! ") << "Found exception_occur at adr 0x" << std::hex << pc_adr << endl;
+                sc_start(3, SC_NS);
+                cleanup(core_inst, tfp, 2);
+            }
+            else if (signature_name == "" && (pc_adr == good_adr || pc_adr == good_adr +4)) {
+                if(stats)
+                {
+                    test_stats << test_filename << " " << NB_CYCLES  << " " << "SCALAR" << endl;
+                    test_stats.close();
+                }
+                
+                cout << FGRN("Success ! ") << "Found good at adr 0x" << std::hex << pc_adr << endl;
+                sc_start(3, SC_NS);
+                cleanup(core_inst, tfp, 0);
+            } 
+        }
+        else if (riscof && countdown == 0)
+        {
             cout << "Test ended at " << std::hex << pc_adr << endl;
             sc_start(3, SC_NS);
 

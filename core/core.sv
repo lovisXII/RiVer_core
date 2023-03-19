@@ -476,7 +476,7 @@ mem mem_i (
         .CSR_WDATA_SM( CSR_WDATA_SM),   
         .CSR_ENABLE_SM( CSR_ENABLE_SM), 
 
-        .MSTATUS_WDATA_SM( mstatus_wdata_sm),    
+        .MSTATUS_WDATA_SM( MSTATUS_WDATA_SM),    
         .MIP_WDATA_SM( MIP_WDATA_SM),    
         .MEPC_WDATA_SM( MEPC_WDATA_SM),    
         .MCAUSE_WDATA_SM( MCAUSE_WDATA_SM),    

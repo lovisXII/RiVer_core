@@ -1,21 +1,21 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Thu Mar 16 20:49:48 2023
+[*] Sun Mar 19 16:22:59 2023
 [*]
 [dumpfile] "/home/lovis/Desktop/RiVer_core/core/logs/vlt_dump.vcd"
-[dumpfile_mtime] "Thu Mar 16 20:48:55 2023"
-[dumpfile_size] 775940
+[dumpfile_mtime] "Sun Mar 19 16:21:33 2023"
+[dumpfile_size] 794534
 [savefile] "/home/lovis/Desktop/RiVer_core/core/logs/init.gtkw"
-[timestart] 4960
+[timestart] 79960
 [size] 2486 1403
-[pos] -2561 -28
-*-11.000000 14330 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -1 -1
+*-11.000000 95280 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] core_inst.
 [treeopen] core_inst.core.
-[sst_width] 287
+[sst_width] 378
 [signals_width] 389
 [sst_expanded] 1
-[sst_vpaned_height] 432
+[sst_vpaned_height] 441
 @28
 core_inst.core.dec_i.clk
 core_inst.core.dec_i.reset_n
@@ -28,8 +28,8 @@ core_inst.core.dec_i.EXCEPTION_SM
 -DECOD
 -
 @22
-core_inst.core.dec_i.INSTR_RI[31:0]
 core_inst.core.dec_i.PC_RD[31:0]
+core_inst.core.dec_i.INSTR_RI[31:0]
 @200
 -
 -ifetch
@@ -41,8 +41,12 @@ core_inst.core.dec_i.PC_RD[31:0]
 -MEM
 @22
 core_inst.core.mem_i.PC_EXE2MEM_RE[31:0]
-@23
 core_inst.core.mem_i.MCACHE_RESULT_SM[31:0]
+@28
+core_inst.core.mem_i.STORE_ADRESS_MISALIGNED_RE
+core_inst.core.mem_i.LOAD_ADRESS_MISALIGNED_RE
+@29
+core_inst.core.mem_i.EXCEPTION_SM
 @200
 -
 -CSR
