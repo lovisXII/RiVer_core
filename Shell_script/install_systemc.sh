@@ -19,7 +19,7 @@ if ( cat /etc/*-release | grep Ubuntu > /dev/null 2>&1) then
         else
             echo "Installing systemc for Linux distribution"
             cd /usr/local/
-            apt install build-essential make wget git gcc g++ automake
+            sudo apt install build-essential make wget git gcc g++ automake
             wget http://www.accellera.org/images/downloads/standards/systemc/systemc-2.3.3.gz
             echo "Uncompressing the tar archive into current directory"
             tar -xzf systemc-2.3.3.gz
@@ -29,35 +29,10 @@ if ( cat /etc/*-release | grep Ubuntu > /dev/null 2>&1) then
                 mkdir /usr/local/systemc-2.3.3/
             fi
             cd systemc-2.3.3 && mkdir -p objdir && cd objdir
-            ../configure --prefix=/usr/local/systemc-2.3.3/
-            make -j$(nproc)
-            make install
+            sudo  ../configure --prefix=/usr/local/systemc-2.3.3/
+            sudo make -j$(nproc)
+            sudo make install
         fi
-    fi
-fi
-if ( cat /etc/*-release | grep Scientific> /dev/null 2>&1 ) then
-  echo "Scientific Linux"
-  scl enable devtoolset-8 bash
-    if ( "$1" = "clean" )
-    then    
-        echo "rm systemc-2.3.3.gz"
-        rm -f systemc-2.3.3.gz.1
-    else
-        echo "Installing systemc for Scientific Linux distribution"
-        cd $1
-        rpm install build-essential make wget git gcc g++ automake
-        wget http://www.accellera.org/images/downloads/standards/systemc/systemc-2.3.3.gz
-        echo "Uncompressing the tar archive into current directory"
-        tar -xzf systemc-2.3.3.gz
-        
-        if ( ! -d $1/systemc-2.3.3/ )
-        then
-            mkdir $1/systemc-2.3.3/
-        fi
-        cd systemc-2.3.3 && mkdir -p objdir && cd objdir
-        ../configure --prefix=$1/systemc-2.3.3/
-        make -j$(nproc)
-        make install
     fi
 fi
 if ( cat /etc/*-release | grep Ubuntu > /dev/null 2>&1) && ( ! grep -q microsoft /proc/version ) then
@@ -68,7 +43,7 @@ if ( cat /etc/*-release | grep Ubuntu > /dev/null 2>&1) && ( ! grep -q microsoft
         rm -r systemc-2.3.3 && rm systemc-2.3.3.gz
     else
             echo "Installing systemc for Linux distribution"
-            apt install build-essential make wget git gcc g++ automake
+            sudo apt install build-essential make wget git gcc g++ automake
             wget http://www.accellera.org/images/downloads/standards/systemc/systemc-2.3.3.gz
             echo "Uncompressing the tar archive into current directory"
             tar -xzf systemc-2.3.3.gz
@@ -78,8 +53,8 @@ if ( cat /etc/*-release | grep Ubuntu > /dev/null 2>&1) && ( ! grep -q microsoft
                 mkdir /usr/local/systemc-2.3.3/
             fi
             cd systemc-2.3.3 && mkdir -p objdir && cd objdir
-            ../configure --prefix=/usr/local/systemc-2.3.3/
-            make -j$(nproc)
-            make install
+            sudo ../configure --prefix=/usr/local/systemc-2.3.3/
+            sudo make -j$(nproc)
+            sudo make install
     fi
 fi
