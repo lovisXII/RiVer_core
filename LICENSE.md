@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2022 Louis Geoffroy Pitailler, Kevin Lastra, Timothée Le Berre
+Copyright (c) 2022 Louis Geoffroy Pitailler, Samy Attal
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
