@@ -17,7 +17,7 @@
 using namespace std;
 using namespace ELFIO;
 
-enum error_type {HELP = 0, ARG_MISS = 1, OV_CYCLES};
+enum error_type {HELP = 0, ARG_MISS = 1, OV_CYCLES, DEBUG};
 
 void helper(int error){
     cout << endl << endl;
@@ -31,10 +31,17 @@ void helper(int error){
     }
     else if(error == HELP){
         cerr << "Usage: obj_dir/Vcore test_filename [options] ..." << endl;
+        cerr << "file_name type accepted are .s, .S, .c or elf file" << endl;
         cerr << "Options:" << endl << endl;
-        cerr << "-O                          \t Optimise the .c file" << endl;
+        cerr << "-O                          \t Compile test_filename with -O option" << endl;
         cerr << "--riscof signature_filename \t Allow to enable the riscof gestion and store the signature in the file named signature_filename" << endl ;
+        cerr << "--riscof signature_filename --debug \t Allow to visualise all the store made by the cpu" << endl;
         cerr << "--stats                     \t Allow to use the statistic such as the number of cycle needed to end the program" << endl;
+    }
+    else if(error == DEBUG)
+    {
+        cerr << "[Error] Please enter a valide option" << endl;
+        cerr << "[info] run --help to see the options" << endl ;
     }
     exit(1);
 }
@@ -99,6 +106,7 @@ int sc_main(int argc, char* argv[]) {
     unordered_map<int, int> ram;
     elfio                   reader;  // creation of an elfio object
     string                  path(argv[1]);
+    bool                    debug = false;
 
     // trace file settings
     Verilated::mkdir("logs");
@@ -114,8 +122,10 @@ int sc_main(int argc, char* argv[]) {
         opt = "-O2";
     } 
     else if (argc >= 3 && std::string(argv[2]) == "--riscof") {
-        if(argc != 4)
-            helper(ARG_MISS );
+        if(argc == 5 && string(argv[4]) == "--debug")
+            debug = true;
+        else
+            helper(DEBUG);
         signature_name          = string(argv[3]);
         riscof                  = true;
         stats                   = true;
@@ -150,6 +160,9 @@ int sc_main(int argc, char* argv[]) {
             cout << "Impossible to open " << filename_stats << endl ;
             exit(1);
         }
+    }
+    else{
+        helper(ARG_MISS);
     }
     (riscof) ? cout << "[info] riscof enable" << endl : cout << "[info] riscof disable" << endl; 
 /*
@@ -389,7 +402,6 @@ int sc_main(int argc, char* argv[]) {
             #endif
             helper(OV_CYCLES);
         }
-
         // starting the countdown
         if(!riscof && !start_countdown && signature_name == "" && (pc_adr == bad_adr || pc_adr == good_adr 
         || pc_adr == exception_occur)){
@@ -484,7 +496,9 @@ int sc_main(int argc, char* argv[]) {
             default:
                 break;
             }
-        }
+        if(debug)
+            cout << FBLU("[Debug] ") << "0x" << std::hex << mem_adr << " : "<< std::hex << MCACHE_DATA_SM.read() << endl;
+}
             
         mem_result = ram[mem_adr];
         MCACHE_RESULT_SM.write(mem_result);
