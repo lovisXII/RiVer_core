@@ -22,7 +22,7 @@ enum error_type {HELP = 0, ARG_MISS = 1, OV_CYCLES, DEBUG};
 void helper(int error){
     cout << endl << endl;
     if(error == ARG_MISS){
-        cerr << "[Error] Missing argument" << endl;
+        cerr << "[Error] Wrong or missing argument" << endl;
         cerr << "[info] run --help to see the options" << endl ;
     }
     else if (error == OV_CYCLES){
@@ -72,55 +72,49 @@ int sc_main(int argc, char* argv[]) {
     if(argc < 2){
         helper(ARG_MISS);
     }
-    if(argc == 2 && std::string(argv[1]) == "--help"){
-        helper(HELP);
-    }
+    
+    // Compiling options 
 
+    bool                    debug = false;
+    string                  opt;
+    bool                    riscof = false;
+    bool                    stats = false ;
 
-    /*
-    ##############################################################
-                    Affecting main arguments 
-    ##############################################################
-    */
-
+    // Addresses and sections
     int                     reset_adr;
     int                     start_adr;
     int                     good_adr;
     int                     exception_occur ;
     int                     bad_adr;
-
     int                     rvtest_code_end     = 0xFFFFFFFF;
     int                     rvtest_entry_point  = 0xFFFFFFFF;
     int                     begin_signature;
     int                     end_signature;
     int                     rvtest_end          = 0xFFFFFFFF;
+
+    // Files settings
+
     fstream                 test_stats;
-    string                  filename_stats;
-
-    char                    test[512] = "> a.out.txt.s";
-    string                  opt;
     string                  signature_name;
-    bool                    riscof = false;
-    bool                    stats;
+    string                  filename_stats;
     string                  test_filename(argv[1]);
-    unordered_map<int, int> ram;
-    elfio                   reader;  // creation of an elfio object
     string                  path(argv[1]);
-    bool                    debug = false;
-
-    // trace file settings
-    Verilated::mkdir("logs");
-    Verilated::traceEverOn(true);
-    VerilatedVcdSc* tfp     = nullptr;
-    tfp                     = new VerilatedVcdSc;
+    char                    test[512] = "> a.out.txt.s";
     
-    // Core instanciation
-    Vcore core_inst("core_inst");
+    // Ram and elfio object
 
-    if (argc >= 3 && std::string(argv[2]) == "-O") {
+    unordered_map<int, int> ram;
+    elfio                   reader;  
+    cout << argc << endl;
+    if(argc == 2){
+        if(std::string(argv[1]) == "--help")
+            helper(HELP);
+    }
+    else if (argc >= 3 && std::string(argv[2]) == "-O") {
         opt = "-O2";
     } 
-    else if (argc >= 3 && std::string(argv[2]) == "--riscof") {
+    else if (argc >= 4 && std::string(argv[2]) == "--riscof") {
+        cout << "riscof" << endl;
         if(argc == 5 && string(argv[4]) == "--debug")
             debug = true;
         else if(argc == 5 && string(argv[4]) != "--debug")
@@ -163,6 +157,22 @@ int sc_main(int argc, char* argv[]) {
     else{
         helper(ARG_MISS);
     }
+
+    /*
+    ##############################################################
+                    Waves setup 
+    ##############################################################
+    */
+
+    // trace file settings
+    Verilated::mkdir("logs");
+    Verilated::traceEverOn(true);
+    VerilatedVcdSc* tfp     = nullptr;
+    tfp                     = new VerilatedVcdSc;
+    
+    // Core instanciation
+    Vcore core_inst("core_inst");
+
     (riscof) ? cout << "[info] riscof enable" << endl : cout << "[info] riscof disable" << endl; 
 /*
     ##############################################################
@@ -353,7 +363,7 @@ int sc_main(int argc, char* argv[]) {
     // Use to let the time to riscof to execute the last instruction
     // When it arrives to the end of the code it will start the countdown before exiting
 
-    int countdown = 50 ;
+    int countdown = 100 ;
     bool start_countdown = false;
 
     while (1) 
@@ -403,12 +413,12 @@ int sc_main(int argc, char* argv[]) {
         }
         // starting the countdown
         if(!riscof && !start_countdown && signature_name == "" && (pc_adr == bad_adr || pc_adr == good_adr 
-        || pc_adr == exception_occur)){
+        || pc_adr == exception_occur && if_afr_valid)){
             cout << "Reaching ending point, starting countdown" << endl;
             start_countdown = true;
         }    
         // riscof :   
-        else if((riscof && !start_countdown && pc_adr == rvtest_code_end) || (pc_adr ==  rvtest_end)){
+        else if(((riscof && !start_countdown && pc_adr == rvtest_code_end) || (pc_adr ==  rvtest_end)) && if_afr_valid){
             cout << "Reaching ending point, starting countdown" << endl;
             start_countdown = true;
         }
