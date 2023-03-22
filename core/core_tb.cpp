@@ -115,7 +115,6 @@ int sc_main(int argc, char* argv[]) {
     tfp                     = new VerilatedVcdSc;
     
     // Core instanciation
-
     Vcore core_inst("core_inst");
 
     if (argc >= 3 && std::string(argv[2]) == "-O") {
@@ -124,7 +123,7 @@ int sc_main(int argc, char* argv[]) {
     else if (argc >= 3 && std::string(argv[2]) == "--riscof") {
         if(argc == 5 && string(argv[4]) == "--debug")
             debug = true;
-        else
+        else if(argc == 5 && string(argv[4]) != "--debug")
             helper(DEBUG);
         signature_name          = string(argv[3]);
         riscof                  = true;
