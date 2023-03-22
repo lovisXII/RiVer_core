@@ -1,21 +1,21 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Sun Mar 19 16:22:59 2023
+[*] Wed Mar 22 18:38:50 2023
 [*]
 [dumpfile] "/home/lovis/Desktop/RiVer_core/core/logs/vlt_dump.vcd"
-[dumpfile_mtime] "Sun Mar 19 16:21:33 2023"
-[dumpfile_size] 794534
+[dumpfile_mtime] "Wed Mar 22 18:35:39 2023"
+[dumpfile_size] 1678721
 [savefile] "/home/lovis/Desktop/RiVer_core/core/logs/init.gtkw"
-[timestart] 79960
+[timestart] 11580
 [size] 2486 1403
-[pos] -1 -1
-*-11.000000 95280 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -2561 -28
+*-11.000000 23350 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] core_inst.
 [treeopen] core_inst.core.
 [sst_width] 378
 [signals_width] 389
 [sst_expanded] 1
-[sst_vpaned_height] 441
+[sst_vpaned_height] 451
 @28
 core_inst.core.dec_i.clk
 core_inst.core.dec_i.reset_n
@@ -45,10 +45,36 @@ core_inst.core.mem_i.MCACHE_RESULT_SM[31:0]
 @28
 core_inst.core.mem_i.STORE_ADRESS_MISALIGNED_RE
 core_inst.core.mem_i.LOAD_ADRESS_MISALIGNED_RE
-@29
 core_inst.core.mem_i.EXCEPTION_SM
 @200
 -
+-STORE INFO
+@22
+core_inst.core.mem_i.PC_EXE2MEM_RE[31:0]
+@28
+core_inst.core.mem_i.STORE_RE
+@23
+core_inst.core.mem_i.MCACHE_DATA_SM[31:0]
+@22
+core_inst.core.mem_i.MCACHE_ADR_SM[31:0]
+@28
+core_inst.core.mem_i.MCACHE_ADR_VALID_SM
+@200
+-
 -CSR
+@22
+core_inst.core.csr_i.reg_marchid[31:0]
+core_inst.core.csr_i.reg_mcause[31:0]
+core_inst.core.csr_i.reg_mepc[31:0]
+core_inst.core.csr_i.reg_mimpid[31:0]
+core_inst.core.csr_i.reg_mie[31:0]
+core_inst.core.csr_i.reg_misa[31:0]
+core_inst.core.csr_i.reg_mip[31:0]
+core_inst.core.csr_i.reg_mscratch[31:0]
+core_inst.core.csr_i.reg_mstatus[31:0]
+core_inst.core.csr_i.reg_mstatush[31:0]
+core_inst.core.csr_i.reg_mtval[31:0]
+core_inst.core.csr_i.reg_mtvec[31:0]
+core_inst.core.csr_i.reg_mvendorid[31:0]
 [pattern_trace] 1
 [pattern_trace] 0

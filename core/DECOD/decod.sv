@@ -256,94 +256,93 @@ assign dec2if_push_sd = (!add_offset_to_pc && !dec2if_full_sd) || (add_offset_to
 assign dec2exe_push_sd = !stall_sd; 
 
 // Instruction type 
-assign r_type_sd = (INSTR_RI[6:0] == 7'b0110011) ? 1'b1 : 1'b0;
-assign i_type_sd = (INSTR_RI[6:0] == 7'b0010011 || INSTR_RI[6:0] == 7'b0000011) ? 1'b1 : 1'b0;
-assign s_type_sd = (INSTR_RI[6:0] == 7'b0100011) ? 1'b1 : 1'b0;
-assign b_type_sd = (INSTR_RI[6:0] == 7'b1100011) ? 1'b1 : 1'b0;
-assign u_type_sd = (INSTR_RI[6:0] == 7'b0110111 || INSTR_RI[6:0] == 7'b0010111) ? 1'b1 : 1'b0;
-assign j_type_sd = (INSTR_RI[6:0] == 7'b1101111) ? 1'b1 : 1'b0;
-assign jalr_type_sd = (INSTR_RI[6:0] == 7'b1100111) ? 1'b1 : 1'b0;
-assign load_type_sd = (INSTR_RI[6:0] == 7'b0000011) ? 1'b1 : 1'b0;
-assign nmem_type_sd = (INSTR_RI[6:0] == 7'b0010011) ? 1'b1 : 1'b0; // not mem type but i type
-assign system_inst_sd = (INSTR_RI[6:0] == 7'b1110011) ? 1'b1 : 1'b0;
-assign m_type_sd = (INSTR_RI[6:0] == 7'b0110011 && INSTR_RI[31:25] == 7'b0000001) ? 1'b1 : 1'b0; 
+assign r_type_sd        = INSTR_RI[6:0] == 7'b0110011 ;
+assign i_type_sd        = INSTR_RI[6:0] == 7'b0010011 || INSTR_RI[6:0] == 7'b0000011 ;
+assign s_type_sd        = INSTR_RI[6:0] == 7'b0100011 ;
+assign b_type_sd        = INSTR_RI[6:0] == 7'b1100011 ;
+assign u_type_sd        = INSTR_RI[6:0] == 7'b0110111 || INSTR_RI[6:0] == 7'b0010111 ;
+assign j_type_sd        = INSTR_RI[6:0] == 7'b1101111 ;
+assign jalr_type_sd     = INSTR_RI[6:0] == 7'b1100111 ;
+assign load_type_sd     = INSTR_RI[6:0] == 7'b0000011 ;
+assign nmem_type_sd     = INSTR_RI[6:0] == 7'b0010011 ; // not mem type but i type
+assign system_inst_sd   = INSTR_RI[6:0] == 7'b1110011 ;
+assign m_type_sd        = INSTR_RI[6:0] == 7'b0110011 && INSTR_RI[31:25] == 7'b0000001 ; 
 
 //-------------------------
 // Instruction decoding
 //-------------------------
 // R Type
-assign add_i_sd = (r_type_sd && (INSTR_RI[14:12] == 3'b000) && (!INSTR_RI[30])) ? 1'b1 : 1'b0;
-assign sub_i_sd = (r_type_sd && (INSTR_RI[14:12] == 3'b000) && (INSTR_RI[30])) ? 1'b1 : 1'b0;
-assign slt_i_sd = (r_type_sd && (INSTR_RI[14:12] == 3'b010) && (!INSTR_RI[30])) ? 1'b1 : 1'b0;
-assign sltu_i_sd = (r_type_sd && (INSTR_RI[14:12] == 3'b011) && (!INSTR_RI[30])) ? 1'b1 : 1'b0;
-assign and_i_sd = (r_type_sd && (INSTR_RI[14:12] == 3'b111) && (!INSTR_RI[30])) ? 1'b1 : 1'b0;
-assign or_i_sd = (r_type_sd && (INSTR_RI[14:12] == 3'b110) && (!INSTR_RI[30])) ? 1'b1 : 1'b0;
-assign xor_i_sd = (r_type_sd && (INSTR_RI[14:12] == 3'b100) && (!INSTR_RI[30])) ? 1'b1 : 1'b0;
-assign sll_i_sd = (r_type_sd && (INSTR_RI[14:12] == 3'b001) && (!INSTR_RI[30])) ? 1'b1 : 1'b0;
-assign srl_i_sd = (r_type_sd && (INSTR_RI[14:12] == 3'b101) && (!INSTR_RI[30])) ? 1'b1 : 1'b0;
-assign sra_i_sd = (r_type_sd && (INSTR_RI[14:12] == 3'b101) && (INSTR_RI[30])) ? 1'b1 : 1'b0;
+assign add_i_sd         = r_type_sd & INSTR_RI[14:12] == 3'b000 && !INSTR_RI[30] ;
+assign sub_i_sd         = r_type_sd & INSTR_RI[14:12] == 3'b000 &&  INSTR_RI[30] ;
+assign slt_i_sd         = r_type_sd & INSTR_RI[14:12] == 3'b010 && !INSTR_RI[30] ;
+assign sltu_i_sd        = r_type_sd & INSTR_RI[14:12] == 3'b011 && !INSTR_RI[30] ;
+assign and_i_sd         = r_type_sd & INSTR_RI[14:12] == 3'b111 && !INSTR_RI[30] ;
+assign or_i_sd          = r_type_sd & INSTR_RI[14:12] == 3'b110 && !INSTR_RI[30] ;
+assign xor_i_sd         = r_type_sd & INSTR_RI[14:12] == 3'b100 && !INSTR_RI[30] ;
+assign sll_i_sd         = r_type_sd & INSTR_RI[14:12] == 3'b001 && !INSTR_RI[30] ;
+assign srl_i_sd         = r_type_sd & INSTR_RI[14:12] == 3'b101 && !INSTR_RI[30] ;
+assign sra_i_sd         = r_type_sd & INSTR_RI[14:12] == 3'b101 &&  INSTR_RI[30] ;
 
 // I type
-assign addi_i_sd = (nmem_type_sd && (INSTR_RI[14:12] == 3'b000)) ? 1'b1 : 1'b0;
-assign slti_i_sd = (nmem_type_sd && (INSTR_RI[14:12] == 3'b010)) ? 1'b1 : 1'b0;
-assign sltiu_i_sd = (nmem_type_sd && (INSTR_RI[14:12] == 3'b011)) ? 1'b1 : 1'b0;
-assign andi_i_sd = (nmem_type_sd && (INSTR_RI[14:12] == 3'b111)) ? 1'b1 : 1'b0;
-assign ori_i_sd = (nmem_type_sd && (INSTR_RI[14:12] == 3'b110)) ? 1'b1 : 1'b0;
-assign xori_i_sd = (nmem_type_sd && (INSTR_RI[14:12] == 3'b100)) ? 1'b1 : 1'b0;
-assign slli_i_sd = (nmem_type_sd == 1 && INSTR_RI[14:12] == 3'b001) ? 1'b1 : 1'b0;
-assign srli_i_sd = (nmem_type_sd == 1 && INSTR_RI[14:12] == 3'b101 && INSTR_RI[30] == 1'b0) ? 1'b1 : 1'b0;
-assign srai_i_sd = (nmem_type_sd == 1 && INSTR_RI[14:12] == 3'b101 && INSTR_RI[30] == 1'b1) ? 1'b1 : 1'b0;
+assign addi_i_sd        = nmem_type_sd & INSTR_RI[14:12] == 3'b000 ;
+assign slti_i_sd        = nmem_type_sd & INSTR_RI[14:12] == 3'b010 ;
+assign sltiu_i_sd       = nmem_type_sd & INSTR_RI[14:12] == 3'b011 ;
+assign andi_i_sd        = nmem_type_sd & INSTR_RI[14:12] == 3'b111 ;
+assign ori_i_sd         = nmem_type_sd & INSTR_RI[14:12] == 3'b110 ;
+assign xori_i_sd        = nmem_type_sd & INSTR_RI[14:12] == 3'b100 ;
+assign slli_i_sd        = nmem_type_sd & INSTR_RI[14:12] == 3'b001 ;
+assign srli_i_sd        = nmem_type_sd & INSTR_RI[14:12] == 3'b101 && !INSTR_RI[30] ;
+assign srai_i_sd        = nmem_type_sd & INSTR_RI[14:12] == 3'b101 &&  INSTR_RI[30] ;
 
 // B type_sd
-assign beq_i_sd = (b_type_sd == 1 && INSTR_RI[14:12] == 3'b000) ? 1'b1 : 1'b0;
-assign bne_i_sd = (b_type_sd == 1 && INSTR_RI[14:12] == 3'b001) ? 1'b1 : 1'b0;
-assign blt_i_sd = (b_type_sd == 1 && INSTR_RI[14:12] == 3'b100) ? 1'b1 : 1'b0;
-assign bge_i_sd = (b_type_sd == 1 && INSTR_RI[14:12] == 3'b101) ? 1'b1 : 1'b0;
-assign bltu_i_sd = (b_type_sd == 1 && INSTR_RI[14:12] == 3'b110) ? 1'b1 : 1'b0;
-assign bgeu_i_sd = (b_type_sd == 1 && INSTR_RI[14:12] == 3'b111) ? 1'b1 : 1'b0;
+assign beq_i_sd         = b_type_sd & INSTR_RI[14:12] == 3'b000 ;
+assign bne_i_sd         = b_type_sd & INSTR_RI[14:12] == 3'b001 ;
+assign blt_i_sd         = b_type_sd & INSTR_RI[14:12] == 3'b100 ;
+assign bge_i_sd         = b_type_sd & INSTR_RI[14:12] == 3'b101 ;
+assign bltu_i_sd        = b_type_sd & INSTR_RI[14:12] == 3'b110 ;
+assign bgeu_i_sd        = b_type_sd & INSTR_RI[14:12] == 3'b111 ;
 
 // U type
-assign lui_i_sd = u_type_sd;
-assign auipc_i_sd = (INSTR_RI[6:0] == 7'b0010111) ? 1'b1 : 1'b0;
+assign lui_i_sd         = u_type_sd;
+assign auipc_i_sd       = INSTR_RI[6:0] == 7'b0010111 ;
 
 // J type
-assign jal_i_sd = j_type_sd;
-assign jalr_i_sd = jalr_type_sd;
+assign jal_i_sd         = j_type_sd;
+assign jalr_i_sd        = jalr_type_sd;
 
 // Mem access
-assign lw_i_sd = (load_type_sd == 1 && INSTR_RI[14:12] == 3'b010) ? 1'b1 : 1'b0;
-assign lh_i_sd = (load_type_sd == 1 && INSTR_RI[14:12] == 3'b001) ? 1'b1 : 1'b0;
-assign lhu_i_sd = (load_type_sd == 1 && INSTR_RI[14:12] == 3'b101) ? 1'b1 : 1'b0;
-assign lb_i_sd = (load_type_sd == 1 && INSTR_RI[14:12] == 3'b000) ? 1'b1 : 1'b0;
-assign lbu_i_sd = (load_type_sd == 1 && INSTR_RI[14:12] == 3'b100) ? 1'b1 : 1'b0;
+assign lw_i_sd          = load_type_sd & INSTR_RI[14:12] == 3'b010 ;
+assign lh_i_sd          = load_type_sd & INSTR_RI[14:12] == 3'b001 ;
+assign lhu_i_sd         = load_type_sd & INSTR_RI[14:12] == 3'b101 ;
+assign lb_i_sd          = load_type_sd & INSTR_RI[14:12] == 3'b000 ;
+assign lbu_i_sd         = load_type_sd & INSTR_RI[14:12] == 3'b100 ;
 
-assign sw_i_sd = (s_type_sd == 1 && INSTR_RI[14:12] == 3'b010) ? 1'b1 : 1'b0;
-assign sh_i_sd = (s_type_sd == 1 && INSTR_RI[14:12] == 3'b001) ? 1'b1 : 1'b0;
-assign sb_i_sd = (s_type_sd && (INSTR_RI[14:12] == 3'h0)) ? 1'b1 : 1'b0;
+assign sw_i_sd          = s_type_sd & INSTR_RI[14:12] == 3'b010 ;
+assign sh_i_sd          = s_type_sd & INSTR_RI[14:12] == 3'b001 ;
+assign sb_i_sd          = s_type_sd & INSTR_RI[14:12] == 3'h0   ;
 
 // M type
-assign mul_i_sd = (m_type_sd && (INSTR_RI[14:12] == 3'h0)) ? 1'b1 : 1'b0;
-assign mulh_i_sd = (m_type_sd && (INSTR_RI[14:12] == 3'h1)) ? 1'b1 : 1'b0;
-assign mulhsu_i_sd = (m_type_sd && (INSTR_RI[14:12] == 3'h2)) ? 1'b1 : 1'b0;
-assign mulhu_i_sd = (m_type_sd && (INSTR_RI[14:12] == 3'h3)) ? 1'b1 : 1'b0;
-assign div_i_sd = (m_type_sd && (INSTR_RI[14:12] == 3'h4)) ? 1'b1 : 1'b0;
-assign divu_i_sd = (m_type_sd && (INSTR_RI[14:12] == 3'h5)) ? 1'b1 : 1'b0;
-assign rem_i_sd = (m_type_sd && (INSTR_RI[14:12] == 3'h6)) ? 1'b1 : 1'b0;
-assign remu_i_sd = (m_type_sd && (INSTR_RI[14:12] == 3'h7)) ? 1'b1 : 1'b0;
+assign mul_i_sd         = m_type_sd & INSTR_RI[14:12] == 3'h0 ;
+assign mulh_i_sd        = m_type_sd & INSTR_RI[14:12] == 3'h1 ;
+assign mulhsu_i_sd      = m_type_sd & INSTR_RI[14:12] == 3'h2 ;
+assign mulhu_i_sd       = m_type_sd & INSTR_RI[14:12] == 3'h3 ;
+assign div_i_sd         = m_type_sd & INSTR_RI[14:12] == 3'h4 ;
+assign divu_i_sd        = m_type_sd & INSTR_RI[14:12] == 3'h5 ;
+assign rem_i_sd         = m_type_sd & INSTR_RI[14:12] == 3'h6 ;
+assign remu_i_sd        = m_type_sd & INSTR_RI[14:12] == 3'h7 ;
 
 // System type
-assign ecall_i_sd = (system_inst_sd && (INSTR_RI[14:12] == 3'h0) && (INSTR_RI[31:20] == 12'h000)) ? 1'b1 : 1'b0;
-assign ebreak_i_sd = (system_inst_sd && (INSTR_RI[14:12] == 3'h0) && (INSTR_RI[31:20] == 12'h001)) ? 1'b1 : 1'b0;
-assign csrrw_i_sd = (system_inst_sd && (INSTR_RI[14:12] == 3'h1)) ? 1'b1 : 1'b0;
-assign csrrs_i_sd = (system_inst_sd && (INSTR_RI[14:12] == 3'h2)) ? 1'b1 : 1'b0;
-assign csrrc_i_sd = (system_inst_sd && (INSTR_RI[14:12] == 3'h3)) ? 1'b1 : 1'b0;
-assign csrrwi_i_sd = (system_inst_sd && (INSTR_RI[14:12] == 3'h5)) ? 1'b1 : 1'b0;
-assign csrrsi_i_sd = (system_inst_sd && (INSTR_RI[14:12] == 3'h6)) ? 1'b1 : 1'b0;
-assign csrrci_i_sd = (system_inst_sd && (INSTR_RI[14:12] == 3'h7)) ? 1'b1 : 1'b0;
-assign mret_i_sd = (INSTR_RI == 32'h30200073) ? 1'b1 : 1'b0;
-assign sret_i_sd = (INSTR_RI == 32'h10200073) ? 1'b1 : 1'b0;
-
-assign fence_i_sd = (INSTR_RI[6:0] == 7'h0F) && (INSTR_RI[14:12] == 3'h0) ? 1'b1 : 1'b0;
+assign ecall_i_sd       = system_inst_sd & INSTR_RI[14:12] == 3'h0 & INSTR_RI[31:20] == 12'h000 ;
+assign ebreak_i_sd      = system_inst_sd & INSTR_RI[14:12] == 3'h0 & INSTR_RI[31:20] == 12'h001 ;
+assign csrrw_i_sd       = system_inst_sd & INSTR_RI[14:12] == 3'h1 ;
+assign csrrs_i_sd       = system_inst_sd & INSTR_RI[14:12] == 3'h2 ;
+assign csrrc_i_sd       = system_inst_sd & INSTR_RI[14:12] == 3'h3 ;
+assign csrrwi_i_sd      = system_inst_sd & INSTR_RI[14:12] == 3'h5 ;
+assign csrrsi_i_sd      = system_inst_sd & INSTR_RI[14:12] == 3'h6 ;
+assign csrrci_i_sd      = system_inst_sd & INSTR_RI[14:12] == 3'h7 ;
+assign mret_i_sd        = INSTR_RI == 32'h30200073;
+assign sret_i_sd        = INSTR_RI == 32'h10200073;
+assign fence_i_sd       = INSTR_RI[6:0] == 7'h0F & INSTR_RI[14:12] == 3'h0;
 
 assign illegal_inst = !(add_i_sd || sub_i_sd || slt_i_sd || sltu_i_sd || and_i_sd || or_i_sd || xor_i_sd || sll_i_sd || srl_i_sd || sra_i_sd ||
                         addi_i_sd || slti_i_sd || sltiu_i_sd || andi_i_sd || ori_i_sd || xori_i_sd ||
@@ -357,11 +356,11 @@ assign illegal_inst_sd = illegal_inst && !IF2DEC_EMPTY_SI;
 
 // Env call  
 
-assign env_call_u_mode_sd = (CURRENT_MODE_SM == 2'b00) && ecall_i_sd ? 1'b1 : 1'b0;
-assign env_call_s_mode_sd = (CURRENT_MODE_SM != 2'b10) && sret_i_sd ? 1'b1 : 1'b0;
-assign env_call_m_mode_sd = (CURRENT_MODE_SM == 2'b11) && ecall_i_sd ? 1'b1 : 1'b0;
+assign env_call_u_mode_sd  = CURRENT_MODE_SM  == 2'b00 & ecall_i_sd ;
+assign env_call_s_mode_sd  = CURRENT_MODE_SM  == 2'b10 & sret_i_sd  ;
+assign env_call_m_mode_sd  = CURRENT_MODE_SM  == 2'b11 & ecall_i_sd ;
 
-assign env_call_wrong_mode = (CURRENT_MODE_SM != 2'b11) && mret_i_sd ? 1'b1 : 1'b0;
+assign env_call_wrong_mode = CURRENT_MODE_SM != 2'b11 && mret_i_sd ;
 
 //------------------------------------
 //-- Registers and operands selection
@@ -655,43 +654,43 @@ assign POP_ADR_RAS_RD = dec2if_dout[132];
 assign PUSH_ADR_RAS_RD = dec2if_dout[133];
 
 // dec2exe 
-assign dec2exe_data[251] = mul_i_sd | mulh_i_sd | mulhsu_i_sd | mulhu_i_sd;  
-assign dec2exe_data[250:248] = select_operation_sd[3:1];
-assign dec2exe_data[247:216] = pc_branch_value_sd;
-assign dec2exe_data[215] = ebreak_i_sd; 
-assign dec2exe_data[214] = instruction_access_fault_sd; 
-assign dec2exe_data[213] = mret_i_sd; 
-assign dec2exe_data[212] = exception_sd; 
-assign dec2exe_data[211] = env_call_wrong_mode;
-assign dec2exe_data[210] = env_call_u_mode_sd;
-assign dec2exe_data[209] = illegal_inst_sd;
-assign dec2exe_data[208] = instruction_adress_misaligned_sd;
-assign dec2exe_data[207] = env_call_m_mode_sd;
-assign dec2exe_data[206] = env_call_s_mode_sd;
-assign dec2exe_data[205:174] = CSR_RDATA_SC; 
-assign dec2exe_data[173] = csr_wenable_sd;
-assign dec2exe_data[172:161] = csr_radr;
-assign dec2exe_data[160:129] = PC_IF2DEC_RI; 
-assign dec2exe_data[128] = block_bp_sd; 
-assign dec2exe_data[127] = r1_valid_sd; 
-assign dec2exe_data[126] = r2_valid_sd;
-assign dec2exe_data[125:120] = radr1_sd; 
-assign dec2exe_data[119:114] = radr2_sd;
-assign dec2exe_data[113:112] = exe_cmd_sd;
-assign dec2exe_data[111:80] = dec2exe_op1_sd;
-assign dec2exe_data[111:80] = dec2exe_op1_sd;
-assign dec2exe_data[79:48] = dec2exe_op2_sd;
-assign dec2exe_data[47] = neg_op2_sd; 
-assign dec2exe_data[46] = wb_sd; 
-assign dec2exe_data[45:14] = mem_data_sd;
-assign dec2exe_data[13] = mem_load_sd;
-assign dec2exe_data[12] = mem_store_sd; 
-assign dec2exe_data[11] = mem_sign_extend_sd; 
-assign dec2exe_data[10:9] = mem_size_sd; 
-assign dec2exe_data[8] = select_operation_sd[0]; 
-assign dec2exe_data[7:2] = rdest_sd; 
-assign dec2exe_data[1] = (slt_i_sd | slti_i_sd);
-assign dec2exe_data[0] = (sltu_i_sd | sltiu_i_sd);
+assign dec2exe_data[251]        = mul_i_sd | mulh_i_sd | mulhsu_i_sd | mulhu_i_sd;  
+assign dec2exe_data[250:248]    = select_operation_sd[3:1];
+assign dec2exe_data[247:216]    = pc_branch_value_sd;
+assign dec2exe_data[215]        = ebreak_i_sd; 
+assign dec2exe_data[214]        = instruction_access_fault_sd; 
+assign dec2exe_data[213]        = mret_i_sd; 
+assign dec2exe_data[212]        = exception_sd; 
+assign dec2exe_data[211]        = env_call_wrong_mode;
+assign dec2exe_data[210]        = env_call_u_mode_sd;
+assign dec2exe_data[209]        = illegal_inst_sd;
+assign dec2exe_data[208]        = instruction_adress_misaligned_sd;
+assign dec2exe_data[207]        = env_call_m_mode_sd;
+assign dec2exe_data[206]        = env_call_s_mode_sd;
+assign dec2exe_data[205:174]    = CSR_RDATA_SC; 
+assign dec2exe_data[173]        = csr_wenable_sd;
+assign dec2exe_data[172:161]    = csr_radr;
+assign dec2exe_data[160:129]    = PC_IF2DEC_RI; 
+assign dec2exe_data[128]        = block_bp_sd; 
+assign dec2exe_data[127]        = r1_valid_sd; 
+assign dec2exe_data[126]        = r2_valid_sd;
+assign dec2exe_data[125:120]    = radr1_sd; 
+assign dec2exe_data[119:114]    = radr2_sd;
+assign dec2exe_data[113:112]    = exe_cmd_sd;
+assign dec2exe_data[111:80]     = dec2exe_op1_sd;
+assign dec2exe_data[111:80]     = dec2exe_op1_sd;
+assign dec2exe_data[79:48]      = dec2exe_op2_sd;
+assign dec2exe_data[47]         = neg_op2_sd; 
+assign dec2exe_data[46]         = wb_sd; 
+assign dec2exe_data[45:14]      = mem_data_sd;
+assign dec2exe_data[13]         = mem_load_sd;
+assign dec2exe_data[12]         = mem_store_sd; 
+assign dec2exe_data[11]         = mem_sign_extend_sd; 
+assign dec2exe_data[10:9]       = mem_size_sd; 
+assign dec2exe_data[8]          = select_operation_sd[0]; 
+assign dec2exe_data[7:2]        = rdest_sd; 
+assign dec2exe_data[1]          = (slt_i_sd | slti_i_sd);
+assign dec2exe_data[0]          = (sltu_i_sd | sltiu_i_sd);
 
 assign dec2exe_x[251:161] = 0;
 assign dec2exe_x[160:129] = PC_IF2DEC_RI;
@@ -699,41 +698,41 @@ assign dec2exe_x[128:0] = 0;
 
 assign dec2exe_din = (EXCEPTION_SM == 1) ? dec2exe_x : dec2exe_data;
 
-assign dec_fifo_mult_inst = dec2exe_dout[251];
-assign SELECT_OPERATION_RD[3:1] = dec2exe_dout[250:248];
-assign PC_BRANCH_VALUE_RD = dec2exe_dout[247:216]; 
-assign EBREAK_RD = dec2exe_dout[215];
-assign INSTRUCTION_ACCESS_FAULT_RD = dec2exe_dout[214];
-assign MRET_RD = dec2exe_dout[213];
-assign EXCEPTION_RD = dec2exe_dout[212];
-assign ENV_CALL_WRONG_MODE_RD = dec2exe_dout[211];
-assign ENV_CALL_U_MODE_RD = dec2exe_dout[210];
-assign ILLEGAL_INSTRUCTION_RD = dec2exe_dout[209];
-assign ADRESS_MISALIGNED_RD = dec2exe_dout[208];
-assign ENV_CALL_M_MODE_RD = dec2exe_dout[207];
-assign ENV_CALL_S_MODE_RD = dec2exe_dout[206];                
-assign CSR_RDATA_RD = dec2exe_dout[205:174];
-assign csr_wenable_fifo = dec2exe_dout[173];
-assign CSR_WADR_RD = dec2exe_dout[172:161];
-assign PC_DEC2EXE_RD = dec2exe_dout[160:129];
-assign BLOCK_BP_RD = dec2exe_dout[128];
-assign BP_R1_VALID_RD = dec2exe_dout[127];
-assign BP_R2_VALID_RD = dec2exe_dout[126];
-assign BP_RADR1_RD = dec2exe_dout[125:120];
-assign BP_RADR2_RD = dec2exe_dout[119:114];
-assign CMD_RD = dec2exe_dout[113:112];
-assign OP1_RD = dec2exe_dout[111:80];
-assign OP2_RD = dec2exe_dout[79:48];
-assign NEG_OP2_RD = dec2exe_dout[47];
-assign WB_RD = dec2exe_dout[46];
-assign MEM_DATA_RD = dec2exe_dout[45:14];
-assign mem_load_fifo = dec2exe_dout[13];
-assign MEM_STORE_RD = dec2exe_dout[12];
-assign MEM_SIGN_EXTEND_RD = dec2exe_dout[11];
-assign MEM_SIZE_RD = dec2exe_dout[10:9];
-assign SELECT_OPERATION_RD[0] = dec2exe_dout[8];
-assign dec_fifo_rdest = dec2exe_dout[7:2];
-assign SLT_RD = dec2exe_dout[1];
-assign SLTU_RD = dec2exe_dout[0];
+assign dec_fifo_mult_inst           = dec2exe_dout[251];
+assign SELECT_OPERATION_RD[3:1]     = dec2exe_dout[250:248];
+assign PC_BRANCH_VALUE_RD           = dec2exe_dout[247:216]; 
+assign EBREAK_RD                    = dec2exe_dout[215];
+assign INSTRUCTION_ACCESS_FAULT_RD  = dec2exe_dout[214];
+assign MRET_RD                      = dec2exe_dout[213];
+assign EXCEPTION_RD                 = dec2exe_dout[212];
+assign ENV_CALL_WRONG_MODE_RD       = dec2exe_dout[211];
+assign ENV_CALL_U_MODE_RD           = dec2exe_dout[210];
+assign ILLEGAL_INSTRUCTION_RD       = dec2exe_dout[209];
+assign ADRESS_MISALIGNED_RD         = dec2exe_dout[208];
+assign ENV_CALL_M_MODE_RD           = dec2exe_dout[207];
+assign ENV_CALL_S_MODE_RD           = dec2exe_dout[206];                
+assign CSR_RDATA_RD                 = dec2exe_dout[205:174];
+assign csr_wenable_fifo             = dec2exe_dout[173];
+assign CSR_WADR_RD                  = dec2exe_dout[172:161];
+assign PC_DEC2EXE_RD                = dec2exe_dout[160:129];
+assign BLOCK_BP_RD                  = dec2exe_dout[128];
+assign BP_R1_VALID_RD               = dec2exe_dout[127];
+assign BP_R2_VALID_RD               = dec2exe_dout[126];
+assign BP_RADR1_RD                  = dec2exe_dout[125:120];
+assign BP_RADR2_RD                  = dec2exe_dout[119:114];
+assign CMD_RD                       = dec2exe_dout[113:112];
+assign OP1_RD                       = dec2exe_dout[111:80];
+assign OP2_RD                       = dec2exe_dout[79:48];
+assign NEG_OP2_RD                   = dec2exe_dout[47];
+assign WB_RD                        = dec2exe_dout[46];
+assign MEM_DATA_RD                  = dec2exe_dout[45:14];
+assign mem_load_fifo                = dec2exe_dout[13];
+assign MEM_STORE_RD                 = dec2exe_dout[12];
+assign MEM_SIGN_EXTEND_RD           = dec2exe_dout[11];
+assign MEM_SIZE_RD                  = dec2exe_dout[10:9];
+assign SELECT_OPERATION_RD[0]       = dec2exe_dout[8];
+assign dec_fifo_rdest               = dec2exe_dout[7:2];
+assign SLT_RD                       = dec2exe_dout[1];
+assign SLTU_RD                      = dec2exe_dout[0];
 
 endmodule
