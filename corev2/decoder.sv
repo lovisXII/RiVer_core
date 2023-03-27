@@ -1,13 +1,12 @@
+`include "riscv_pkg.sv" 
 
 
-module decoder #(
-    localparam  XLEN = 64
-)(
-    input logic[XLEN-1:0] instr_i,
-    input logic[XLEN-1:0] pc_i
+module decoder(
+    input logic[31:0] instr_i,
+    input logic[31:0] pc_i
 
 );
-
+import riscv::*;
 logic[6:0]  opcode;
 logic[4:0]  rd;
 logic[4:0]  rs1;
@@ -101,7 +100,6 @@ logic remuw;
 
 
 
-
 assign opcode   = instr_i[6:0];
 assign rd       = instr_i[11:7];
 assign funct3   = instr_i[14:12];
@@ -109,39 +107,26 @@ assign rs1      = instr_i[19:15];
 assign rs2      = instr_i[24:20];
 assign funct7   = instr_i[31:25];
 
-case(opcode)
-    7'b0110011: assign r_type          = 1'b1;
-    7'b0010011: assign i_type          = 1'b1;
-    7'b0000011: assign i_type          = 1'b1;
-    7'b0100011: assign s_type          = 1'b1;
-    7'b1100011: assign b_type          = 1'b0;
-    7'b0110111: assign u_type          = 1'b1;
-    7'b1101111: assign j_type          = 1'b1;
-endcase
+assign add   =  opcode == R_TYPE & funct3 == 3'b000 & funct7 == 7'b0000000;  
+assign sub   =  opcode == R_TYPE & funct3 == 3'b000 & funct7 == 7'b0100000;  
+assign sll   =  opcode == R_TYPE & funct3 == 3'b001 & funct7 == 7'b0000000;  
+assign slt   =  opcode == R_TYPE & funct3 == 3'b010 & funct7 == 7'b0000000;  
+assign sltu  =  opcode == R_TYPE & funct3 == 3'b011 & funct7 == 7'b0000000;  
+assign xorr  =  opcode == R_TYPE & funct3 == 3'b100 & funct7 == 7'b0000000;  
+assign srl   =  opcode == R_TYPE & funct3 == 3'b101 & funct7 == 7'b0000000;  
+assign sra   =  opcode == R_TYPE & funct3 == 3'b101 & funct7 == 7'b0100000;  
+assign orr   =  opcode == R_TYPE & funct3 == 3'b110 & funct7 == 7'b0000000;  
+assign andd  =  opcode == R_TYPE & funct3 == 3'b111 & funct7 == 7'b0000000;  
 
-casex({opcode, funct3, funct7})
-    // r-type
-    {r_type, 3'b000, 7'b0000000} : assign add   = 1'b1;
-    {r_type, 3'b000, 7'b0100000} : assign sub   = 1'b1;
-    {r_type, 3'b001, 7'b0000000} : assign sll   = 1'b1;
-    {r_type, 3'b010, 7'b0000000} : assign slt   = 1'b1;
-    {r_type, 3'b011, 7'b0000000} : assign sltu  = 1'b1;
-    {r_type, 3'b100, 7'b0000000} : assign xorr  = 1'b1;
-    {r_type, 3'b101, 7'b0000000} : assign srl   = 1'b1;
-    {r_type, 3'b101, 7'b0100000} : assign sra   = 1'b1;
-    {r_type, 3'b110, 7'b0000000} : assign orr   = 1'b1;
-    {r_type, 3'b111, 7'b0000000} : assign andd  = 1'b1;
-    // i-type
-    {i_type, 3'b000, 7'b???????} : assign addi  = 1'b1;
-    {i_type, 3'b010, 7'b???????} : assign slti  = 1'b1;
-    {i_type, 3'b011, 7'b???????} : assign sltiu = 1'b1;
-    {i_type, 3'b100, 7'b???????} : assign xori  = 1'b1;
-    {i_type, 3'b110, 7'b???????} : assign ori   = 1'b1;
-    {i_type, 3'b111, 7'b???????} : assign andi  = 1'b1;
-    {i_type, 3'b001, 7'b???????} : assign slli  = 1'b1;
-    {i_type, 3'b101, 7'b???????} : assign srli  = 1'b1;
-    {i_type, 3'b101, 7'b???????} : assign srai  = 1'b1;
-endcase
+assign addi  =  opcode == I_TYPE &  funct3 == 3'b000;  
+assign slti  =  opcode == I_TYPE &  funct3 == 3'b010;  
+assign sltiu =  opcode == I_TYPE &  funct3 == 3'b011;  
+assign xori  =  opcode == I_TYPE &  funct3 == 3'b100;  
+assign ori   =  opcode == I_TYPE &  funct3 == 3'b110;  
+assign andi  =  opcode == I_TYPE &  funct3 == 3'b111;  
+assign slli  =  opcode == I_TYPE &  funct3 == 3'b001;  
+assign srli  =  opcode == I_TYPE &  funct3 == 3'b101;  
+assign srai  =  opcode == I_TYPE &  funct3 == 3'b101;  
 
 
 assign rd_v = r_type | i_type | u_type;
