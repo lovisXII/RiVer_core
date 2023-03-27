@@ -9,7 +9,11 @@ typedef enum logic [6:0]{
     S_TYPE = 7'b0100011,
     B_TYPE = 7'b1100011,
     U_TYPE = 7'b0110111,
-    J_TYPE = 7'b1101111
+    AUIPC  = 7'b0010111, 
+    JAL    = 7'b1101111,
+    JALR   = 7'b1100111,
+    P_TYPE = 7'b1110011, // priviledge type
+    FENCE  = 7'b0001111
 } inst_type_t;
 
 typedef enum logic [11:0] {
