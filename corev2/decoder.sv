@@ -31,6 +31,8 @@ logic fence;
 logic auipc;
 logic jalr;
 logic jal;
+logic r64_type;
+logic i64_type;
 
 logic illegal_inst;
 
@@ -121,41 +123,50 @@ assign b_type        = opcode == B_TYPE;
 assign u_type        = opcode == U_TYPE;
 assign p_type        = opcode == P_TYPE;
 assign fence         = opcode == FENCE;
+assign r64_type      = opcode == R64_TYPE;
+assign i64_type      = opcode == I64_TYPE;
 
-assign illegal_inst = ~r_type & ~i_type & ~l_type & ~s_type & ~b_type & ~u_type & 
-                      ~p_type & ~fence & opcode != AUIPC & opcode != JAL &
-                      ~opcode == JALR;
+assign illegal_inst = ~r_type | ~i_type | ~l_type | ~s_type | ~b_type | ~u_type | 
+                      ~p_type | ~fence | ~auipc | ~jal | ~jalr | ~r64_type | ~i64_type;
 //-------------------------
 // Instruction decoding
 //-------------------------
 // R-Type
-assign add    =  r_type & funct3 == 3'b000 & funct7 == 7'b0000000;  
-assign sub    =  r_type & funct3 == 3'b000 & funct7 == 7'b0100000;  
-assign sll    =  r_type & funct3 == 3'b001 & funct7 == 7'b0000000;  
-assign slt    =  r_type & funct3 == 3'b010 & funct7 == 7'b0000000;  
-assign sltu   =  r_type & funct3 == 3'b011 & funct7 == 7'b0000000;  
-assign xorr   =  r_type & funct3 == 3'b100 & funct7 == 7'b0000000;  
-assign srl    =  r_type & funct3 == 3'b101 & funct7 == 7'b0000000;  
-assign sra    =  r_type & funct3 == 3'b101 & funct7 == 7'b0100000;  
-assign orr    =  r_type & funct3 == 3'b110 & funct7 == 7'b0000000;  
-assign andd   =  r_type & funct3 == 3'b111 & funct7 == 7'b0000000; 
+assign add    = r_type & funct3 == 3'b000 & funct7 == 7'b0000000;  
+assign sub    = r_type & funct3 == 3'b000 & funct7 == 7'b0100000;  
+assign sll    = r_type & funct3 == 3'b001 & funct7 == 7'b0000000;  
+assign slt    = r_type & funct3 == 3'b010 & funct7 == 7'b0000000;  
+assign sltu   = r_type & funct3 == 3'b011 & funct7 == 7'b0000000;  
+assign xorr   = r_type & funct3 == 3'b100 & funct7 == 7'b0000000;  
+assign srl    = r_type & funct3 == 3'b101 & funct7 == 7'b0000000;  
+assign sra    = r_type & funct3 == 3'b101 & funct7 == 7'b0100000;  
+assign orr    = r_type & funct3 == 3'b110 & funct7 == 7'b0000000;  
+assign andd   = r_type & funct3 == 3'b111 & funct7 == 7'b0000000; 
+assign mul    = r_type & funct3 == 3'b000 & funct7  == 7'b1; 
+assign mulh   = r_type & funct3 == 3'b001 & funct7  == 7'b1;
+assign mulhsu = r_type & funct3 == 3'b010 & funct7  == 7'b1;
+assign mulhu  = r_type & funct3 == 3'b011 & funct7  == 7'b1;
+assign div    = r_type & funct3 == 3'b100 & funct7  == 7'b1;
+assign divu   = r_type & funct3 == 3'b101 & funct7  == 7'b1;
+assign rem    = r_type & funct3 == 3'b110 & funct7  == 7'b1;
+assign remu   = r_type & funct3 == 3'b111 & funct7  == 7'b1;
 // I-type
-assign addi   =  i_type &  funct3 == 3'b000;  
-assign slti   =  i_type &  funct3 == 3'b010;  
-assign sltiu  =  i_type &  funct3 == 3'b011;  
-assign xori   =  i_type &  funct3 == 3'b100;  
-assign ori    =  i_type &  funct3 == 3'b110;  
-assign andi   =  i_type &  funct3 == 3'b111;  
-assign slli   =  i_type &  funct3 == 3'b001;  
-assign srli   =  i_type &  funct3 == 3'b101;  
-assign srai   =  i_type &  funct3 == 3'b101;  
+assign addi   = i_type &  funct3 == 3'b000;  
+assign slti   = i_type &  funct3 == 3'b010;  
+assign sltiu  = i_type &  funct3 == 3'b011;  
+assign xori   = i_type &  funct3 == 3'b100;  
+assign ori    = i_type &  funct3 == 3'b110;  
+assign andi   = i_type &  funct3 == 3'b111;  
+assign slli   = i_type &  funct3 == 3'b001;  
+assign srli   = i_type &  funct3 == 3'b101;  
+assign srai   = i_type &  funct3 == 3'b101;  
 // B-type
-assign beq    =  b_type &  funct3 == 3'b000;
-assign bne    =  b_type &  funct3 == 3'b001;
-assign blt    =  b_type &  funct3 == 3'b100;
-assign bge    =  b_type &  funct3 == 3'b101;
-assign bltu   =  b_type &  funct3 == 3'b110;
-assign bgeu   =  b_type &  funct3 == 3'b111;
+assign beq    = b_type &  funct3 == 3'b000;
+assign bne    = b_type &  funct3 == 3'b001;
+assign blt    = b_type &  funct3 == 3'b100;
+assign bge    = b_type &  funct3 == 3'b101;
+assign bltu   = b_type &  funct3 == 3'b110;
+assign bgeu   = b_type &  funct3 == 3'b111;
 // U-type
 assign lui    = u_type;
 assign auipc  = opcode == AUIPC;
@@ -168,10 +179,13 @@ assign lh     = l_type & funct3 == 3'b001;
 assign lhu    = l_type & funct3 == 3'b101;
 assign lb     = l_type & funct3 == 3'b000;
 assign lbu    = l_type & funct3 == 3'b100;
+assign lwu    = l_type & funct3 == 3'b110;
+assign ld     = l_type & funct3 == 3'b011;
 // S-type
 assign sw     = s_type & funct3 == 3'b010;
 assign sh     = s_type & funct3 == 3'b001;
 assign sb     = s_type & funct3 == 3'b000;
+assign sd     = s_type & funct3 == 3'b011;
 // P-type
 assign ecall  = p_type & funct3 == 3'h0 & ~instr_i[20];
 assign ebreak = p_type & funct3 == 3'h0 &  instr_i[20];
@@ -182,10 +196,10 @@ assign csrrwi = p_type & funct3 == 3'h5;
 assign csrrsi = p_type & funct3 == 3'h6;
 assign csrrci = p_type & funct3 == 3'h7;
 assign fence  = fence  & funct3 == 3'b001;
-
 assign mret   = instr_i == 32'h30200073;
 assign sret   = instr_i == 32'h10200073;
-
-assign rd_v = r_type | i_type | u_type;
+// Reg valid
+assign rd_v = r_type | i_type | u_type | auipc | jal | jalr | l_type 
+              | p_type & ~(ecall | ebreak);
 
 endmodule

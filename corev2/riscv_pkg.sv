@@ -3,17 +3,19 @@ package riscv;
 localparam XLEN = 64;
 
 typedef enum logic [6:0]{
-    R_TYPE = 7'b0110011,
-    I_TYPE = 7'b0010011,
-    L_TYPE = 7'b0000011, // loads
-    S_TYPE = 7'b0100011,
-    B_TYPE = 7'b1100011,
-    U_TYPE = 7'b0110111,
-    AUIPC  = 7'b0010111, 
-    JAL    = 7'b1101111,
-    JALR   = 7'b1100111,
-    P_TYPE = 7'b1110011, // priviledge type
-    FENCE  = 7'b0001111
+    R_TYPE   = 7'b0110011,
+    I_TYPE   = 7'b0010011,
+    L_TYPE   = 7'b0000011, // loads
+    S_TYPE   = 7'b0100011,
+    B_TYPE   = 7'b1100011,
+    U_TYPE   = 7'b0110111,
+    AUIPC    = 7'b0010111, 
+    JAL      = 7'b1101111,
+    JALR     = 7'b1100111,
+    P_TYPE   = 7'b1110011, // priviledge type
+    FENCE    = 7'b0001111,
+    R64_TYPE = 7'b0111011, // 64 bits mul & r
+    I64_TYPE = 7'b0011011
 } inst_type_t;
 
 typedef enum logic [11:0] {
