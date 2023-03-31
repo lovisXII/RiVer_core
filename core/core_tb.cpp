@@ -105,7 +105,6 @@ int sc_main(int argc, char* argv[]) {
 
     unordered_map<int, int> ram;
     elfio                   reader;  
-    cout << argc << endl;
     if(argc == 2){
         if(std::string(argv[1]) == "--help")
             helper(HELP);
