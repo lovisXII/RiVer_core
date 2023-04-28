@@ -18,6 +18,22 @@ typedef enum logic [6:0]{
     I64_TYPE = 7'b0011011
 } inst_type_t;
 
+typedef enum logic [12:0] {
+  R_TYPE_ONE_HOT   = 0000000000001,
+  I_TYPE_ONE_HOT   = 0000000000010,
+  L_TYPE_ONE_HOT   = 0000000000100,
+  S_TYPE_ONE_HOT   = 0000000001000,
+  B_TYPE_ONE_HOT   = 0000000010000,
+  U_TYPE_ONE_HOT   = 0000000100000,
+  P_TYPE_ONE_HOT   = 0000001000000,
+  FENCE_ONE_HOT    = 0000010000000,
+  AUIPC_ONE_HOT    = 0000100000000,
+  JALR_ONE_HOT     = 0001000000000,
+  JAL_ONE_HOT      = 0010000000000,
+  R64_TYPE_ONE_HOT = 0100000000000,
+  I64_TYPE_ONE_HOT = 1000000000000
+}instr_one_hot_t;
+
 typedef enum logic [11:0] {
         // Floating-Point CSRs
         CSR_FFLAGS         = 12'h001,
@@ -155,5 +171,26 @@ typedef enum logic [11:0] {
         CSR_HPM_COUNTER_31 = 12'hC1F  // reserved
     } csr_reg_t;
 
-
+    // instr decoded
+    // operation can be :
+    // addition         000
+    // shift left       001
+    // shift right      101
+    // xor              100
+    // or               110
+    // and              111
+    // multiplication   
+    typedef struct packed {
+        logic [4:0] rs1;
+        logic [4:0] rs2;
+        logic [4:0] rd;
+        logic       rs1_v;
+        logic       rs2_v;
+        logic       rd_v;
+        logic [3:0] operation;
+        logic       is_load;
+        logic       is_store;
+        logic       is_branch;
+        logic       is_csr;
+    } instr_dec_t;
 endpackage
