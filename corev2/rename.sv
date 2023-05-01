@@ -1,4 +1,3 @@
-`include "riscv_pkg.sv" 
 import riscv::*;
 
 module rename (
