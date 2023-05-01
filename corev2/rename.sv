@@ -68,14 +68,25 @@ generate
   end 
 endgenerate
 
-always_ff @(posedge clk) begin
-  prd_q   = prd;
-  prs1_q  = prs1;
-  prs2_q  = prs2;
+always_ff @(posedge clk, negedge resetn) begin
+  if (!resetn) begin
 
-  regtable_rd_q  = regtable_rd;
-  regtable_rs1_q = regtable_rs1;
-  regtable_rs2_q = regtable_rs2;
+  prd_q   <= '0;
+  prs1_q  <= '0;
+  prs2_q  <= '0;
+
+  regtable_rd_q  <= '0;
+  regtable_rs1_q <= '0;
+  regtable_rs2_q <= '0;
+  end else begin
+  prd_q   <= prd;
+  prs1_q  <= prs1;
+  prs2_q  <= prs2;
+
+  regtable_rd_q  <= regtable_rd;
+  regtable_rs1_q <= regtable_rs1;
+  regtable_rs2_q <= regtable_rs2;
+  end
 end
 
 

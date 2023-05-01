@@ -250,7 +250,37 @@ assign immediat_o          = {32{i_type | jalr}} & {20'b0, instr_i[31:20]}
                            | {32{b_type}}        & {19'b0, instr_i[31],instr_i[7],instr_i[30:25],instr_i[11:8],1'b0} 
                            | {32{jal}}           & {11'b0, instr_i[31],instr_i[19:12],instr_i[20],instr_i[30:21],1'b0} 
                            | {32{auipc | lui}}   & {12'b0, instr_i[31:12]}; 
-assign instr_type_o       = {r64_type, i64_type, jal, jalr, auipc, fence, p_type, u_type, b_type, s_type, l_type, i_type, r_type};              
+assign instr_type_o       = {r64_type, i64_type, jal, jalr, auipc, fence, p_type, u_type, b_type, s_type, l_type, i_type, r_type};   
+// should encode the operation, add, sub, sll, slr, sra...etc
+// msb encodes the unit, lsb encodes the operation
+// 000 xxx : alu
+// 001 xxx : shifter
+// 010 xxx : branch
+// 011 xxx : lsu
+// 100 xxx : mutiplier
+// 101 xxx : divider
+// Arithmetic unit :
+  // 000 000 : add
+  // 000 001 : sub
+  // 000 010 : and
+  // 000 011 : or
+  // 000 100 : xor
+  // 000 101 : slt
+// Shifter unit :
+  // 001 000 : sll
+  // 001 001 : srl
+  // 001 010 : sra
+// Branch unit :
+  // 001 000 : beq
+  // 001 001 : bne
+  // 001 010 : blt
+  // 001 011 : bge
+  // 001 011 : jal
+  // 001 011 : jalr
+// lsu unit :
+  // 001 000 : store
+  // 001 001 : load
+assign cmd_o              =
 assign access_size_o      = {3{lb | lbu | sb}} & 3'b001 | {3{lh | lhu | sh}} & 3'b010 | {3{lw | sw}} & 3'b100;
 assign unsign_extension_o = bltu | bgeu | lbu | lhu | sltiu | sltu;  
 endmodule
