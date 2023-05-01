@@ -7,7 +7,8 @@ RISC=riscv32-unknown-elf-gcc
 
 VERILATOR_FLAGS=-sc -Wno-fatal --trace
 TB=core_tb.cpp
-SRC= $(shell find . -type f -name '*.sv') $(TB)
+PKG=riscv_pkg.sv
+SRC=$(shell find . -type f -name '*.sv' | grep -v 'riscv_pkg.sv')
 TOP=core
 
 
@@ -25,15 +26,13 @@ RISC_FLAGS= -nostdlib $(LD_SCRIPT)
 
 all: core_tb
 
-files:
-	$(VERILATOR) $(VERILATOR_FLAGS) decoder.sv -I./riscv_pkg.sv
-
 core_tb: kernel
 	export SYSTEMC_INCLUDE=/usr/local/systemc-2.3.3/include/
 	export SYSTEMC_LIBDIR=/usr/local/systemc-2.3.3/lib-linux64/
 	$(VERILATOR) -CFLAGS "$(C_ARGS)" $(VERILATOR_FLAGS) $(SRC) --top-module $(TOP)  --exe $(TB)
 	$(MAKE) -j -C obj_dir -f Vcore.mk
-
+syntax:
+	$(VERILATOR) $(PKG) $(VERILATOR_FLAGS) $(SRC)
 kernel:$(SW_DIR)/exception.s $(SW_DIR)/reset.s
 	$(RISC) $(RISC_FLAGS) $^ -o $@
 
