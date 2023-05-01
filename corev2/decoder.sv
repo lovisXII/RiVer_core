@@ -202,7 +202,6 @@ always_comb begin
     {L_TYPE, 3'b101, 7'b???????} : lhu    = 1'b1;
     {L_TYPE, 3'b000, 7'b???????} : lb     = 1'b1;
     {L_TYPE, 3'b100, 7'b???????} : lbu    = 1'b1;
-    {L_TYPE, 3'b110, 7'b???????} : lwu    = 1'b1;
     {L_TYPE, 3'b011, 7'b???????} : ld     = 1'b1;
     // S-type
     {S_TYPE, 3'b010, 7'b???????} : sw     = 1'b1;
@@ -242,15 +241,55 @@ assign rs2_o   = {5{rd_v}} & instr_i[24:20];
 
 // Additionnal informations
 assign rs2_is_immediat_o   = lui |auipc | jalr | jalr | l_type | i_type;
-assign is_store_o          = s_type;
-assign is_load_o           = lb | lh | lw | lbu | lhu;
-assign is_branch_o         = b_type | jal | jalr; 
+assign is_store            = s_type ;
+assign is_load             = lb | lh | lw | lbu | lhu;
+assign is_branch           = b_type | jal | jalr; 
+assign is_mul              = mul | mulh | mulhsu | mulhu;
+assign is_div              = div | divu | rem | remu;
+assign is_arithm           = (r_type | i_type) & ~(sll | srl | sra | slli | srli | srai);
+assign is_shift            = (r_type | i_type) & (sll | srl | sra | slli | srli | srai);
 assign immediat_o          = {32{i_type | jalr}} & {20'b0, instr_i[31:20]} 
                            | {32{s_type}}        & {20'b0, instr_i[31:25],instr_i[11:7]} 
                            | {32{b_type}}        & {19'b0, instr_i[31],instr_i[7],instr_i[30:25],instr_i[11:8],1'b0} 
                            | {32{jal}}           & {11'b0, instr_i[31],instr_i[19:12],instr_i[20],instr_i[30:21],1'b0} 
                            | {32{auipc | lui}}   & {12'b0, instr_i[31:12]}; 
-assign instr_type_o       = {r64_type, i64_type, jal, jalr, auipc, fence, p_type, u_type, b_type, s_type, l_type, i_type, r_type};              
+assign instr_type_o       = {r64_type, i64_type, jal, jalr, auipc, fence, p_type, u_type, b_type, s_type, l_type, i_type, r_type};   
+// should encode the operation, add, sub, sll, slr, sra...etc
+// msb encodes the unit, lsb encodes the operation
+// 00001 xxx : alu
+// 00010 xxx : shifter
+// 00010 xxx : branch
+// 00100 xxx : lsu
+// 01000 xxx : mutiplier
+// 10000 xxx : divider
+// Arithmetic unit :
+  // 00001 000001 : add
+  // 00001 000010 : sub
+  // 00001 000100 : and
+  // 00001 001000 : or
+  // 00001 010000 : xor
+  // 00001 100000 : slt
+// Shifter unit :
+  // 00010 000001 : sll
+  // 00010 000010 : srl
+  // 00010 000100 : sra
+// Branch unit :
+  // 00010 000001 : beq
+  // 00010 000010 : bne
+  // 00010 000100 : blt
+  // 00010 001000 : bge
+  // 00010 010000 : jal
+  // 00010 100000 : jalr
+// lsu unit :
+  // 00100 000001 : store
+  // 00100 000010 : load
+assign unit_o               = {1'b0, 1'b0, is_memory, is_branch, is_shift, is_arithm};
+assign operation_o          = {(slt  | sltu | slti | sltiu),
+                               (xorr | xori | jalr), 
+                               (orr  | ori  | jal),
+                               (andd | andi | sra  | srai  | blt | is_store),
+                               (sub  | srl  | srli | bne   | is_load),
+                               (add  | addi | sll  | slli  | lui  | auipc | beq | s_type)}; 
 assign access_size_o      = {3{lb | lbu | sb}} & 3'b001 | {3{lh | lhu | sh}} & 3'b010 | {3{lw | sw}} & 3'b100;
 assign unsign_extension_o = bltu | bgeu | lbu | lhu | sltiu | sltu;  
 endmodule

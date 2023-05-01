@@ -6,23 +6,23 @@ module dec (
   input logic [FRONTEND_WIDTH-1:0][XLEN-1:0]      instr_i,
   input logic [FRONTEND_WIDTH-1:0][XLEN-1:0]      pc_i,
   // Exception
-  output logic [FRONTEND_WIDTH-1:0]               illegal_inst_o,
+  output logic [FRONTEND_WIDTH-1:0]               ren_illegal_inst_o,
   // Registers
-  output logic [FRONTEND_WIDTH-1:0]               rd_v_o, 
-  output logic [FRONTEND_WIDTH-1:0][4:0]          rd_o, 
-  output logic [FRONTEND_WIDTH-1:0]               rs1_v_o,
-  output logic [FRONTEND_WIDTH-1:0][4:0]          rs1_o,
-  output logic [FRONTEND_WIDTH-1:0]               rs2_v_o, 
-  output logic [FRONTEND_WIDTH-1:0][4:0]          rs2_o,   
+  output logic [FRONTEND_WIDTH-1:0]               ren_rd_v_o, 
+  output logic [FRONTEND_WIDTH-1:0][4:0]          ren_rd_o, 
+  output logic [FRONTEND_WIDTH-1:0]               ren_rs1_v_o,
+  output logic [FRONTEND_WIDTH-1:0][4:0]          ren_rs1_o,
+  output logic [FRONTEND_WIDTH-1:0]               ren_rs2_v_o, 
+  output logic [FRONTEND_WIDTH-1:0][4:0]          ren_rs2_o,   
   // Additionnal informations
-  output logic [FRONTEND_WIDTH-1:0]               rs2_is_immediat_o, 
-  output logic [FRONTEND_WIDTH-1:0]               is_store_o,        
-  output logic [FRONTEND_WIDTH-1:0]               is_load_o,          
-  output logic [FRONTEND_WIDTH-1:0]               is_branch_o,         
-  output logic [FRONTEND_WIDTH-1:0][31:0]         immediat_o,
-  output logic [FRONTEND_WIDTH-1:0][2:0]          access_size_o,
-  output logic [FRONTEND_WIDTH-1:0][12:0]         instr_type_o,
-  output logic [FRONTEND_WIDTH-1:0]               unsign_extension_o
+  output logic [FRONTEND_WIDTH-1:0]               ren_rs2_is_immediat_o, 
+  output logic [FRONTEND_WIDTH-1:0]               ren_is_store_o,        
+  output logic [FRONTEND_WIDTH-1:0]               ren_is_load_o,          
+  output logic [FRONTEND_WIDTH-1:0]               ren_is_branch_o,         
+  output logic [FRONTEND_WIDTH-1:0][31:0]         ren_immediat_o,
+  output logic [FRONTEND_WIDTH-1:0][2:0]          ren_access_size_o,
+  output logic [FRONTEND_WIDTH-1:0][12:0]         ren_instr_type_o,
+  output logic [FRONTEND_WIDTH-1:0]               ren_unsign_extension_o
 );
 
   logic [FRONTEND_WIDTH-1:0]                      illegal_inst;
