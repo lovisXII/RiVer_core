@@ -13,14 +13,13 @@ module decoder (
   output logic                       rs2_v_o, 
   output logic [4:0]                 rs2_o,   
   // Additionnal informations
-  output logic                       rs2_is_immediat_o, 
-  output logic                       is_store_o,        
-  output logic                       is_load_o,          
-  output logic                       is_branch_o,         
+  output logic                       rs2_is_immediat_o,        
   output logic [31:0]                immediat_o,
   output logic [2:0]                 access_size_o,
   output logic [12:0]                instr_type_o,
-  output logic                       unsign_extension_o         
+  output logic                       unsign_extension_o,    
+  output logic [NBR_UNIT-1:0]        unit_o,
+  output logic [NBR_OPERATION-1:0]   operation_o  
 );
 
 
@@ -52,6 +51,14 @@ logic[4:0]  rs1;
 logic[4:0]  rs2;
 logic[2:0]  funct3;
 logic[6:0]  funct7;
+// Additionnal informations
+logic is_store;
+logic is_load;
+logic is_branch;
+logic is_mul;
+logic is_div;
+logic is_arithm;
+logic is_shift;
 // Instruction type 
 logic r_type;
 logic i_type;
@@ -283,7 +290,7 @@ assign instr_type_o       = {r64_type, i64_type, jal, jalr, auipc, fence, p_type
 // lsu unit :
   // 00100 000001 : store
   // 00100 000010 : load
-assign unit_o               = {1'b0, 1'b0, is_memory, is_branch, is_shift, is_arithm};
+assign unit_o               = {1'b0, 1'b0, is_load | is_store, is_branch, is_shift, is_arithm};
 assign operation_o          = {(slt  | sltu | slti | sltiu),
                                (xorr | xori | jalr), 
                                (orr  | ori  | jal),
