@@ -3,7 +3,7 @@ import riscv::*;
 module rename (
   input logic                           clk, 
   input logic                           reset_n,
-
+  // Information coming from dec
   input logic [FRONTEND_WIDTH-1:0]      dec_rd_v_i,
   input logic [FRONTEND_WIDTH-1:0]      dec_rd_i    [4:0],
   input logic [FRONTEND_WIDTH-1:0]      dec_rs1_v_i,
@@ -22,38 +22,38 @@ module rename (
 
   input logic [PHYS_REGS_ADDR_SIZE-1:0] freelist_preg_i [FRONTEND_WIDTH-1:0],
 
-  output logic [FRONTEND_WIDTH-1:0]     dispatch_prd_o  [PHYS_REGS_ADDR_SIZE-1:0],
-  output logic [FRONTEND_WIDTH-1:0]     dispatch_prs1_o [PHYS_REGS_ADDR_SIZE-1:0],
-  output logic [FRONTEND_WIDTH-1:0]     dispatch_prs2_o [PHYS_REGS_ADDR_SIZE-1:0],
+  output logic [FRONTEND_WIDTH-1:0][PHYS_REGS_ADDR_SIZE-1:0]     dispatch_prd_o  ,
+  output logic [FRONTEND_WIDTH-1:0][PHYS_REGS_ADDR_SIZE-1:0]     dispatch_prs1_o ,
+  output logic [FRONTEND_WIDTH-1:0][PHYS_REGS_ADDR_SIZE-1:0]     dispatch_prs2_o ,
 
-  output logic [FRONTEND_WIDTH-1:0]     regtable_rd_o   [4:0],
-  output logic [FRONTEND_WIDTH-1:0]     regtable_prd_o  [PHYS_REGS_ADDR_SIZE-1:0],
+  output logic [FRONTEND_WIDTH-1:0][4:0]     regtable_rd_o   ,
+  output logic [FRONTEND_WIDTH-1:0][PHYS_REGS_ADDR_SIZE-1:0]     regtable_prd_o  ,
 
-  output logic [FRONTEND_WIDTH-1:0]     regtable_rs1_o  [4:0],
-  output logic [FRONTEND_WIDTH-1:0]     regtable_prs1_o [PHYS_REGS_ADDR_SIZE-1:0],
+  output logic [FRONTEND_WIDTH-1:0][4:0]                         regtable_rs1_o  ,
+  output logic [FRONTEND_WIDTH-1:0][PHYS_REGS_ADDR_SIZE-1:0]     regtable_prs1_o ,
 
-  output logic [FRONTEND_WIDTH-1:0]     regtable_rs2_o  [4:0],
-  output logic [FRONTEND_WIDTH-1:0]     regtable_prs2_o [PHYS_REGS_ADDR_SIZE-1:0]
+  output logic [FRONTEND_WIDTH-1:0][4:0]                         regtable_rs2_o  ,
+  output logic [FRONTEND_WIDTH-1:0][PHYS_REGS_ADDR_SIZE-1:0]     regtable_prs2_o 
 );
 
 
-logic [FRONTEND_WIDTH-1:0] prd  [PHYS_REGS_ADDR_SIZE-1:0];
-logic [FRONTEND_WIDTH-1:0] prs1 [PHYS_REGS_ADDR_SIZE-1:0];
-logic [FRONTEND_WIDTH-1:0] prs2 [PHYS_REGS_ADDR_SIZE-1:0];
+logic [FRONTEND_WIDTH-1:0][PHYS_REGS_ADDR_SIZE-1:0] prd  ;
+logic [FRONTEND_WIDTH-1:0][PHYS_REGS_ADDR_SIZE-1:0] prs1 ;
+logic [FRONTEND_WIDTH-1:0][PHYS_REGS_ADDR_SIZE-1:0] prs2 ;
 
 
-logic [FRONTEND_WIDTH-1:0] prd_q  [PHYS_REGS_ADDR_SIZE-1:0];
-logic [FRONTEND_WIDTH-1:0] prs1_q [PHYS_REGS_ADDR_SIZE-1:0];
-logic [FRONTEND_WIDTH-1:0] prs2_q [PHYS_REGS_ADDR_SIZE-1:0];
+logic [FRONTEND_WIDTH-1:0][PHYS_REGS_ADDR_SIZE-1:0] prd_q  ;
+logic [FRONTEND_WIDTH-1:0][PHYS_REGS_ADDR_SIZE-1:0] prs1_q ;
+logic [FRONTEND_WIDTH-1:0][PHYS_REGS_ADDR_SIZE-1:0] prs2_q ;
 
-logic [FRONTEND_WIDTH-1:0] regtable_rd  [4:0];
-logic [FRONTEND_WIDTH-1:0] regtable_rs1 [4:0];
-logic [FRONTEND_WIDTH-1:0] regtable_rs2 [4:0];
+logic [FRONTEND_WIDTH-1:0][4:0] regtable_rd  ;
+logic [FRONTEND_WIDTH-1:0][4:0] regtable_rs1 ;
+logic [FRONTEND_WIDTH-1:0][4:0] regtable_rs2 ;
 
 
-logic [FRONTEND_WIDTH-1:0] regtable_rd_q  [4:0];
-logic [FRONTEND_WIDTH-1:0] regtable_rs1_q [4:0];
-logic [FRONTEND_WIDTH-1:0] regtable_rs2_q [4:0];
+logic [FRONTEND_WIDTH-1:0][4:0] regtable_rd_q  ;
+logic [FRONTEND_WIDTH-1:0][4:0] regtable_rs1_q ;
+logic [FRONTEND_WIDTH-1:0][4:0] regtable_rs2_q ;
 
 genvar i;
 generate

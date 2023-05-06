@@ -1,10 +1,12 @@
 package riscv;
 
 localparam XLEN                 = 64;
+localparam XLEN_SIZE            = $clog2(64);
 localparam FRONTEND_WIDTH       = 2;
 localparam PHYS_REGS_SIZE       = 64;
 localparam PHYS_REGS_ADDR_SIZE  = $clog2(PHYS_REGS_SIZE);
-
+localparam NBR_UNIT             = 6;
+localparam NBR_OPERATION        = 6;
 typedef enum logic [6:0]{
     R_TYPE   = 7'b0110011,
     I_TYPE   = 7'b0010011,
