@@ -1,107 +1,214 @@
 import riscv::*;
 
 module dec (
-  input logic                                     clk,
-  input logic                                     resetn,
-  input logic [FRONTEND_WIDTH-1:0][XLEN-1:0]      instr_i,
-  input logic [FRONTEND_WIDTH-1:0][XLEN-1:0]      pc_i,
+  input logic                 clk,
+  input logic                 resetn,
+// -----------------------
+//      LINE 0
+// -----------------------
+  input logic [XLEN-1:0]      line0_instr_i,
+  input logic [XLEN-1:0]      line0_pc_i,
   // Exception
-  output logic [FRONTEND_WIDTH-1:0]               ren_illegal_inst_o,
+  output logic                line0_ren_illegal_inst_o,
   // Registers
-  output logic [FRONTEND_WIDTH-1:0]               ren_rd_v_o, 
-  output logic [FRONTEND_WIDTH-1:0][4:0]          ren_rd_o, 
-  output logic [FRONTEND_WIDTH-1:0]               ren_rs1_v_o,
-  output logic [FRONTEND_WIDTH-1:0][4:0]          ren_rs1_o,
-  output logic [FRONTEND_WIDTH-1:0]               ren_rs2_v_o, 
-  output logic [FRONTEND_WIDTH-1:0][4:0]          ren_rs2_o,   
+  output logic                ren_line0_rd_v_o, 
+  output logic [4:0]          ren_line0_rd_o, 
+  output logic                ren_line0_rs1_v_o,
+  output logic [4:0]          ren_line0_rs1_o,
+  output logic                ren_line0_rs2_v_o, 
+  output logic [4:0]          ren_line0_rs2_o,   
   // Additionnal informations
-  output logic [FRONTEND_WIDTH-1:0]               ren_rs2_is_immediat_o, 
-  output logic [FRONTEND_WIDTH-1:0]               ren_is_store_o,        
-  output logic [FRONTEND_WIDTH-1:0]               ren_is_load_o,          
-  output logic [FRONTEND_WIDTH-1:0]               ren_is_branch_o,         
-  output logic [FRONTEND_WIDTH-1:0][31:0]         ren_immediat_o,
-  output logic [FRONTEND_WIDTH-1:0][2:0]          ren_access_size_o,
-  output logic [FRONTEND_WIDTH-1:0][12:0]         ren_instr_type_o,
-  output logic [FRONTEND_WIDTH-1:0]               ren_unsign_extension_o
-);
+  output logic                ren_line0_rs2_is_immediat_o, 
+  output logic                ren_line0_is_store_o,        
+  output logic                ren_line0_is_load_o,          
+  output logic                ren_line0_is_branch_o,         
+  output logic [31:0]         ren_line0_immediat_o,
+  output logic [2:0]          ren_line0_access_size_o,
+  output logic [12:0]         ren_line0_instr_type_o,
+  output logic                ren_line0_unsign_extension_o,
+// -----------------------
+//      LINE 1
+// -----------------------
+  input logic [XLEN-1:0]      line1_instr_i,
+  input logic [XLEN-1:0]      line1_pc_i,
+  // Exception
+  output logic                ren_line1_illegal_inst_o,
+  // Registers
+  output logic                ren_line1_rd_v_o, 
+  output logic [4:0]          ren_line1_rd_o, 
+  output logic                ren_line1_rs1_v_o,
+  output logic [4:0]          ren_line1_rs1_o,
+  output logic                ren_line1_rs2_v_o, 
+  output logic [4:0]          ren_line1_rs2_o,   
+  // Additionnal informations
+  output logic                ren_line1_rs2_is_immediat_o, 
+  output logic                ren_line1_is_store_o,        
+  output logic                ren_line1_is_load_o,          
+  output logic                ren_line1_is_branch_o,         
+  output logic [31:0]         ren_line1_immediat_o,
+  output logic [2:0]          ren_line1_access_size_o,
+  output logic [12:0]         ren_line1_instr_type_o,
+  output logic                ren_line1_unsign_extension_o
 
-  logic [FRONTEND_WIDTH-1:0]                      illegal_inst;
+);
+// -----------------------
+//      LINE 0
+// -----------------------
+  logic                       line0_illegal_inst;
   // Registers
-  logic [FRONTEND_WIDTH-1:0]                      rd_v; 
-  logic [FRONTEND_WIDTH-1:0][4:0]                 rd; 
-  logic [FRONTEND_WIDTH-1:0]                      rs1_v;
-  logic [FRONTEND_WIDTH-1:0][4:0]                 rs1;
-  logic [FRONTEND_WIDTH-1:0]                      rs2_v; 
-  logic [FRONTEND_WIDTH-1:0][4:0]                 rs2;   
+  logic                       line0_rd_v; 
+  logic [4:0]                 line0_rd; 
+  logic                       line0_rs1_v;
+  logic [4:0]                 line0_rs1;
+  logic                       line0_rs2_v; 
+  logic [4:0]                 line0_rs2;   
   // Additionnal informations
-  logic [FRONTEND_WIDTH-1:0]                      rs2_is_immediat; 
-  logic [FRONTEND_WIDTH-1:0]                      is_store;        
-  logic [FRONTEND_WIDTH-1:0]                      is_load;          
-  logic [FRONTEND_WIDTH-1:0]                      is_branch;         
-  logic [FRONTEND_WIDTH-1:0][31:0]                immediat;
-  logic [FRONTEND_WIDTH-1:0][2:0]                 access_size;
-  logic [FRONTEND_WIDTH-1:0][12:0]                instr_type;
-  logic [FRONTEND_WIDTH-1:0]                      unsign_extension;     
+  logic                       line0_rs2_is_immediat; 
+  logic                       line0_is_store;        
+  logic                       line0_is_load;          
+  logic                       line0_is_branch;         
+  logic [31:0]                line0_immediat;
+  logic [2:0]                 line0_access_size;
+  logic [12:0]                line0_instr_type;
+  logic                       line0_unsign_extension;     
+// -----------------------
+//      LINE 1
+// -----------------------
+  logic                       line1_illegal_inst;
+  // Registers
+  logic                       line1_rd_v; 
+  logic [4:0]                 line1_rd; 
+  logic                       line1_rs1_v;
+  logic [4:0]                 line1_rs1;
+  logic                       line1_rs2_v; 
+  logic [4:0]                 line1_rs2;   
+  // Additionnal informations
+  logic                       line1_rs2_is_immediat; 
+  logic                       line1_is_store;        
+  logic                       line1_is_load;          
+  logic                       line1_is_branch;         
+  logic [31:0]                line1_immediat;
+  logic [2:0]                 line1_access_size;
+  logic [12:0]                line1_instr_type;
+  logic                       line1_unsign_extension; 
 
   // Instanciated the decoders
-  generate
-    for(genvar i = 0; i < FRONTEND_WIDTH; i++)
-        decoder dec(
-            .instr_i            (instr_i[i]),
-            .pc_i               (pc_i[i]),          
-            .illegal_inst_o     (illegal_inst[i]),
-            .rd_v_o             (rd_v[i]), 
-            .rd_o               (rd[i]), 
-            .rs1_v_o            (rs1_v[i]),
-            .rs1_o              (rs1[i]),
-            .rs2_v_o            (rs2_v[i]), 
-            .rs2_o              (rs2[i]),   
-            .rs2_is_immediat_o  (rs2_is_immediat[i]), 
-            .is_store_o         (is_store[i]),        
-            .is_load_o          (is_load[i]),          
-            .is_branch_o        (is_branch[i]),         
-            .immediat_o         (immediat[i]),
-            .access_size_o      (access_size[i]),
-            .instr_type_o       (instr_type[i]),
-            .unsign_extension_o (unsign_extension[i]) 
-        );
-  endgenerate
+  decoder dec0(
+      .instr_i            (line0_instr_i[i]),
+      .pc_i               (line0_pc_i[i]),          
+      .illegal_inst_o     (line0_illegal_inst[i]),
+      .rd_v_o             (line0_rd_v[i]), 
+      .rd_o               (line0_rd[i]), 
+      .rs1_v_o            (line0_rs1_v[i]),
+      .rs1_o              (line0_rs1[i]),
+      .rs2_v_o            (line0_rs2_v[i]), 
+      .rs2_o              (line0_rs2[i]),   
+      .rs2_is_immediat_o  (line0_rs2_is_immediat[i]), 
+      .is_store_o         (line0_is_store[i]),        
+      .is_load_o          (line0_is_load[i]),          
+      .is_branch_o        (line0_is_branch[i]),         
+      .immediat_o         (line0_immediat[i]),
+      .access_size_o      (line0_access_size[i]),
+      .instr_type_o       (line0_instr_type[i]),
+      .unsign_extension_o (line0_unsign_extension[i]) 
+  );
+decoder dec1(
+      .instr_i            (line1_instr_i[i]),
+      .pc_i               (line1_pc_i[i]),          
+      .illegal_inst_o     (line1_illegal_inst[i]),
+      .rd_v_o             (line1_rd_v[i]), 
+      .rd_o               (line1_rd[i]), 
+      .rs1_v_o            (line1_rs1_v[i]),
+      .rs1_o              (line1_rs1[i]),
+      .rs2_v_o            (line1_rs2_v[i]), 
+      .rs2_o              (line1_rs2[i]),   
+      .rs2_is_immediat_o  (line1_rs2_is_immediat[i]), 
+      .is_store_o         (line1_is_store[i]),        
+      .is_load_o          (line1_is_load[i]),          
+      .is_branch_o        (line1_is_branch[i]),         
+      .immediat_o         (line1_immediat[i]),
+      .access_size_o      (line1_access_size[i]),
+      .instr_type_o       (line1_instr_type[i]),
+      .unsign_extension_o (line1_unsign_extension[i]) 
+  );
   // Flopping outputs
   generate
     for(genvar i = 0; i < FRONTEND_WIDTH; i++)
       always_ff @(posedge clk, negedge resetn)
           if (!resetn) begin
-              illegal_inst_o[i]     <= '0;
-              rd_v_o[i]             <= '0;
-              rd_o[i]               <= '0;
-              rs1_v_o[i]            <= '0;
-              rs1_o[i]              <= '0;
-              rs2_v_o[i]            <= '0;
-              rs2_o[i]              <= '0;
-              rs2_is_immediat_o[i]  <= '0;
-              is_store_o[i]         <= '0;
-              is_load_o[i]          <= '0;
-              is_branch_o[i]        <= '0;
-              immediat_o[i]         <= '0;
-              access_size_o[i]      <= '0;
-              instr_type_o[i]       <= '0;
-              unsign_extension_o[i] <= '0;
+            // -----------------------
+            //      LINE 0
+            // -----------------------
+              line0_illegal_inst_o     <= '0;
+              line0_rd_v_o             <= '0;
+              line0_rd_o               <= '0;
+              line0_rs1_v_o            <= '0;
+              line0_rs1_o              <= '0;
+              line0_rs2_v_o            <= '0;
+              line0_rs2_o              <= '0;
+              line0_rs2_is_immediat_o  <= '0;
+              line0_is_store_o         <= '0;
+              line0_is_load_o          <= '0;
+              line0_is_branch_o        <= '0;
+              line0_immediat_o         <= '0;
+              line0_access_size_o      <= '0;
+              line0_instr_type_o       <= '0;
+              line0_unsign_extension_o <= '0;
+            // -----------------------
+            //      LINE 1
+            // -----------------------
+              line1_illegal_inst_o     <= '0;
+              line1_rd_v_o             <= '0;
+              line1_rd_o               <= '0;
+              line1_rs1_v_o            <= '0;
+              line1_rs1_o              <= '0;
+              line1_rs2_v_o            <= '0;
+              line1_rs2_o              <= '0;
+              line1_rs2_is_immediat_o  <= '0;
+              line1_is_store_o         <= '0;
+              line1_is_load_o          <= '0;
+              line1_is_branch_o        <= '0;
+              line1_immediat_o         <= '0;
+              line1_access_size_o      <= '0;
+              line1_instr_type_o       <= '0;
+              line1_unsign_extension_o <= '0;
           end else begin
-              illegal_inst_o[i]     <= illegal_inst[i];
-              rd_v_o[i]             <= rd_v[i];
-              rd_o[i]               <= rd[i];
-              rs1_v_o[i]            <= rs1_v[i];
-              rs1_o[i]              <= rs1[i];
-              rs2_v_o[i]            <= rs2_v[i];
-              rs2_o[i]              <= rs2[i];
-              rs2_is_immediat_o[i]  <= rs2_is_immediat[i];
-              is_store_o[i]         <= is_store[i];
-              is_load_o[i]          <= is_load[i];
-              is_branch_o[i]        <= is_branch[i];
-              immediat_o[i]         <= immediat[i];
-              access_size_o[i]      <= access_size[i];
-              instr_type_o[i]       <= instr_type[i];
-              unsign_extension_o[i] <= unsign_extension[i];
+            // -----------------------
+            //      LINE 0
+            // -----------------------
+              line0_illegal_inst_o     <= illegal_inst;
+              line0_rd_v_o             <= rd_v;
+              line0_rd_o               <= rd;
+              line0_rs1_v_o            <= rs1_v;
+              line0_rs1_o              <= rs1;
+              line0_rs2_v_o            <= rs2_v;
+              line0_rs2_o              <= rs2;
+              line0_rs2_is_immediat_o  <= rs2_is_immediat;
+              line0_is_store_o         <= is_store;
+              line0_is_load_o          <= is_load;
+              line0_is_branch_o        <= is_branch;
+              line0_immediat_o         <= immediat;
+              line0_access_size_o      <= access_size;
+              line0_instr_type_o       <= instr_type;
+              line0_unsign_extension_o <= unsign_extension;
+            // -----------------------
+            //      LINE 1
+            // -----------------------
+              line1_illegal_inst_o     <= illegal_inst;
+              line1_rd_v_o             <= rd_v;
+              line1_rd_o               <= rd;
+              line1_rs1_v_o            <= rs1_v;
+              line1_rs1_o              <= rs1;
+              line1_rs2_v_o            <= rs2_v;
+              line1_rs2_o              <= rs2;
+              line1_rs2_is_immediat_o  <= rs2_is_immediat;
+              line1_is_store_o         <= is_store;
+              line1_is_load_o          <= is_load;
+              line1_is_branch_o        <= is_branch;
+              line1_immediat_o         <= immediat;
+              line1_access_size_o      <= access_size;
+              line1_instr_type_o       <= instr_type;
+              line1_unsign_extension_o <= unsign_extension;
           end
       endgenerate
 endmodule
