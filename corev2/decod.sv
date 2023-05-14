@@ -26,6 +26,8 @@ module dec (
   output logic [2:0]          ren_line0_access_size_o,
   output logic [12:0]         ren_line0_instr_type_o,
   output logic                ren_line0_unsign_extension_o,
+  output logic [NBR_UNIT-1:0]        ren__line0_unit,
+  output logic [NBR_OPERATION-1:0]   ren__line0_operation, 
 // -----------------------
 //      LINE 1
 // -----------------------
@@ -48,7 +50,9 @@ module dec (
   output logic [31:0]         ren_line1_immediat_o,
   output logic [2:0]          ren_line1_access_size_o,
   output logic [12:0]         ren_line1_instr_type_o,
-  output logic                ren_line1_unsign_extension_o
+  output logic                ren_line1_unsign_extension_o,
+  output logic [NBR_UNIT-1:0]        ren__line1_unit,
+  output logic [NBR_OPERATION-1:0]   ren__line1_operation, 
 
 );
 // -----------------------
@@ -70,7 +74,9 @@ module dec (
   logic [31:0]                line0_immediat;
   logic [2:0]                 line0_access_size;
   logic [12:0]                line0_instr_type;
-  logic                       line0_unsign_extension;     
+  logic                       line0_unsign_extension;
+  logic [NBR_UNIT-1:0]        line0_unit;
+  logic [NBR_OPERATION-1:0]   line0_operation;      
 // -----------------------
 //      LINE 1
 // -----------------------
@@ -91,45 +97,51 @@ module dec (
   logic [2:0]                 line1_access_size;
   logic [12:0]                line1_instr_type;
   logic                       line1_unsign_extension; 
+  logic [NBR_UNIT-1:0]        line1_unit;
+  logic [NBR_OPERATION-1:0]   line1_operation; 
 
   // Instanciated the decoders
   decoder dec0(
-      .instr_i            (line0_instr_i[i]),
-      .pc_i               (line0_pc_i[i]),          
-      .illegal_inst_o     (line0_illegal_inst[i]),
-      .rd_v_o             (line0_rd_v[i]), 
-      .rd_o               (line0_rd[i]), 
-      .rs1_v_o            (line0_rs1_v[i]),
-      .rs1_o              (line0_rs1[i]),
-      .rs2_v_o            (line0_rs2_v[i]), 
-      .rs2_o              (line0_rs2[i]),   
-      .rs2_is_immediat_o  (line0_rs2_is_immediat[i]), 
-      .is_store_o         (line0_is_store[i]),        
-      .is_load_o          (line0_is_load[i]),          
-      .is_branch_o        (line0_is_branch[i]),         
-      .immediat_o         (line0_immediat[i]),
-      .access_size_o      (line0_access_size[i]),
-      .instr_type_o       (line0_instr_type[i]),
-      .unsign_extension_o (line0_unsign_extension[i]) 
+      .instr_i            (line0_instr_i),
+      .pc_i               (line0_pc_i),          
+      .illegal_inst_o     (line0_illegal_inst),
+      .rd_v_o             (line0_rd_v), 
+      .rd_o               (line0_rd), 
+      .rs1_v_o            (line0_rs1_v),
+      .rs1_o              (line0_rs1),
+      .rs2_v_o            (line0_rs2_v), 
+      .rs2_o              (line0_rs2),   
+      .rs2_is_immediat_o  (line0_rs2_is_immediat), 
+      .is_store_o         (line0_is_store),        
+      .is_load_o          (line0_is_load),          
+      .is_branch_o        (line0_is_branch),         
+      .immediat_o         (line0_immediat),
+      .access_size_o      (line0_access_size),
+      .instr_type_o       (line0_instr_type),
+      .unsign_extension_o (line0_unsign_extension), 
+      .unit_o             (line0_unit),
+      .operation_o        (line0_operation) 
   );
 decoder dec1(
-      .instr_i            (line1_instr_i[i]),
-      .pc_i               (line1_pc_i[i]),          
-      .illegal_inst_o     (line1_illegal_inst[i]),
-      .rd_v_o             (line1_rd_v[i]), 
-      .rd_o               (line1_rd[i]), 
-      .rs1_v_o            (line1_rs1_v[i]),
-      .rs1_o              (line1_rs1[i]),
-      .rs2_v_o            (line1_rs2_v[i]), 
-      .rs2_o              (line1_rs2[i]),   
-      .rs2_is_immediat_o  (line1_rs2_is_immediat[i]), 
-      .is_store_o         (line1_is_store[i]),        
-      .is_load_o          (line1_is_load[i]),          
-      .is_branch_o        (line1_is_branch[i]),         
-      .immediat_o         (line1_immediat[i]),
-      .access_size_o      (line1_access_size[i]),
-      .instr_type_o       (line1_instr_type[i]),
-      .unsign_extension_o (line1_unsign_extension[i]) 
+      .instr_i            (line1_instr_i),
+      .pc_i               (line1_pc_i),          
+      .illegal_inst_o     (line1_illegal_inst),
+      .rd_v_o             (line1_rd_v), 
+      .rd_o               (line1_rd), 
+      .rs1_v_o            (line1_rs1_v),
+      .rs1_o              (line1_rs1),
+      .rs2_v_o            (line1_rs2_v), 
+      .rs2_o              (line1_rs2),   
+      .rs2_is_immediat_o  (line1_rs2_is_immediat), 
+      .is_store_o         (line1_is_store),        
+      .is_load_o          (line1_is_load),          
+      .is_branch_o        (line1_is_branch),         
+      .immediat_o         (line1_immediat),
+      .access_size_o      (line1_access_size),
+      .instr_type_o       (line1_instr_type),
+      .unsign_extension_o (line1_unsign_extension) 
+      .unit_o             (line1_unit),
+      .operation_o        (line1_operation) 
   );
   // Flopping outputs
   generate
@@ -154,6 +166,8 @@ decoder dec1(
               line0_access_size_o      <= '0;
               line0_instr_type_o       <= '0;
               line0_unsign_extension_o <= '0;
+              ren__line0_unit_o             <= '0;
+              ren__line0_operation_o        <= '0; 
             // -----------------------
             //      LINE 1
             // -----------------------
@@ -172,6 +186,8 @@ decoder dec1(
               line1_access_size_o      <= '0;
               line1_instr_type_o       <= '0;
               line1_unsign_extension_o <= '0;
+              ren__line1_unit_o             <= '0;
+              ren__line1_operation_o        <= '0; 
           end else begin
             // -----------------------
             //      LINE 0
@@ -191,6 +207,8 @@ decoder dec1(
               line0_access_size_o      <= access_size;
               line0_instr_type_o       <= instr_type;
               line0_unsign_extension_o <= unsign_extension;
+              line0_unit_o              <= line0_unit;
+              line0_operation_o         <= line0_unit; 
             // -----------------------
             //      LINE 1
             // -----------------------
@@ -209,6 +227,8 @@ decoder dec1(
               line1_access_size_o      <= access_size;
               line1_instr_type_o       <= instr_type;
               line1_unsign_extension_o <= unsign_extension;
+              line1_unit_o            <= line1_unit;
+              line1_operation_o       <= line1_unit; 
           end
       endgenerate
 endmodule
