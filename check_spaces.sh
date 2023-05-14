@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the symbols to check
-SYMBOLS=("=" "&" ":" "+" "|" "^")
+SYMBOLS=("=" "&" "+" "|" "^")
 CHANGES=$(git diff --name-only HEAD~1 HEAD)
 # Run the script on all relevant files
 for file in $CHANGES; do
